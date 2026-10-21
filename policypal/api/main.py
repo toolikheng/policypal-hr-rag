@@ -1,6 +1,6 @@
 """FastAPI application factory.
 
-Run with:  uvicorn policypal.api.main:create_app --factory
+Run with:  uvicorn policypal.api.main:create_app_from_env --factory
 """
 
 import logging
@@ -14,7 +14,7 @@ from fastapi import FastAPI, Request, Response
 
 from policypal import __version__
 from policypal.api.routes import health
-from policypal.config import Settings, get_settings
+from policypal.config import Settings
 from policypal.db import make_engine
 from policypal.logging_setup import configure_logging, request_id_var
 
@@ -24,9 +24,16 @@ logger = logging.getLogger("policypal.api")
 _VALID_REQUEST_ID = re.compile(r"^[A-Za-z0-9-]{1,64}$")
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
-    settings = settings or get_settings()
+def create_app_from_env() -> FastAPI:
+    """Process entry point (used by uvicorn): read settings from the environment and set up
+    logging. Process-wide side effects live here, not in create_app()."""
+    settings = Settings()
     configure_logging(settings.log_level)
+    return create_app(settings)
+
+
+def create_app(settings: Settings) -> FastAPI:
+    """Build the API from explicit settings. No global side effects, so tests can build many."""
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
