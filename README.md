@@ -40,9 +40,9 @@ minutes. Later starts are much faster.
 | Streamlit UI | <http://localhost:8501> |
 | PostgreSQL (from your machine) | `localhost:5433` |
 
-`curl localhost:8000/health` returns `{"status":"ok","database":"ok",...}` when the API
-can reach a migrated database. If the database is down or not migrated, it returns
-HTTP 503 with the reason.
+`curl localhost:8000/health` returns `{"database":"ok","version":"0.1.0","status":"ok"}` when the API
+can reach a database whose schema is at the newest migration. If the database is down
+or behind the code, it returns HTTP 503 with the reason.
 
 Stop everything with `docker compose down`. Database data is kept in the `pgdata`
 volume. `docker compose down -v` deletes it.
