@@ -12,12 +12,18 @@ def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv(name, raising=False)
 
 
-def test_defaults_load_without_any_environment() -> None:
+def test_database_url_is_required() -> None:
+    with pytest.raises(ValidationError, match="database_url"):
+        Settings(_env_file=None)
+
+
+def test_other_settings_have_safe_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
     settings = Settings(_env_file=None)
 
     assert settings.llm_provider == "ollama"
     assert settings.log_level == "INFO"
-    assert settings.database_url.startswith("postgresql+psycopg://")
 
 
 def test_values_come_from_environment_variables(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -32,6 +38,7 @@ def test_values_come_from_environment_variables(monkeypatch: pytest.MonkeyPatch)
 
 @pytest.mark.parametrize("provider", ["openai", "fake", ""])
 def test_unknown_llm_provider_is_rejected(monkeypatch: pytest.MonkeyPatch, provider: str) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
     monkeypatch.setenv("LLM_PROVIDER", provider)
 
     with pytest.raises(ValidationError, match="llm_provider"):
@@ -39,6 +46,7 @@ def test_unknown_llm_provider_is_rejected(monkeypatch: pytest.MonkeyPatch, provi
 
 
 def test_invalid_log_level_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
     monkeypatch.setenv("LOG_LEVEL", "LOUD")
 
     with pytest.raises(ValidationError, match="log_level"):

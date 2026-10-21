@@ -5,9 +5,9 @@ services:
   db:
     image: pgvector/pgvector:0.8.7-pg17
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-policypal}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-policypal-local-dev}
-      POSTGRES_DB: ${POSTGRES_DB:-policypal}
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env (copy .env.example)}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (copy .env.example)}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in .env (copy .env.example)}
     ports:
       - "${DB_HOST_PORT:-5433}:5432"
     volumes:
@@ -25,7 +25,8 @@ services:
     env_file: .env
     environment:
       # Inside Compose the database host is the "db" service, not localhost.
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-policypal}:${POSTGRES_PASSWORD:-policypal-local-dev}@db:5432/${POSTGRES_DB:-policypal}
+      # (The db service above already stops Compose if these variables are missing.)
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ports:
       - "${API_PORT:-8000}:8000"
     depends_on:
