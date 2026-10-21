@@ -1,21 +1,21 @@
 """Alembic environment: runs migrations against the configured database."""
 
-from logging.config import fileConfig
-
 from alembic import context
 from sqlalchemy import create_engine
 
-from policypal.config import get_settings
+from policypal.config import Settings
+from policypal.logging_setup import configure_logging
 
 config = context.config
 
-# Only configure logging when run from the `alembic` command line; inside the app or
-# the test suite we keep their logging setup.
-if config.config_file_name is not None and not config.attributes.get("database_url"):
-    fileConfig(config.config_file_name)
-
-# Tests pass the URL in directly; everything else uses the DATABASE_URL setting.
-database_url = config.attributes.get("database_url") or get_settings().database_url
+if config.cmd_opts is not None:
+    # Run from the `alembic` command line: use the app's settings and its JSON logging.
+    settings = Settings()
+    configure_logging(settings.log_level)
+    database_url = settings.database_url
+else:
+    # Called from Python (the test suite), which passes the URL and owns logging.
+    database_url = config.attributes["database_url"]
 
 engine = create_engine(database_url)
 with engine.connect() as connection:

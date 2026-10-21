@@ -1,7 +1,7 @@
 import json
 import logging
 
-from policypal.logging_setup import JsonFormatter, request_id_var
+from policypal.logging_setup import JsonFormatter, configure_logging, request_id_var
 
 
 def make_record(message: str, **extra: object) -> logging.LogRecord:
@@ -37,3 +37,30 @@ def test_current_request_id_is_included() -> None:
         request_id_var.reset(token)
 
     assert payload["request_id"] == "abc123"
+
+
+def test_configure_logging_sends_uvicorn_logs_through_the_json_handler() -> None:
+    root, uvicorn_logger = logging.getLogger(), logging.getLogger("uvicorn")
+    saved_root = (list(root.handlers), root.level)
+    saved_uvicorn = (list(uvicorn_logger.handlers), uvicorn_logger.propagate)
+    # Simulate uvicorn's own start-up logging config: a plain-text handler, no propagation.
+    uvicorn_logger.handlers = [logging.StreamHandler()]
+    uvicorn_logger.propagate = False
+    try:
+        configure_logging("INFO")
+
+        assert uvicorn_logger.handlers == []
+        assert uvicorn_logger.propagate is True
+        [handler] = root.handlers
+        assert isinstance(handler.formatter, JsonFormatter)
+    finally:
+        root.handlers, root.level = saved_root
+        uvicorn_logger.handlers, uvicorn_logger.propagate = saved_uvicorn
+
+
+def test_uvicorn_terminal_colour_copy_of_the_message_is_dropped() -> None:
+    record = make_record("Started server process [1]", color_message="\x1b[36m%d\x1b[0m")
+
+    payload = json.loads(JsonFormatter().format(record))
+
+    assert "color_message" not in payload

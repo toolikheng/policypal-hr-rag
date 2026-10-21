@@ -17,7 +17,8 @@ from datetime import UTC, datetime
 request_id_var: ContextVar[str] = ContextVar("request_id", default="")
 
 # Attributes every LogRecord has. Anything else on a record came from `extra=`.
-_STANDARD_RECORD_ATTRS = set(vars(logging.makeLogRecord({}))) | {"message", "asctime"}
+# uvicorn also adds "color_message", a copy of the message with terminal colour codes.
+_NON_EXTRA_ATTRS = set(vars(logging.makeLogRecord({}))) | {"message", "asctime", "color_message"}
 
 
 class JsonFormatter(logging.Formatter):
@@ -31,7 +32,7 @@ class JsonFormatter(logging.Formatter):
         if request_id := request_id_var.get():
             payload["request_id"] = request_id
         payload.update(
-            {key: value for key, value in vars(record).items() if key not in _STANDARD_RECORD_ATTRS}
+            {key: value for key, value in vars(record).items() if key not in _NON_EXTRA_ATTRS}
         )
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
@@ -39,8 +40,17 @@ class JsonFormatter(logging.Formatter):
 
 
 def configure_logging(level: str) -> None:
+    """Send all log records, including uvicorn's, to stdout as JSON lines.
+
+    Call this once per process, at its entry point. It changes global logging state.
+    """
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonFormatter())
     root = logging.getLogger()
     root.handlers = [handler]
     root.setLevel(level)
+    # uvicorn installs its own plain-text handlers at start-up; route its records to ours.
+    for name in ("uvicorn", "uvicorn.access"):
+        uvicorn_logger = logging.getLogger(name)
+        uvicorn_logger.handlers = []
+        uvicorn_logger.propagate = True
