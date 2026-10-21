@@ -5,7 +5,7 @@ import os
 import httpx
 import streamlit as st
 
-from ui.api_client import ApiUnavailableError, PolicyPalClient
+from ui.api_client import ApiError, PolicyPalClient
 
 API_URL = os.environ.get("API_URL", "http://localhost:8000")
 
@@ -19,7 +19,7 @@ st.caption(
 client = PolicyPalClient(httpx.Client(base_url=API_URL, timeout=5))
 try:
     health = client.health()
-except ApiUnavailableError as exc:
+except ApiError as exc:
     st.error(str(exc))
 else:
     if health["status"] == "ok":
