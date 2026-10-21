@@ -1,0 +1,68 @@
+# PolicyPal services. Start everything with:  docker compose up --build
+name: policypal
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-policypal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-policypal-local-dev}
+      POSTGRES_DB: ${POSTGRES_DB:-policypal}
+    ports:
+      - "${DB_HOST_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    image: ${POLICYPAL_IMAGE:-policypal:local}
+    env_file: .env
+    environment:
+      # Inside Compose the database host is the "db" service, not localhost.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-policypal}:${POSTGRES_PASSWORD:-policypal-local-dev}@db:5432/${POSTGRES_DB:-policypal}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # urlopen fails on a 503, so the container is only "healthy" when /health is ok.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  ui:
+    build: .
+    image: ${POLICYPAL_IMAGE:-policypal:local}
+    command:
+      - streamlit
+      - run
+      - ui/Chat.py
+      - --server.port=8501
+      - --server.address=0.0.0.0
+      - --server.headless=true
+      - --browser.gatherUsageStats=false
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "${UI_PORT:-8501}:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+volumes:
+  pgdata:

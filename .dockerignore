@@ -1,0 +1,7 @@
+# Keep secrets and bulky local folders out of the Docker build context.
+.env
+.git
+.venv
+**/__pycache__
+.pytest_cache
+.ruff_cache
