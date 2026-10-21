@@ -16,17 +16,13 @@ UNAVAILABLE_EXAMPLE = {"status": "unavailable", "database": "unreachable", "vers
     responses={
         503: {
             "model": HealthResponse,
-            "description": "The database is unreachable or not migrated.",
+            "description": "The database is unreachable or not at the newest migration.",
             "content": {"application/json": {"example": UNAVAILABLE_EXAMPLE}},
         }
     },
 )
 def health(request: Request, response: Response) -> HealthResponse:
-    database = check_database(request.app.state.engine)
-    if database != "ok":
+    report = HealthResponse(database=check_database(request.app.state.engine), version=__version__)
+    if report.status == "unavailable":
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
-    return HealthResponse(
-        status="ok" if database == "ok" else "unavailable",
-        database=database,
-        version=__version__,
-    )
+    return report

@@ -1,3 +1,9 @@
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
 from alembic import command
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
@@ -35,3 +41,40 @@ def test_downgrade_then_upgrade_round_trip(migrated_database_url: str) -> None:
         command.upgrade(config, "head")
 
     assert vector_extension_installed(migrated_database_url)
+
+
+def test_health_is_not_migrated_when_database_is_behind_the_code(
+    migrated_database_url: str,
+) -> None:
+    """Being reachable isn't enough: the schema must be at the newest migration."""
+    engine = create_engine(migrated_database_url)
+    try:
+        with engine.begin() as conn:
+            head = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+            conn.execute(text("UPDATE alembic_version SET version_num = 'older'"))
+        with TestClient(create_app(make_settings(migrated_database_url))) as client:
+            response = client.get("/health")
+    finally:
+        with engine.begin() as conn:
+            conn.execute(text("UPDATE alembic_version SET version_num = :head"), {"head": head})
+        engine.dispose()
+
+    assert response.status_code == 503
+    assert response.json()["database"] == "not_migrated"
+
+
+def test_alembic_command_line_works_locally_and_logs_json(migrated_database_url: str) -> None:
+    """`alembic upgrade head` from the repo root (no PYTHONPATH) logs JSON lines."""
+    alembic_cli = Path(sys.executable).parent / "alembic"
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    env |= {"DATABASE_URL": migrated_database_url, "LOG_LEVEL": "INFO"}
+
+    result = subprocess.run(
+        [str(alembic_cli), "upgrade", "head"], env=env, capture_output=True, text=True, timeout=60
+    )
+
+    assert result.returncode == 0, result.stderr
+    lines = [line for line in (result.stdout + result.stderr).splitlines() if line.strip()]
+    assert lines, "expected alembic to log something"
+    for line in lines:
+        json.loads(line)  # raises if any line is not JSON
