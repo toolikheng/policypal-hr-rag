@@ -1,0 +1,10 @@
+# Runtime dependencies (installed in the Docker image and in local/CI environments).
+# Pin exact versions so every machine installs the same thing.
+fastapi==0.158.2
+uvicorn[standard]==0.54.0
+pydantic-settings==2.16.1
+sqlalchemy==2.1.6
+psycopg[binary]==3.3.6
+alembic==1.20.0
+httpx==0.28.1
+streamlit==1.66.1
