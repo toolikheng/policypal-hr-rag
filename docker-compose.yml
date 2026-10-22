@@ -1,6 +1,12 @@
 # PolicyPal services. Start everything with:  docker compose up --build
 name: policypal
 
+# One image for api and ui. EMBEDDING_MODEL is baked into the image at build time.
+x-app-build: &app-build
+  context: .
+  args:
+    EMBEDDING_MODEL: ${EMBEDDING_MODEL:?set EMBEDDING_MODEL in .env (copy .env.example)}
+
 services:
   db:
     image: pgvector/pgvector:0.8.7-pg17
@@ -20,7 +26,7 @@ services:
       retries: 10
 
   api:
-    build: .
+    build: *app-build
     image: ${POLICYPAL_IMAGE:-policypal:local}
     env_file: .env
     environment:
@@ -41,7 +47,7 @@ services:
       start_period: 15s
 
   ui:
-    build: .
+    build: *app-build
     image: ${POLICYPAL_IMAGE:-policypal:local}
     command:
       - streamlit
