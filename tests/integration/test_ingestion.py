@@ -197,3 +197,21 @@ def test_command_line_ingests_the_sample_policies_twice_without_duplicates(
 
     assert after_first[0] == 8
     assert counts(engine) == after_first
+
+
+def test_each_document_is_logged_as_it_is_processed(
+    engine: Engine, policy_folder: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("INFO", logger="policypal.ingest")
+    ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+    (policy_folder / "overtime-policy.md").unlink()
+
+    ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+
+    logged = [(r.slug, r.status) for r in caplog.records if r.getMessage() == "ingest.document"]
+    assert logged == [
+        ("leave-policy", "created"),
+        ("overtime-policy", "created"),
+        ("leave-policy", "unchanged"),
+        ("overtime-policy", "removed"),
+    ]

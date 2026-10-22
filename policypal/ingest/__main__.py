@@ -25,11 +25,7 @@ def main() -> None:
     finally:
         engine.dispose()
 
-    for result in results:
-        logger.info(
-            "ingest.document",
-            extra={"slug": result.slug, "status": result.status, "chunks": result.chunks},
-        )
+    # Each document was logged as it was processed; this is the summary.
     # Nested under one key: a status name such as "created" is a reserved log-record field.
     by_status = dict(Counter(result.status for result in results))
     logger.info("ingest.completed", extra={"documents_by_status": by_status})

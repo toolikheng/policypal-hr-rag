@@ -2,12 +2,17 @@
 schema (constraints, indexes); these classes mirror the columns."""
 
 from datetime import datetime
+from typing import Literal
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import BigInteger, DateTime, ForeignKey, Identity, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from policypal.embeddings import EMBEDDING_DIMENSION
+from policypal.ingest.parsing import FileType
+
+# Where a document came from: the sample policies folder, or an upload.
+Origin = Literal["sample", "upload"]
 
 
 class Base(DeclarativeBase):
@@ -23,8 +28,8 @@ class Document(Base):
     slug: Mapped[str] = mapped_column(Text, unique=True)
     title: Mapped[str] = mapped_column(Text)
     source_filename: Mapped[str] = mapped_column(Text)
-    file_type: Mapped[str] = mapped_column(Text)  # "md" or "pdf"
-    origin: Mapped[str] = mapped_column(Text)  # "sample" or "upload"
+    file_type: Mapped[FileType] = mapped_column(Text)
+    origin: Mapped[Origin] = mapped_column(Text)
     content_sha256: Mapped[str] = mapped_column(String(64))
     pipeline_version: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

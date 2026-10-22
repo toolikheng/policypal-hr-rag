@@ -7,8 +7,8 @@ Ingestion is idempotent, so it is safe to run on every start:
 """
 
 import hashlib
+import logging
 import re
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
@@ -18,18 +18,14 @@ from sqlalchemy.orm import Session
 
 from policypal.embeddings import EMBEDDING_DIMENSION, Embedder
 from policypal.ingest.chunking import CHUNKER_VERSION, chunk_document, embedding_text
-from policypal.ingest.parsing import ParsedDocument, parse_markdown, parse_pdf
-from policypal.models import Document, DocumentChunk
+from policypal.ingest.parsing import SUPPORTED_SUFFIXES, file_type_of, parse_document
+from policypal.models import Document, DocumentChunk, Origin
+
+logger = logging.getLogger("policypal.ingest")
 
 SAMPLE_POLICIES_DIR = Path(__file__).resolve().parents[2] / "data" / "policies"
 
-Origin = Literal["sample", "upload"]
 IngestStatus = Literal["created", "updated", "unchanged", "removed"]
-
-PARSERS: dict[str, Callable[[bytes], ParsedDocument]] = {
-    ".md": lambda data: parse_markdown(data.decode("utf-8")),
-    ".pdf": parse_pdf,
-}
 
 
 @dataclass(frozen=True)
@@ -44,15 +40,20 @@ def ingest_folder(
 ) -> list[IngestResult]:
     """Ingest every .md/.pdf file directly inside `folder` (not sub-folders), then remove
     documents of the same origin whose file is no longer there."""
-    files = sorted(path for path in folder.iterdir() if path.suffix.lower() in PARSERS)
+    files = sorted(path for path in folder.iterdir() if path.suffix.lower() in SUPPORTED_SUFFIXES)
     results = [ingest_file(engine, embedder, path, origin) for path in files]
     return results + _remove_missing(engine, origin, keep={result.slug for result in results})
 
 
 def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
-    parse = PARSERS.get(path.suffix.lower())
-    if parse is None:
-        raise ValueError(f"Unsupported file type '{path.suffix}': only .md and .pdf are supported.")
+    """Ingest one file and log the outcome (created, updated or unchanged)."""
+    result = _ingest_file(engine, embedder, path, origin)
+    _log(result)
+    return result
+
+
+def _ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
+    file_type = file_type_of(path.name)
     if embedder.dimension != EMBEDDING_DIMENSION:
         raise ValueError(
             f"Embedding model '{embedder.model_name}' makes {embedder.dimension}-number vectors,"
@@ -66,13 +67,15 @@ def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) 
 
     with Session(engine) as session, session.begin():
         document = session.scalar(select(Document).where(Document.slug == slug))
-        if document and (document.content_sha256, document.pipeline_version) == (
-            content_sha256,
-            version,
-        ):
+        unchanged = (
+            document is not None
+            and document.content_sha256 == content_sha256
+            and document.pipeline_version == version
+        )
+        if unchanged:
             return IngestResult(slug, "unchanged", _chunk_count(session, document.id))
 
-        parsed = parse(data)
+        parsed = parse_document(data, file_type)
         chunks = chunk_document(parsed)
         vectors = embedder.embed_documents([embedding_text(parsed.title, c) for c in chunks])
 
@@ -82,7 +85,7 @@ def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) 
             session.add(document)
         document.title = parsed.title
         document.source_filename = path.name
-        document.file_type = path.suffix.lower().removeprefix(".")
+        document.file_type = file_type
         document.origin = origin
         document.content_sha256 = content_sha256
         document.pipeline_version = version
@@ -126,4 +129,14 @@ def _remove_missing(engine: Engine, origin: Origin, keep: set[str]) -> list[Inge
         ).all()
         for document in missing:
             session.delete(document)  # its chunks go too (ON DELETE CASCADE)
-    return [IngestResult(document.slug, "removed", 0) for document in missing]
+    results = [IngestResult(document.slug, "removed", 0) for document in missing]
+    for result in results:
+        _log(result)
+    return results
+
+
+def _log(result: IngestResult) -> None:
+    logger.info(
+        "ingest.document",
+        extra={"slug": result.slug, "status": result.status, "chunks": result.chunks},
+    )
