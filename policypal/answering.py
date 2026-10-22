@@ -7,7 +7,8 @@ The rules, in order:
 3. Otherwise ask the LLM, giving it the chunks that passed the threshold as excerpts [1]..[n].
    - If the LLM fails (down, timeout, ...), quote the passages and say why.
    - Citation markers that don't match an excerpt are removed.
-   - No valid marker left: a refusal if the LLM refused, otherwise quote the passages.
+   - An answer needs a valid marker and some words besides the markers.
+   - Otherwise: a refusal if the LLM refused, else quote the passages and say why.
 Every answer states its mode, so a fallback is never silent.
 """
 
@@ -28,13 +29,14 @@ from policypal.retrieval import RetrievedChunk, retrieve
 logger = logging.getLogger("policypal.answering")
 
 Mode = Literal["llm", "extractive", "refused"]
-FallbackReason = LLMErrorReason | Literal["llm_no_valid_citation"]
+FallbackReason = LLMErrorReason | Literal["llm_no_valid_citation", "llm_empty_answer"]
 
 # A citation marker: [1], or a list such as [1, 3]. The spaces before it are captured so
 # a removed marker doesn't leave a gap before the full stop.
 _MARKER = re.compile(r"(\s*)\[(\d+(?:\s*,\s*\d+)*)\]")
-# The refusal sentence, allowing a curly apostrophe or "could not".
-_REFUSAL = re.compile(r"could(?:n't| not) find this in the policies", re.IGNORECASE)
+# A sentence containing the refusal ("could not" also counts). Apostrophes are made
+# straight before matching.
+_REFUSAL = re.compile(r"[^.!?\n]*could(?:n't| not) find this in the policies[^.!?\n]*[.!?]?", re.I)
 
 
 @dataclass(frozen=True)
@@ -111,13 +113,18 @@ def build_reply(
 
     text = _remove_invalid_markers(text, len(excerpts)).strip()
     numbers = _cited_numbers(text)
-    if numbers:
+    plain = text.replace("’", "'")
+    refused = _REFUSAL.search(plain) is not None
+    # Words left once the markers and any refusal sentence are taken out.
+    has_words = re.search(r"[A-Za-z]", _REFUSAL.sub("", _MARKER.sub("", plain))) is not None
+    if numbers and has_words:
         citations = tuple(Citation(n, excerpts[n - 1]) for n in numbers)
         return Reply(text, "llm", citations, llm.model, generation_ms=generation_ms)
-    if _REFUSAL.search(text.replace("’", "'")):
+    if refused:
         return Reply(REFUSAL_SENTENCE, "refused", model=llm.model, generation_ms=generation_ms)
-    logger.warning("llm.fallback", extra={"reason": "llm_no_valid_citation"})
-    return _extractive(excerpts, "llm_no_valid_citation", generation_ms)
+    reason: FallbackReason = "llm_empty_answer" if numbers else "llm_no_valid_citation"
+    logger.warning("llm.fallback", extra={"reason": reason})
+    return _extractive(excerpts, reason, generation_ms)
 
 
 def _extractive(

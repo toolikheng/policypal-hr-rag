@@ -168,6 +168,46 @@ def test_a_cited_answer_that_also_mentions_the_refusal_is_still_an_answer() -> N
     assert reply.mode == "llm"
 
 
+# Replies like these came from llama3.2:1b in the Phase 2 latency measurement.
+@pytest.mark.parametrize(
+    "llm_reply",
+    [
+        "[1] [2] [3]\n\nI couldn't find this in the policies.",
+        "[1]. Sorry, I could not find this in the policies.",
+    ],
+)
+def test_markers_with_only_the_refusal_sentence_are_a_refusal(llm_reply: str) -> None:
+    reply = build_reply("Q?", [LEAVE, CARRY, OVERTIME], FakeLLM(llm_reply), THRESHOLD)
+
+    assert reply.mode == "refused"
+    assert reply.text == REFUSAL_SENTENCE
+    assert reply.citations == ()
+
+
+@pytest.mark.parametrize("llm_reply", ["[1] [3.1.1]", "[1][2]", " [1]. ", "[2] - [1]"])
+def test_an_answer_of_only_markers_falls_back_to_policy_text(llm_reply: str) -> None:
+    reply = build_reply("Q?", [LEAVE, CARRY], FakeLLM(llm_reply), THRESHOLD)
+
+    assert reply.mode == "extractive"
+    assert reply.fallback_reason == "llm_empty_answer"
+    assert reply.text.startswith(EXTRACTIVE_HEADING)
+
+
+def test_a_short_cited_answer_is_still_an_answer() -> None:
+    reply = build_reply("Can I accept cash?", [LEAVE], FakeLLM("No [1]."), THRESHOLD)
+
+    assert reply.mode == "llm"
+    assert reply.text == "No [1]."
+
+
+def test_a_refusal_with_advice_but_no_citation_is_still_a_refusal() -> None:
+    llm = FakeLLM("I couldn't find this in the policies. Please contact HR.")
+
+    reply = build_reply("Q?", [LEAVE], llm, THRESHOLD)
+
+    assert reply.mode == "refused"
+
+
 # --- Falling back when the LLM fails ----------------------------------------------
 
 
