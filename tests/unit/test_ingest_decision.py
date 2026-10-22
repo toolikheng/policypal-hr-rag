@@ -30,8 +30,10 @@ def stored(origin: str, sha: str = SHA_A, version: str = V1) -> Document:
         (stored("upload"), "upload", SHA_A, V2, "new_pipeline"),
         (stored("upload"), "upload", SHA_B, V1, "new_content"),
         (stored("sample"), "sample", SHA_B, V1, "new_content"),
-        # A sample file takes over a slug that an upload used first.
-        (stored("upload"), "sample", SHA_B, V1, "new_content"),
+        # A sample file takes over a slug that an upload used first, even with the same
+        # bytes: the document must become a sample, or deleting the upload would remove it.
+        (stored("upload"), "sample", SHA_B, V1, "new_owner"),
+        (stored("upload"), "sample", SHA_A, V1, "new_owner"),
         # "Sample wins": an upload never replaces a sample...
         (stored("sample"), "upload", SHA_B, V1, "sample_owns_slug"),
         (stored("sample"), "upload", SHA_B, V2, "sample_owns_slug"),

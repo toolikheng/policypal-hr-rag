@@ -33,8 +33,9 @@ IngestStatus = Literal["created", "updated", "unchanged", "removed", "skipped"]
 #   same              same bytes, already embedded with this pipeline: nothing to do
 #   new_pipeline      same bytes, but the model or chunker changed: re-embed
 #   new_content       different bytes: replace the document
+#   new_owner         a sample file whose slug an upload used first: the sample takes over
 #   sample_owns_slug  an upload whose slug belongs to a sample policy: "sample wins"
-Change = Literal["new", "same", "new_pipeline", "new_content", "sample_owns_slug"]
+Change = Literal["new", "same", "new_pipeline", "new_content", "new_owner", "sample_owns_slug"]
 
 
 @dataclass(frozen=True)
@@ -77,8 +78,12 @@ def classify(
     """The one rule, used by the folder scan and by uploads."""
     if existing is None:
         return "new"
-    if existing.origin == "sample" and origin == "upload":
-        # An upload never replaces a sample; identical bytes simply change nothing.
+    if existing.origin != origin:
+        # "Sample wins" both ways: a sample takes over an upload's slug (even with the same
+        # bytes, so the document stops depending on the uploaded file), and an upload never
+        # replaces a sample (identical bytes simply change nothing).
+        if origin == "sample":
+            return "new_owner"
         return "same" if existing.content_sha256 == content_sha256 else "sample_owns_slug"
     if existing.content_sha256 != content_sha256:
         return "new_content"
@@ -174,8 +179,11 @@ def _remove_missing(engine: Engine, origin: Origin, keep: set[str]) -> list[Inge
 
 
 def _log(result: IngestResult) -> None:
-    fields: dict[str, object] = {"slug": result.slug, "status": result.status}
-    fields["chunks"] = result.chunks
+    fields: dict[str, object] = {
+        "slug": result.slug,
+        "status": result.status,
+        "chunks": result.chunks,
+    }
     if result.status == "skipped":
         fields["reason"] = "a sample policy has this slug"
         logger.warning("ingest.document", extra=fields)

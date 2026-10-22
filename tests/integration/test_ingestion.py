@@ -224,6 +224,26 @@ def test_command_line_also_ingests_uploaded_policies(
     assert origins[UPLOAD_DEMO_POLICY.stem] == "upload"
 
 
+def test_a_sample_with_the_same_bytes_as_an_upload_takes_it_over(
+    engine: Engine, tmp_path: Path
+) -> None:
+    uploads, samples = tmp_path / "uploads", tmp_path / "samples"
+    uploads.mkdir()
+    samples.mkdir()
+    shutil.copy(UPLOAD_DEMO_POLICY, uploads)
+    ingest_folder(engine, FakeEmbedder(), uploads, origin="upload")
+    shutil.copy(UPLOAD_DEMO_POLICY, samples)
+
+    sample_results = ingest_folder(engine, FakeEmbedder(), samples, origin="sample")
+    (uploads / UPLOAD_DEMO_POLICY.name).unlink()
+    upload_results = ingest_folder(engine, FakeEmbedder(), uploads, origin="upload")
+
+    assert statuses(sample_results) == {UPLOAD_DEMO_POLICY.stem: "updated"}
+    assert upload_results == []  # nothing removed: the document now belongs to the sample
+    with engine.connect() as conn:
+        assert conn.execute(text("SELECT origin FROM documents")).scalars().all() == ["sample"]
+
+
 def test_an_uploaded_file_with_a_sample_slug_is_skipped(
     engine: Engine, policy_folder: Path, tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
