@@ -33,6 +33,19 @@ from policypal.ingest.pipeline import (
 
 _MEGABYTE = 1024 * 1024
 
+# Messages for rejected uploads. They are shown to users, and the API docs show them too.
+TOO_LARGE = "The file is larger than {max_mb} MB."
+UNSUPPORTED_TYPE = "Only .md and .pdf files are supported."
+NOT_A_PDF = "The file is not a valid PDF."
+SAMPLE_NAME = (
+    "'{slug}' is a built-in sample policy and can't be replaced by upload."
+    " Rename the file to add it as a new policy."
+)
+NAME_TAKEN = (
+    "A policy named '{slug}' already exists with different content."
+    " Nothing was changed. To replace it, upload again with replace=true."
+)
+
 # Uploads and re-scans check the database, then write files and rows. Running them one
 # at a time means two requests can't both pass the conflict check. (The API runs as one
 # process; the database's unique slug is the last line of defence.)
@@ -79,11 +92,11 @@ def add_upload(
     max_bytes = max_mb * _MEGABYTE
     data = stream.read(max_bytes + 1)  # never read more than one byte past the limit
     if len(data) > max_bytes:
-        raise FileTooLarge(f"The file is larger than {max_mb} MB.")
+        raise FileTooLarge(TOO_LARGE.format(max_mb=max_mb))
     try:
         file_type = file_type_of(filename)
     except ValueError as exc:
-        raise UnsupportedFileType("Only .md and .pdf files are supported.") from exc
+        raise UnsupportedFileType(UNSUPPORTED_TYPE) from exc
     slug = slug_for(Path(filename))
     if not slug:
         raise InvalidUpload("The file name must contain letters or digits.")
@@ -94,15 +107,9 @@ def add_upload(
         if change == "same":
             return UploadResult("unchanged", _stored(engine, slug))
         if change == "sample_owns_slug":
-            raise UploadConflict(
-                f"'{slug}' is a built-in sample policy and can't be replaced by upload."
-                " Rename the file to add it as a new policy."
-            )
+            raise UploadConflict(SAMPLE_NAME.format(slug=slug))
         if change == "new_content" and not replace:
-            raise UploadConflict(
-                f"A policy named '{slug}' already exists with different content."
-                " Nothing was changed. To replace it, upload again with replace=true."
-            )
+            raise UploadConflict(NAME_TAKEN.format(slug=slug))
         path = _save(upload_dir, slug, file_type, data)
         ingest_file(engine, embedder, path, origin="upload")
         return UploadResult("created" if change == "new" else "updated", _stored(engine, slug))
@@ -123,7 +130,7 @@ def _stored(engine: Engine, slug: str) -> DocumentInfo:
 
 def _check_content(data: bytes, file_type: FileType) -> None:
     if file_type == "pdf" and not data.startswith(b"%PDF-"):
-        raise InvalidUpload("The file is not a valid PDF.")
+        raise InvalidUpload(NOT_A_PDF)
     try:
         parse_document(data, file_type)
     except ValueError as exc:  # the parser's messages are written for users

@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
 from policypal import __version__
+from policypal.api.errors import DATABASE_UNAVAILABLE
 from policypal.api.routes import ask, documents, health
 from policypal.config import Settings
 from policypal.db import make_engine
@@ -78,7 +79,8 @@ async def database_unavailable(request: Request, exc: Exception) -> JSONResponse
     # The error type only: the full message can contain the connection string.
     logger.warning("database.unreachable", extra={"error": type(exc).__name__})
     return JSONResponse(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={"detail": "Database unavailable."}
+        status_code=DATABASE_UNAVAILABLE.status_code,
+        content={"detail": DATABASE_UNAVAILABLE.detail},
     )
 
 

@@ -4,19 +4,22 @@ from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, Up
 
 from policypal import catalogue
 from policypal.api.deps import EmbedderDep, EngineDep, SettingsDep, require_admin
-from policypal.api.schemas import (
+from policypal.api.errors import (
     ADMIN_ERRORS,
     DATABASE_UNAVAILABLE,
+    DOCUMENT_NOT_FOUND,
+    UPLOAD_ERRORS,
+    documented,
+    validation_error,
+)
+from policypal.api.schemas import (
     DOCUMENT_SUMMARY_EXAMPLE,
     UPLOAD_EXAMPLE,
     DocumentDetail,
     DocumentSummary,
-    ErrorResponse,
     IngestResultResponse,
     ReingestResponse,
     UploadResponse,
-    error_example,
-    validation_error_example,
 )
 from policypal.ingest.uploads import (
     FileTooLarge,
@@ -36,7 +39,7 @@ router = APIRouter(tags=["documents"])
     summary="List the policies that can be searched",
     responses={
         200: {"content": {"application/json": {"example": [DOCUMENT_SUMMARY_EXAMPLE]}}},
-        503: DATABASE_UNAVAILABLE,
+        **documented(DATABASE_UNAVAILABLE),
     },
 )
 def list_documents(engine: EngineDep) -> list[DocumentSummary]:
@@ -51,17 +54,19 @@ def list_documents(engine: EngineDep) -> list[DocumentSummary]:
     response_model=DocumentDetail,
     summary="Show one policy, section by section (the source viewer)",
     responses={
-        404: error_example("No document has this id.", "Document not found."),
-        422: validation_error_example(
-            ["path", "document_id"], "Input should be a valid integer", "leave-policy"
+        **documented(DOCUMENT_NOT_FOUND, DATABASE_UNAVAILABLE),
+        422: validation_error(
+            ["path", "document_id"],
+            "Input should be a valid integer, unable to parse string as an integer",
+            "leave-policy",
+            "int_parsing",
         ),
-        503: DATABASE_UNAVAILABLE,
     },
 )
 def get_document(document_id: int, engine: EngineDep) -> DocumentDetail:
     document = catalogue.get_document(engine, document_id)
     if document is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found.")
+        raise DOCUMENT_NOT_FOUND.exception()
     return DocumentDetail.model_validate(document, from_attributes=True)
 
 
@@ -84,38 +89,7 @@ def get_document(document_id: int, engine: EngineDep) -> DocumentDetail:
             "description": "The policy already existed: unchanged, or updated with replace=true.",
             "content": {"application/json": {"example": {**UPLOAD_EXAMPLE, "status": "updated"}}},
         },
-        **ADMIN_ERRORS,
-        409: {
-            "model": ErrorResponse,
-            "description": "A policy with this name already exists with different content.",
-            "content": {
-                "application/json": {
-                    "examples": {
-                        "uploaded_policy": {
-                            "value": {
-                                "detail": "A policy named 'leave-guide' already exists with "
-                                "different content. Nothing was changed. To replace it, upload "
-                                "again with replace=true."
-                            }
-                        },
-                        "sample_policy": {
-                            "value": {
-                                "detail": "'leave-policy' is a built-in sample policy and can't "
-                                "be replaced by upload. Rename the file to add it as a new policy."
-                            }
-                        },
-                    }
-                }
-            },
-        },
-        413: error_example(
-            "The file is too large (MAX_UPLOAD_MB).", "The file is larger than 5 MB."
-        ),
-        415: error_example("Not a .md or .pdf file.", "Only .md and .pdf files are supported."),
-        422: error_example(
-            "The file can't be read as a policy.",
-            "The PDF has no text: no text could be extracted (scanned PDFs are not supported).",
-        ),
+        **documented(*ADMIN_ERRORS, *UPLOAD_ERRORS),
     },
 )
 def upload_document(
@@ -160,13 +134,10 @@ def upload_document(
     description="Safe to run any number of times: unchanged files are skipped, nothing is "
     "duplicated, and documents whose file is gone are removed.",
     dependencies=[Depends(require_admin)],
-    responses=ADMIN_ERRORS,
+    responses=documented(*ADMIN_ERRORS),
 )
 def reingest(settings: SettingsDep, engine: EngineDep, embedder: EmbedderDep) -> ReingestResponse:
     results = rescan(engine, embedder, settings.upload_dir)
     return ReingestResponse(
-        results=[
-            IngestResultResponse(slug=result.slug, status=result.status, chunks=result.chunks)
-            for result in results
-        ]
+        results=[IngestResultResponse.model_validate(r, from_attributes=True) for r in results]
     )

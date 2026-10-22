@@ -5,13 +5,8 @@ from fastapi import APIRouter
 
 from policypal.answering import answer_question
 from policypal.api.deps import EmbedderDep, EngineDep, LLMDep, SettingsDep
-from policypal.api.schemas import (
-    ASK_EXAMPLES,
-    DATABASE_UNAVAILABLE,
-    VALIDATION_ERROR_EXAMPLE,
-    AskRequest,
-    AskResponse,
-)
+from policypal.api.errors import DATABASE_UNAVAILABLE, documented, validation_error
+from policypal.api.schemas import ASK_EXAMPLES, AskRequest, AskResponse
 
 logger = logging.getLogger("policypal.api")
 
@@ -30,8 +25,14 @@ router = APIRouter(tags=["ask"])
     ),
     responses={
         200: {"content": {"application/json": {"examples": ASK_EXAMPLES}}},
-        422: VALIDATION_ERROR_EXAMPLE,
-        503: DATABASE_UNAVAILABLE,
+        422: validation_error(
+            ["body", "question"],
+            "String should have at least 3 characters",
+            "hi",
+            "string_too_short",
+            min_length=3,
+        ),
+        **documented(DATABASE_UNAVAILABLE),
     },
 )
 def ask(

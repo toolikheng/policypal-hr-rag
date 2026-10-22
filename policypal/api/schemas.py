@@ -1,7 +1,7 @@
 """Request and response models. The examples appear in Swagger at /docs."""
 
 from datetime import datetime
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_field
@@ -20,6 +20,16 @@ class LLMHealth(BaseModel):
     status: LLMStatus
 
     model_config = ConfigDict(from_attributes=True)  # built from llm.LLMInfo
+
+
+HEALTH_UNAVAILABLE_EXAMPLE = {
+    "status": "unavailable",
+    "database": "unreachable",
+    "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "ok"},
+    "documents": None,
+    "chunks": None,
+    "version": "0.1.0",
+}
 
 
 class HealthResponse(BaseModel):
@@ -62,42 +72,6 @@ class HealthResponse(BaseModel):
             ]
         }
     )
-
-
-class ErrorResponse(BaseModel):
-    """Every error has a plain message in `detail` (validation errors list each problem)."""
-
-    detail: str
-
-
-def error_example(description: str, detail: str) -> dict[str, Any]:
-    """An entry for a route's `responses=`, so Swagger shows the error and its message."""
-    return {
-        "model": ErrorResponse,
-        "description": description,
-        "content": {"application/json": {"example": {"detail": detail}}},
-    }
-
-
-VALIDATION_ERROR_EXAMPLE = {
-    "description": "The request is invalid, e.g. the question is empty or too long.",
-    "content": {
-        "application/json": {
-            "example": {
-                "detail": [
-                    {
-                        "type": "string_too_short",
-                        "loc": ["body", "question"],
-                        "msg": "String should have at least 3 characters",
-                        "input": "hi",
-                    }
-                ]
-            }
-        }
-    },
-}
-
-DATABASE_UNAVAILABLE = error_example("The database can't be reached.", "Database unavailable.")
 
 
 # --- POST /ask ------------------------------------------------------------------------
@@ -316,20 +290,6 @@ class DocumentDetail(DocumentSummary):
     )
 
 
-def validation_error_example(location: list[str], message: str, value: Any) -> dict[str, Any]:
-    """A 422 entry for a route's `responses=` (FastAPI's own format, with one problem)."""
-    return {
-        "description": "The request is invalid.",
-        "content": {
-            "application/json": {
-                "example": {
-                    "detail": [{"type": "invalid", "loc": location, "msg": message, "input": value}]
-                }
-            }
-        },
-    }
-
-
 # --- POST /documents and /documents/reingest ---------------------------------------------
 
 
@@ -354,6 +314,8 @@ UPLOAD_EXAMPLE = {
 
 
 class IngestResultResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)  # built from pipeline.IngestResult
+
     slug: str
     status: IngestStatus = Field(
         description="created, updated, unchanged, removed (file gone), or skipped "
@@ -381,25 +343,3 @@ class ReingestResponse(BaseModel):
             ]
         }
     )
-
-
-ADMIN_ERRORS: dict[int | str, dict[str, Any]] = {
-    401: error_example(
-        "The X-Admin-Token header is missing.", "Admin token required in the X-Admin-Token header."
-    ),
-    403: error_example("The admin token is wrong.", "Admin token is not valid."),
-    503: {
-        "model": ErrorResponse,
-        "description": "Admin features are off (no ADMIN_TOKEN), or the database is down.",
-        "content": {
-            "application/json": {
-                "examples": {
-                    "admin_disabled": {
-                        "value": {"detail": "Admin features are disabled: set ADMIN_TOKEN."}
-                    },
-                    "database": {"value": {"detail": "Database unavailable."}},
-                }
-            }
-        },
-    },
-}

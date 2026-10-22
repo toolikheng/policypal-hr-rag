@@ -2,20 +2,11 @@ from fastapi import APIRouter, Response, status
 
 from policypal import __version__
 from policypal.api.deps import EngineDep, LLMDep
-from policypal.api.schemas import HealthResponse, LLMHealth
+from policypal.api.schemas import HEALTH_UNAVAILABLE_EXAMPLE, HealthResponse, LLMHealth
 from policypal.db import check_database
 from policypal.llm import describe_llm
 
 router = APIRouter(tags=["health"])
-
-UNAVAILABLE_EXAMPLE = {
-    "status": "unavailable",
-    "database": "unreachable",
-    "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "ok"},
-    "documents": None,
-    "chunks": None,
-    "version": "0.1.0",
-}
 
 
 @router.get(
@@ -28,7 +19,7 @@ UNAVAILABLE_EXAMPLE = {
         503: {
             "model": HealthResponse,
             "description": "The database is unreachable or not at the newest migration.",
-            "content": {"application/json": {"example": UNAVAILABLE_EXAMPLE}},
+            "content": {"application/json": {"example": HEALTH_UNAVAILABLE_EXAMPLE}},
         }
     },
 )

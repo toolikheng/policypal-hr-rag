@@ -7,10 +7,11 @@ create_app(). Endpoints declare what they need, e.g. `def ask(engine: EngineDep)
 import secrets
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Request, Security, status
+from fastapi import Depends, Request, Security
 from fastapi.security import APIKeyHeader
 from sqlalchemy import Engine
 
+from policypal.api.errors import ADMIN_DISABLED, ADMIN_TOKEN_MISSING, ADMIN_TOKEN_WRONG
 from policypal.config import Settings
 from policypal.embeddings import Embedder
 from policypal.llm.base import LLMProvider
@@ -57,15 +58,11 @@ def require_admin(
     A shared demo token, not real user authentication (there are no user accounts).
     """
     if settings.admin_token is None:
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, "Admin features are disabled: set ADMIN_TOKEN."
-        )
+        raise ADMIN_DISABLED.exception()
     if not x_admin_token:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED, "Admin token required in the X-Admin-Token header."
-        )
+        raise ADMIN_TOKEN_MISSING.exception()
     # compare_digest takes the same time whether the first or the last character differs,
     # so response times don't leak how much of a guess was right.
     expected = settings.admin_token.get_secret_value().encode()
     if not secrets.compare_digest(x_admin_token.encode(), expected):
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Admin token is not valid.")
+        raise ADMIN_TOKEN_WRONG.exception()
