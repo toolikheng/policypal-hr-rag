@@ -1,4 +1,4 @@
-"""Ingest the sample policies:  python -m policypal.ingest
+"""Ingest the sample policies and the uploaded ones:  python -m policypal.ingest
 
 Safe to run any number of times: unchanged files are skipped.
 """
@@ -9,7 +9,7 @@ from collections import Counter
 from policypal.config import Settings
 from policypal.db import make_engine
 from policypal.embeddings import build_embedder
-from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_folder
+from policypal.ingest.pipeline import ingest_all
 from policypal.logging_setup import configure_logging
 
 logger = logging.getLogger("policypal.ingest")
@@ -21,7 +21,7 @@ def main() -> None:
     engine = make_engine(settings.database_url)
     try:
         embedder = build_embedder(settings)
-        results = ingest_folder(engine, embedder, SAMPLE_POLICIES_DIR, origin="sample")
+        results = ingest_all(engine, embedder, settings.upload_dir)
     finally:
         engine.dispose()
 

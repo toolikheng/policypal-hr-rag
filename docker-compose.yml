@@ -35,6 +35,9 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     ports:
       - "${API_PORT:-8000}:8000"
+    volumes:
+      # Uploaded policies survive restarts and are re-ingested on start.
+      - uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -73,3 +76,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

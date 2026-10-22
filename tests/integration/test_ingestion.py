@@ -9,6 +9,7 @@ from policypal.ingest.chunking import chunk_document
 from policypal.ingest.parsing import parse_markdown
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_file, ingest_folder
 from tests.fakes import FakeEmbedder
+from tests.sample_data import UPLOAD_DEMO_POLICY
 
 
 @pytest.fixture
@@ -187,8 +188,10 @@ def test_command_line_ingests_the_sample_policies_twice_without_duplicates(
     migrated_database_url: str,
     monkeypatch: pytest.MonkeyPatch,
     restore_root_logging: None,
+    tmp_path: Path,
 ) -> None:
     monkeypatch.setenv("DATABASE_URL", migrated_database_url)
+    monkeypatch.setenv("UPLOAD_DIR", str(tmp_path / "not-created-yet"))
     monkeypatch.setattr(ingest_cli, "build_embedder", lambda settings: FakeEmbedder())
 
     ingest_cli.main()
@@ -197,6 +200,67 @@ def test_command_line_ingests_the_sample_policies_twice_without_duplicates(
 
     assert after_first[0] == 8
     assert counts(engine) == after_first
+
+
+def test_command_line_also_ingests_uploaded_policies(
+    engine: Engine,
+    migrated_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+    restore_root_logging: None,
+    tmp_path: Path,
+) -> None:
+    uploads = tmp_path / "uploads"
+    uploads.mkdir()
+    shutil.copy(UPLOAD_DEMO_POLICY, uploads)
+    monkeypatch.setenv("DATABASE_URL", migrated_database_url)
+    monkeypatch.setenv("UPLOAD_DIR", str(uploads))
+    monkeypatch.setattr(ingest_cli, "build_embedder", lambda settings: FakeEmbedder())
+
+    ingest_cli.main()
+
+    with engine.connect() as conn:
+        origins = dict(conn.execute(text("SELECT slug, origin FROM documents")).all())
+    assert len(origins) == 9
+    assert origins[UPLOAD_DEMO_POLICY.stem] == "upload"
+
+
+def test_an_uploaded_file_with_a_sample_slug_is_skipped(
+    engine: Engine, policy_folder: Path, tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+    uploads = tmp_path / "uploads"
+    uploads.mkdir()
+    (uploads / "leave-policy.md").write_text("# Leave Policy\n\n## 1. Other\n\nOther text.\n")
+    embedder = FakeEmbedder()
+
+    results = ingest_folder(engine, embedder, uploads, origin="upload")
+
+    assert statuses(results) == {"leave-policy": "skipped"}
+    assert embedder.embedded_texts == []
+    [record] = [r for r in caplog.records if getattr(r, "status", None) == "skipped"]
+    assert record.levelname == "WARNING"
+    assert record.slug == "leave-policy"
+    with engine.connect() as conn:
+        origin = conn.execute(text("SELECT origin FROM documents WHERE slug = 'leave-policy'"))
+        assert origin.scalar_one() == "sample"
+
+
+def test_a_new_sample_policy_takes_over_a_slug_used_by_an_upload(
+    engine: Engine, policy_folder: Path, tmp_path: Path
+) -> None:
+    uploads = tmp_path / "uploads"
+    uploads.mkdir()
+    (uploads / "leave-policy.md").write_text("# Leave Policy\n\n## 1. Old\n\nUploaded text.\n")
+    ingest_folder(engine, FakeEmbedder(), uploads, origin="upload")
+
+    sample_results = ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+    upload_results = ingest_folder(engine, FakeEmbedder(), uploads, origin="upload")
+
+    assert statuses(sample_results)["leave-policy"] == "updated"
+    assert statuses(upload_results) == {"leave-policy": "skipped"}
+    with engine.connect() as conn:
+        origin = conn.execute(text("SELECT origin FROM documents WHERE slug = 'leave-policy'"))
+        assert origin.scalar_one() == "sample"
 
 
 def test_each_document_is_logged_as_it_is_processed(

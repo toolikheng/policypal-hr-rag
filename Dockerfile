@@ -35,8 +35,11 @@ COPY ui/ ui/
 COPY data/policies/ data/policies/
 COPY docker/api-entrypoint.sh docker/api-entrypoint.sh
 
-# Run as a normal user, not root.
-RUN useradd --create-home --uid 1000 policypal
+# Run as a normal user, not root. Uploaded policies are saved in /app/uploads
+# (a volume in Compose), which this user must own.
+RUN useradd --create-home --uid 1000 policypal \
+ && mkdir /app/uploads \
+ && chown policypal:policypal /app/uploads
 USER policypal
 
 EXPOSE 8000 8501

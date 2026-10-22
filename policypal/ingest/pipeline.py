@@ -3,7 +3,8 @@
 Ingestion is idempotent, so it is safe to run on every start:
 - a file whose bytes and pipeline version haven't changed is skipped (nothing re-embedded);
 - a new or changed file replaces all of its document's chunks in one transaction;
-- a document whose file has disappeared from its folder is removed.
+- a document whose file has disappeared from its folder is removed;
+- "sample wins": an uploaded file never replaces a sample policy with the same slug.
 """
 
 import hashlib
@@ -25,7 +26,7 @@ logger = logging.getLogger("policypal.ingest")
 
 SAMPLE_POLICIES_DIR = Path(__file__).resolve().parents[2] / "data" / "policies"
 
-IngestStatus = Literal["created", "updated", "unchanged", "removed"]
+IngestStatus = Literal["created", "updated", "unchanged", "removed", "skipped"]
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,16 @@ class IngestResult:
     slug: str
     status: IngestStatus
     chunks: int
+
+
+def ingest_all(engine: Engine, embedder: Embedder, upload_dir: Path) -> list[IngestResult]:
+    """Ingest the sample policies, then the uploaded ones (the folder is created if missing).
+
+    Samples go first, so when both folders have a file with the same slug the sample wins.
+    """
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    samples = ingest_folder(engine, embedder, SAMPLE_POLICIES_DIR, origin="sample")
+    return samples + ingest_folder(engine, embedder, upload_dir, origin="upload")
 
 
 def ingest_folder(
@@ -46,7 +57,7 @@ def ingest_folder(
 
 
 def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
-    """Ingest one file and log the outcome (created, updated or unchanged)."""
+    """Ingest one file and log the outcome (created, updated, unchanged or skipped)."""
     result = _ingest_file(engine, embedder, path, origin)
     _log(result)
     return result
@@ -63,6 +74,8 @@ def _ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin)
 
     with Session(engine) as session, session.begin():
         document = session.scalar(select(Document).where(Document.slug == slug))
+        if document is not None and document.origin == "sample" and origin == "upload":
+            return IngestResult(slug, "skipped", 0)  # "sample wins"
         unchanged = (
             document is not None
             and document.content_sha256 == content_sha256
@@ -132,7 +145,10 @@ def _remove_missing(engine: Engine, origin: Origin, keep: set[str]) -> list[Inge
 
 
 def _log(result: IngestResult) -> None:
-    logger.info(
-        "ingest.document",
-        extra={"slug": result.slug, "status": result.status, "chunks": result.chunks},
-    )
+    fields: dict[str, object] = {"slug": result.slug, "status": result.status}
+    fields["chunks"] = result.chunks
+    if result.status == "skipped":
+        fields["reason"] = "a sample policy has this slug"
+        logger.warning("ingest.document", extra=fields)
+    else:
+        logger.info("ingest.document", extra=fields)

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -13,6 +15,9 @@ SETTING_ENV_VARS = [
     "OLLAMA_MODEL",
     "OLLAMA_TIMEOUT_SECONDS",
     "MIN_SIMILARITY",
+    "ADMIN_TOKEN",
+    "MAX_UPLOAD_MB",
+    "UPLOAD_DIR",
 ]
 
 
@@ -132,4 +137,41 @@ def test_invalid_min_similarity_is_rejected(monkeypatch: pytest.MonkeyPatch, val
     monkeypatch.setenv("MIN_SIMILARITY", value)
 
     with pytest.raises(ValidationError, match="min_similarity"):
+        Settings(_env_file=None)
+
+
+def test_upload_settings_have_safe_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.admin_token is None  # admin endpoints are off until a token is set
+    assert settings.max_upload_mb == 5
+    assert settings.upload_dir == Path("uploads")
+
+
+def test_admin_token_is_hidden_when_printed(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("ADMIN_TOKEN", "s3cret-token")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.admin_token is not None
+    assert settings.admin_token.get_secret_value() == "s3cret-token"
+    assert "s3cret-token" not in repr(settings)
+
+
+def test_empty_admin_token_means_admin_is_off(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("ADMIN_TOKEN", "")
+
+    assert Settings(_env_file=None).admin_token is None
+
+
+@pytest.mark.parametrize("size", ["0", "51", "big"])
+def test_invalid_max_upload_size_is_rejected(monkeypatch: pytest.MonkeyPatch, size: str) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("MAX_UPLOAD_MB", size)
+
+    with pytest.raises(ValidationError, match="max_upload_mb"):
         Settings(_env_file=None)

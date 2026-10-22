@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_f
 from policypal.answering import Answer, FallbackReason, Mode
 from policypal.db import DatabaseStatus
 from policypal.ingest.parsing import FileType
+from policypal.ingest.pipeline import IngestStatus
 from policypal.models import Origin
 
 
@@ -296,3 +297,76 @@ def validation_error_example(location: list[str], message: str, value: Any) -> d
             }
         },
     }
+
+
+# --- POST /documents and /documents/reingest ---------------------------------------------
+
+
+class UploadResponse(BaseModel):
+    status: Literal["created", "updated", "unchanged"]
+    document: DocumentSummary
+
+
+UPLOAD_EXAMPLE = {
+    "status": "created",
+    "document": {
+        **DOCUMENT_SUMMARY_EXAMPLE,
+        "id": 9,
+        "slug": "training-and-development-policy",
+        "title": "Training and Development Policy",
+        "origin": "upload",
+        "chunks": 14,
+    },
+}
+
+
+class IngestResultResponse(BaseModel):
+    slug: str
+    status: IngestStatus = Field(
+        description="created, updated, unchanged, removed (file gone), or skipped "
+        "(an uploaded file whose slug belongs to a sample policy)."
+    )
+    chunks: int
+
+
+class ReingestResponse(BaseModel):
+    results: list[IngestResultResponse]
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "results": [
+                        {"slug": "leave-policy", "status": "unchanged", "chunks": 18},
+                        {
+                            "slug": "training-and-development-policy",
+                            "status": "unchanged",
+                            "chunks": 14,
+                        },
+                    ]
+                }
+            ]
+        }
+    )
+
+
+ADMIN_ERRORS: dict[int | str, dict[str, Any]] = {
+    401: error_example(
+        "The X-Admin-Token header is missing.", "Admin token required in the X-Admin-Token header."
+    ),
+    403: error_example("The admin token is wrong.", "Admin token is not valid."),
+    503: {
+        "model": ErrorResponse,
+        "description": "Admin features are off (no ADMIN_TOKEN), or the database is down.",
+        "content": {
+            "application/json": {
+                "examples": {
+                    "admin_disabled": {
+                        "value": {"detail": "Admin features are disabled: set ADMIN_TOKEN."}
+                    },
+                    "database": {"value": {"detail": "Database unavailable."}},
+                }
+            }
+        },
+    },
+}

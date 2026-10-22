@@ -4,9 +4,10 @@ Every setting is documented in .env.example. Invalid or missing values stop the 
 startup with a clear validation error instead of failing later.
 """
 
+from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -35,3 +36,15 @@ class Settings(BaseSettings):
     # probability. 0.65 is provisional: set from 16 hand-picked questions, with the query
     # instruction on (in scope scored 0.70-0.82, out of scope 0.49-0.60).
     min_similarity: float = Field(default=0.65, ge=0, le=1)
+
+    # Shared demo token for the admin endpoints (upload, re-ingest), sent in the
+    # X-Admin-Token header. Unset or empty: admin endpoints are switched off.
+    admin_token: SecretStr | None = None
+    max_upload_mb: int = Field(default=5, ge=1, le=50)
+    # Uploaded policies are saved here (a Docker volume in Compose) and re-ingested on start.
+    upload_dir: Path = Path("uploads")
+
+    @field_validator("admin_token", mode="before")
+    @classmethod
+    def _empty_token_means_off(cls, value: object) -> object:
+        return None if value == "" else value
