@@ -28,6 +28,14 @@ SAMPLE_POLICIES_DIR = Path(__file__).resolve().parents[2] / "data" / "policies"
 
 IngestStatus = Literal["created", "updated", "unchanged", "removed", "skipped"]
 
+# What an incoming file means for the stored document with the same slug:
+#   new               no document has this slug yet
+#   same              same bytes, already embedded with this pipeline: nothing to do
+#   new_pipeline      same bytes, but the model or chunker changed: re-embed
+#   new_content       different bytes: replace the document
+#   sample_owns_slug  an upload whose slug belongs to a sample policy: "sample wins"
+Change = Literal["new", "same", "new_pipeline", "new_content", "sample_owns_slug"]
+
 
 @dataclass(frozen=True)
 class IngestResult:
@@ -63,6 +71,31 @@ def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) 
     return result
 
 
+def classify(
+    existing: Document | None, origin: Origin, content_sha256: str, version: str
+) -> Change:
+    """The one rule, used by the folder scan and by uploads."""
+    if existing is None:
+        return "new"
+    if existing.origin == "sample" and origin == "upload":
+        # An upload never replaces a sample; identical bytes simply change nothing.
+        return "same" if existing.content_sha256 == content_sha256 else "sample_owns_slug"
+    if existing.content_sha256 != content_sha256:
+        return "new_content"
+    return "same" if existing.pipeline_version == version else "new_pipeline"
+
+
+def classify_file(
+    engine: Engine, embedder: Embedder, slug: str, data: bytes, origin: Origin
+) -> Change:
+    """What ingesting these bytes under this slug would do. Reads only; changes nothing."""
+    with Session(engine) as session:
+        existing = session.scalar(select(Document).where(Document.slug == slug))
+        return classify(
+            existing, origin, hashlib.sha256(data).hexdigest(), pipeline_version(embedder)
+        )
+
+
 def _ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
     file_type = file_type_of(path.name)
     check_dimension(embedder)
@@ -74,14 +107,10 @@ def _ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin)
 
     with Session(engine) as session, session.begin():
         document = session.scalar(select(Document).where(Document.slug == slug))
-        if document is not None and document.origin == "sample" and origin == "upload":
-            return IngestResult(slug, "skipped", 0)  # "sample wins"
-        unchanged = (
-            document is not None
-            and document.content_sha256 == content_sha256
-            and document.pipeline_version == version
-        )
-        if unchanged:
+        change = classify(document, origin, content_sha256, version)
+        if change == "sample_owns_slug":
+            return IngestResult(slug, "skipped", 0)
+        if change == "same" and document is not None:  # "same" always has a document
             return IngestResult(slug, "unchanged", _chunk_count(session, document.id))
 
         parsed = parse_document(data, file_type)

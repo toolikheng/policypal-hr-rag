@@ -13,7 +13,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_file
-from policypal.ingest.uploads import UploadConflict, add_upload
+from policypal.ingest.uploads import FileTooLarge, UploadConflict, UploadResult, add_upload
 from tests.fakes import FakeEmbedder
 from tests.helpers import build_test_app
 from tests.sample_data import UPLOAD_DEMO_POLICY
@@ -289,16 +289,53 @@ def test_file_is_saved_under_its_slug(client: TestClient, upload_dir: Path) -> N
     assert [p.name for p in upload_dir.iterdir()] == [f"{DEMO_SLUG}.md"]
 
 
-def test_add_upload_returns_the_stored_document(engine: Engine, upload_dir: Path) -> None:
-    result = add_upload(
-        engine, FakeEmbedder(), upload_dir, f"{DEMO_SLUG}.md", DEMO_BYTES, replace=False
+def add(
+    engine: Engine,
+    upload_dir: Path,
+    data: bytes = DEMO_BYTES,
+    *,
+    embedder: FakeEmbedder | None = None,
+    replace: bool = False,
+    max_bytes: int = 1024 * 1024,
+) -> UploadResult:
+    """add_upload() called directly, without HTTP."""
+    return add_upload(
+        engine,
+        embedder or FakeEmbedder(),
+        upload_dir,
+        f"{DEMO_SLUG}.md",
+        data,
+        replace=replace,
+        max_bytes=max_bytes,
     )
+
+
+def test_add_upload_returns_the_stored_document(engine: Engine, upload_dir: Path) -> None:
+    result = add(engine, upload_dir)
 
     assert result.status == "created"
     assert result.document.slug == DEMO_SLUG
     assert result.document.title == "Training and Development Policy"
     assert result.document.origin == "upload"
     assert result.document.chunks == len(chunk_indexes(engine, DEMO_SLUG))
+
+
+def test_size_limit_is_part_of_the_upload_rules(engine: Engine, upload_dir: Path) -> None:
+    with pytest.raises(FileTooLarge, match="The file is larger than 1 MB."):
+        add(engine, upload_dir, b"#" * (1024 * 1024 + 1))
+    assert not upload_dir.exists()
+
+
+def test_same_bytes_after_a_pipeline_change_are_re_embedded_not_a_conflict(
+    engine: Engine, upload_dir: Path
+) -> None:
+    add(engine, upload_dir, embedder=FakeEmbedder(model_name="model-a"))
+    model_b = FakeEmbedder(model_name="model-b")
+
+    result = add(engine, upload_dir, embedder=model_b)
+
+    assert result.status == "updated"
+    assert model_b.embedded_texts  # stale vectors from model-a were replaced
 
 
 class SlowEmbedder(FakeEmbedder):
@@ -316,7 +353,7 @@ def test_two_uploads_of_one_new_policy_at_once_cannot_both_win(
 
     def try_upload(data: bytes) -> None:
         try:
-            add_upload(engine, SlowEmbedder(), upload_dir, f"{DEMO_SLUG}.md", data, replace=False)
+            add(engine, upload_dir, data, embedder=SlowEmbedder())
             outcomes.append("created")
         except UploadConflict:
             outcomes.append("conflict")

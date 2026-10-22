@@ -1,30 +1,37 @@
 """Add an uploaded policy without ever replacing one by accident.
 
 The rules, checked before anything is saved:
-- A file that isn't .md or .pdf, or can't be read as a policy, is rejected.
-- The same bytes as an existing policy change nothing ("unchanged").
-- A built-in sample policy is never replaced: the sample folder is re-ingested on
-  every start, so an upload of the same name couldn't stick anyway.
-- Different content under the name of an uploaded policy is a conflict, unless the
-  caller asks to replace it.
+- A file that is too large, isn't .md or .pdf, or can't be read as a policy is rejected.
+- What the file means for the stored policy is decided by pipeline.classify(), the same
+  rule the folder scan uses:
+  - the same bytes as an existing policy change nothing ("unchanged");
+  - a built-in sample policy is never replaced (the sample folder is re-ingested on
+    every start, so an upload of the same name couldn't stick anyway);
+  - different content under the name of an uploaded policy is a conflict, unless the
+    caller asks to replace it.
 Only then is the file saved to the upload folder (as <slug>.md or <slug>.pdf) and
 ingested, which also makes it survive a restart.
 """
 
-import hashlib
 import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-from sqlalchemy import Engine, func, select
-from sqlalchemy.orm import Session
+from sqlalchemy import Engine
 
 from policypal.catalogue import DocumentInfo, find_document
 from policypal.embeddings import Embedder
-from policypal.ingest.parsing import SUPPORTED_SUFFIXES, FileType, parse_document
-from policypal.ingest.pipeline import IngestResult, ingest_all, ingest_file, slug_for
-from policypal.models import Document, DocumentChunk
+from policypal.ingest.parsing import SUPPORTED_SUFFIXES, FileType, file_type_of, parse_document
+from policypal.ingest.pipeline import (
+    IngestResult,
+    classify_file,
+    ingest_all,
+    ingest_file,
+    slug_for,
+)
+
+MEGABYTE = 1024 * 1024
 
 # Uploads and re-scans check the database, then write files and rows. Running them one
 # at a time means two requests can't both pass the conflict check. (The API runs as one
@@ -40,6 +47,10 @@ class UploadResult:
 
 class UploadRejected(Exception):
     """The upload was refused. The message is safe to show to the user."""
+
+
+class FileTooLarge(UploadRejected):
+    pass
 
 
 class UnsupportedFileType(UploadRejected):
@@ -62,38 +73,37 @@ def add_upload(
     data: bytes,
     *,
     replace: bool,
+    max_bytes: int,
 ) -> UploadResult:
     """Check, save and ingest one uploaded file. Raises an UploadRejected subclass."""
-    file_type = SUPPORTED_SUFFIXES.get(Path(filename).suffix.lower())
-    if file_type is None:
-        raise UnsupportedFileType("Only .md and .pdf files are supported.")
+    if len(data) > max_bytes:
+        raise FileTooLarge(f"The file is larger than {max_bytes / MEGABYTE:g} MB.")
+    try:
+        file_type = file_type_of(filename)
+    except ValueError as exc:
+        raise UnsupportedFileType("Only .md and .pdf files are supported.") from exc
     slug = slug_for(Path(filename))
     if not slug:
         raise InvalidUpload("The file name must contain letters or digits.")
     _check_content(data, file_type)
-    content_sha256 = hashlib.sha256(data).hexdigest()
 
     with _write_lock:
-        existing = _find(engine, slug)
-        if existing is not None:
-            origin, existing_sha256, _ = existing
-            if existing_sha256 == content_sha256:
-                return UploadResult("unchanged", _stored(engine, slug))
-            if origin == "sample":
-                raise UploadConflict(
-                    f"'{slug}' is a built-in sample policy and can't be replaced by upload."
-                    " Rename the file to add it as a new policy."
-                )
-            if not replace:
-                raise UploadConflict(
-                    f"A policy named '{slug}' already exists with different content."
-                    " Nothing was changed. To replace it, upload again with replace=true."
-                )
+        change = classify_file(engine, embedder, slug, data, origin="upload")
+        if change == "same":
+            return UploadResult("unchanged", _stored(engine, slug))
+        if change == "sample_owns_slug":
+            raise UploadConflict(
+                f"'{slug}' is a built-in sample policy and can't be replaced by upload."
+                " Rename the file to add it as a new policy."
+            )
+        if change == "new_content" and not replace:
+            raise UploadConflict(
+                f"A policy named '{slug}' already exists with different content."
+                " Nothing was changed. To replace it, upload again with replace=true."
+            )
         path = _save(upload_dir, slug, file_type, data)
-        result = ingest_file(engine, embedder, path, origin="upload")
-        # A new slug is "created"; an existing one passed the checks above, so "updated".
-        status = "created" if result.status == "created" else "updated"
-        return UploadResult(status, _stored(engine, slug))
+        ingest_file(engine, embedder, path, origin="upload")
+        return UploadResult("created" if change == "new" else "updated", _stored(engine, slug))
 
 
 def rescan(engine: Engine, embedder: Embedder, upload_dir: Path) -> list[IngestResult]:
@@ -116,19 +126,6 @@ def _check_content(data: bytes, file_type: FileType) -> None:
         parse_document(data, file_type)
     except ValueError as exc:  # the parser's messages are written for users
         raise InvalidUpload(str(exc)) from exc
-
-
-def _find(engine: Engine, slug: str) -> tuple[str, str, int] | None:
-    """(origin, content_sha256, chunk count) of the document with this slug, if any."""
-    query = (
-        select(Document.origin, Document.content_sha256, func.count(DocumentChunk.id))
-        .outerjoin(DocumentChunk, DocumentChunk.document_id == Document.id)
-        .where(Document.slug == slug)
-        .group_by(Document.id)
-    )
-    with Session(engine) as session:
-        row = session.execute(query).first()
-    return None if row is None else (row[0], row[1], row[2])
 
 
 def _save(upload_dir: Path, slug: str, file_type: FileType, data: bytes) -> Path:
