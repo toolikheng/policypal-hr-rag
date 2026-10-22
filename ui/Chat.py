@@ -24,6 +24,8 @@ except ApiError as exc:
 else:
     if health["status"] == "ok":
         st.success(f"API is healthy (version {health['version']}).")
+    elif health["status"] == "degraded":
+        st.warning("API is up, but the AI model isn't ready: answers will quote the policy text.")
     else:
         st.warning(f"API is running but not ready: database is {health['database']}.")
 

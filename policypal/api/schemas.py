@@ -10,20 +10,33 @@ from policypal.answering import Answer, FallbackReason, Mode
 from policypal.db import DatabaseStatus
 from policypal.ingest.parsing import FileType
 from policypal.ingest.pipeline import IngestStatus
+from policypal.llm.base import LLMStatus
 from policypal.models import Origin
+
+
+class LLMHealth(BaseModel):
+    provider: str = Field(description="ollama, or extractive when no LLM is configured.")
+    model: str | None
+    status: LLMStatus
 
 
 class HealthResponse(BaseModel):
     database: DatabaseStatus
+    llm: LLMHealth
     documents: int | None  # null when the database can't be checked
     chunks: int | None
     version: str
 
     @computed_field
     @property
-    def status(self) -> Literal["ok", "unavailable"]:
-        """Overall status, derived from the checks so it can never disagree with them."""
-        return "ok" if self.database == "ok" else "unavailable"
+    def status(self) -> Literal["ok", "degraded", "unavailable"]:
+        """Overall status, derived from the checks so it can never disagree with them.
+
+        degraded: the LLM isn't ready, so answers quote the policy text instead.
+        """
+        if self.database != "ok":
+            return "unavailable"
+        return "ok" if self.llm.status == "ok" else "degraded"
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -31,10 +44,19 @@ class HealthResponse(BaseModel):
                 {
                     "status": "ok",
                     "database": "ok",
+                    "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "ok"},
                     "documents": 8,
                     "chunks": 119,
                     "version": "0.1.0",
-                }
+                },
+                {
+                    "status": "degraded",
+                    "database": "ok",
+                    "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "unavailable"},
+                    "documents": 8,
+                    "chunks": 119,
+                    "version": "0.1.0",
+                },
             ]
         }
     )

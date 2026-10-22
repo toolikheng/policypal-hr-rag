@@ -42,7 +42,8 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      # urlopen fails on a 503, so the container is only "healthy" when /health is ok.
+      # urlopen fails on a 503, so the container is "healthy" only when /health is ok or
+      # degraded (the database works; the LLM may still be downloading).
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
       interval: 10s
       timeout: 5s
