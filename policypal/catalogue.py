@@ -9,7 +9,7 @@ from datetime import datetime
 from itertools import groupby
 from typing import Any
 
-from sqlalchemy import Engine, func, select
+from sqlalchemy import ColumnElement, Engine, func, select
 from sqlalchemy.orm import Session
 
 from policypal.ingest.parsing import FileType
@@ -57,9 +57,6 @@ def find_document(engine: Engine, slug: str) -> DocumentInfo | None:
 
 def get_document(engine: Engine, document_id: int) -> DocumentContents | None:
     """A document with its chunks grouped by section, in document order."""
-    found = _documents(engine, Document.id == document_id)
-    if not found:
-        return None
     query = (
         select(
             DocumentChunk.id,
@@ -70,8 +67,13 @@ def get_document(engine: Engine, document_id: int) -> DocumentContents | None:
         .where(DocumentChunk.document_id == document_id)
         .order_by(DocumentChunk.chunk_index)
     )
-    with engine.connect() as conn:
-        rows = conn.execute(query).all()
+    with Session(engine) as session:
+        document = session.get(Document, document_id)
+        if document is None:
+            return None
+        rows = session.execute(query).all()
+        # The count comes from the rows shown, so it always matches the sections.
+        info = _info(document, chunks=len(rows))
     # A long section is split into several chunks, which are next to each other.
     sections = tuple(
         SectionContents(
@@ -83,10 +85,12 @@ def get_document(engine: Engine, document_id: int) -> DocumentContents | None:
             rows, key=lambda row: (row.section, row.section_path)
         )
     )
-    return DocumentContents(**asdict(found[0]), sections=sections)
+    return DocumentContents(**asdict(info), sections=sections)
 
 
-def _documents(engine: Engine, *where: Any, order_by: tuple[Any, ...] = ()) -> list[DocumentInfo]:
+def _documents(
+    engine: Engine, *where: ColumnElement[bool], order_by: tuple[ColumnElement[Any], ...] = ()
+) -> list[DocumentInfo]:
     """The one "document plus chunk count" query."""
     query = (
         select(Document, func.count(DocumentChunk.id))
@@ -96,15 +100,16 @@ def _documents(engine: Engine, *where: Any, order_by: tuple[Any, ...] = ()) -> l
         .order_by(*order_by)
     )
     with Session(engine) as session:
-        return [
-            DocumentInfo(
-                id=document.id,
-                slug=document.slug,
-                title=document.title,
-                file_type=document.file_type,
-                origin=document.origin,
-                chunks=chunks,
-                updated_at=document.updated_at,
-            )
-            for document, chunks in session.execute(query)
-        ]
+        return [_info(document, chunks) for document, chunks in session.execute(query)]
+
+
+def _info(document: Document, chunks: int) -> DocumentInfo:
+    return DocumentInfo(
+        id=document.id,
+        slug=document.slug,
+        title=document.title,
+        file_type=document.file_type,
+        origin=document.origin,
+        chunks=chunks,
+        updated_at=document.updated_at,
+    )
