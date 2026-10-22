@@ -63,6 +63,9 @@ class SentenceTransformerEmbedder:
     def embed_query(self, question: str) -> list[float]:
         # An explicit prompt (even "") replaces any default prompt the model defines.
         vector = self._model.encode_query(
-            question, prompt=self.query_instruction, normalize_embeddings=True
+            question,
+            prompt=self.query_instruction,
+            normalize_embeddings=True,
+            show_progress_bar=False,  # it would print non-JSON lines to the logs
         )
         return vector.tolist()

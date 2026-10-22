@@ -59,6 +59,20 @@ def test_question_is_embedded_with_the_query_instruction(
     assert vector == [0.6, 0.8, 0.0]
 
 
+@pytest.mark.parametrize("kind", ["query", "document"])
+def test_no_progress_bar_is_drawn(stub_model: type[StubSentenceTransformer], kind: str) -> None:
+    # The library draws one when logging is at INFO, which breaks the JSON-only logs.
+    embedder = SentenceTransformerEmbedder("some/model", query_instruction=BGE_INSTRUCTION)
+
+    if kind == "query":
+        embedder.embed_query("Q?")
+    else:
+        embedder.embed_documents(["Text."])
+
+    [(_, _, options)] = stub_model.instances[0].calls
+    assert options["show_progress_bar"] is False
+
+
 def test_empty_instruction_embeds_the_question_as_written(
     stub_model: type[StubSentenceTransformer],
 ) -> None:
