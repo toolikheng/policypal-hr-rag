@@ -1,9 +1,16 @@
 """Small helpers shared by tests (fixtures live in conftest.py)."""
 
-from alembic.config import Config
+from typing import Any
 
+from alembic.config import Config
+from fastapi import FastAPI
+
+from policypal.api.main import create_app
 from policypal.config import Settings
+from policypal.embeddings import Embedder
+from policypal.llm.base import LLMProvider
 from policypal.retrieval import RetrievedChunk
+from tests.fakes import FakeEmbedder, FakeLLM
 
 
 def alembic_config(database_url: str) -> Config:
@@ -12,9 +19,27 @@ def alembic_config(database_url: str) -> Config:
     return config
 
 
-def make_settings(database_url: str) -> Settings:
+def make_settings(database_url: str, **overrides: Any) -> Settings:
     # _env_file=None: tests must not depend on a developer's local .env file.
-    return Settings(_env_file=None, database_url=database_url)
+    return Settings(_env_file=None, database_url=database_url, **overrides)
+
+
+def build_test_app(
+    database_url: str,
+    *,
+    llm: LLMProvider | None = None,
+    embedder: Embedder | None = None,
+    **settings: Any,
+) -> FastAPI:
+    """The app wired with test doubles, so no model is loaded and no network is used.
+
+    The embedder is a FakeEmbedder and the LLM a FakeLLM unless given. For extractive
+    mode, pass llm_provider="extractive" (the app then has no LLM at all).
+    """
+    app_settings = make_settings(database_url, **settings)
+    if llm is None and app_settings.llm_provider != "extractive":
+        llm = FakeLLM()
+    return create_app(app_settings, embedder=embedder or FakeEmbedder(), llm=llm)
 
 
 def retrieved_chunk(

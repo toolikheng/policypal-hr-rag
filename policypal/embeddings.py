@@ -17,6 +17,15 @@ class Embedder(Protocol):
     def embed_query(self, question: str) -> list[float]: ...
 
 
+def check_dimension(embedder: Embedder) -> None:
+    """Stop early if the model's vectors wouldn't fit the database column."""
+    if embedder.dimension != EMBEDDING_DIMENSION:
+        raise ValueError(
+            f"Embedding model '{embedder.model_name}' makes {embedder.dimension}-number vectors,"
+            f" but the database stores {EMBEDDING_DIMENSION}-number vectors."
+        )
+
+
 def build_embedder(settings: Settings) -> "SentenceTransformerEmbedder":
     """The real embedder, configured from settings (used by the API and the ingest CLI)."""
     return SentenceTransformerEmbedder(

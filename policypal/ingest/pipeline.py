@@ -16,7 +16,7 @@ from typing import Literal
 from sqlalchemy import Engine, delete, func, select
 from sqlalchemy.orm import Session
 
-from policypal.embeddings import EMBEDDING_DIMENSION, Embedder
+from policypal.embeddings import Embedder, check_dimension
 from policypal.ingest.chunking import CHUNKER_VERSION, chunk_document, embedding_text
 from policypal.ingest.parsing import SUPPORTED_SUFFIXES, file_type_of, parse_document
 from policypal.models import Document, DocumentChunk, Origin
@@ -54,11 +54,7 @@ def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) 
 
 def _ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
     file_type = file_type_of(path.name)
-    if embedder.dimension != EMBEDDING_DIMENSION:
-        raise ValueError(
-            f"Embedding model '{embedder.model_name}' makes {embedder.dimension}-number vectors,"
-            f" but the database stores {EMBEDDING_DIMENSION}-number vectors."
-        )
+    check_dimension(embedder)
 
     data = path.read_bytes()
     slug = slug_for(path)

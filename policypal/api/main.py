@@ -10,12 +10,17 @@ import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, status
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import OperationalError
 
 from policypal import __version__
-from policypal.api.routes import health
+from policypal.api.routes import ask, health
 from policypal.config import Settings
 from policypal.db import make_engine
+from policypal.embeddings import Embedder, build_embedder, check_dimension
+from policypal.llm import build_llm
+from policypal.llm.base import LLMProvider
 from policypal.logging_setup import configure_logging, request_id_var
 
 logger = logging.getLogger("policypal.api")
@@ -32,11 +37,24 @@ def create_app_from_env() -> FastAPI:
     return create_app(settings)
 
 
-def create_app(settings: Settings) -> FastAPI:
-    """Build the API from explicit settings. No global side effects, so tests can build many."""
+def create_app(
+    settings: Settings,
+    *,
+    embedder: Embedder | None = None,
+    llm: LLMProvider | None = None,
+) -> FastAPI:
+    """Build the API from explicit settings. No global side effects, so tests can build many.
+
+    The embedding model and the LLM client are built from the settings at startup, unless
+    they are passed in (tests pass fakes). An app without an LLM answers in extractive mode.
+    """
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        app.state.settings = settings
+        app.state.embedder = embedder if embedder is not None else build_embedder(settings)
+        check_dimension(app.state.embedder)  # refuse to start rather than fail on every question
+        app.state.llm = llm if llm is not None else build_llm(settings)
         app.state.engine = make_engine(settings.database_url)
         yield
         app.state.engine.dispose()
@@ -48,8 +66,19 @@ def create_app(settings: Settings) -> FastAPI:
         lifespan=lifespan,
     )
     app.middleware("http")(request_context)
+    app.exception_handler(OperationalError)(database_unavailable)
     app.include_router(health.router)
+    app.include_router(ask.router)
     return app
+
+
+async def database_unavailable(request: Request, exc: Exception) -> JSONResponse:
+    """The database couldn't be reached (OperationalError): 503 instead of a 500."""
+    # The error type only: the full message can contain the connection string.
+    logger.warning("database.unreachable", extra={"error": type(exc).__name__})
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={"detail": "Database unavailable."}
+    )
 
 
 async def request_context(
@@ -61,7 +90,16 @@ async def request_context(
     token = request_id_var.set(request_id)
     started = time.perf_counter()
     try:
-        response = await call_next(request)
+        try:
+            response = await call_next(request)
+        except Exception:
+            # Logged here, while the request ID is still set. The client gets only the ID,
+            # never the error details.
+            logger.exception("request.failed", extra={"path": request.url.path})
+            response = JSONResponse(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                content={"detail": "Internal server error.", "request_id": request_id},
+            )
         response.headers["X-Request-ID"] = request_id
         logger.info(
             "request.completed",

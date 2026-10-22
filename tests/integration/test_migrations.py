@@ -10,8 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
-from policypal.api.main import create_app
-from tests.helpers import alembic_config, make_settings
+from tests.helpers import alembic_config, build_test_app
 
 
 def vector_extension_installed(database_url: str) -> bool:
@@ -35,7 +34,7 @@ def test_downgrade_then_upgrade_round_trip(migrated_database_url: str) -> None:
         assert not vector_extension_installed(migrated_database_url)
 
         # While the schema is missing, /health must say so instead of claiming "ok".
-        with TestClient(create_app(make_settings(migrated_database_url))) as client:
+        with TestClient(build_test_app(migrated_database_url)) as client:
             response = client.get("/health")
         assert response.status_code == 503
         assert response.json()["database"] == "not_migrated"
@@ -54,7 +53,7 @@ def test_health_is_not_migrated_when_database_is_behind_the_code(
         with engine.begin() as conn:
             head = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
             conn.execute(text("UPDATE alembic_version SET version_num = 'older'"))
-        with TestClient(create_app(make_settings(migrated_database_url))) as client:
+        with TestClient(build_test_app(migrated_database_url)) as client:
             response = client.get("/health")
     finally:
         with engine.begin() as conn:

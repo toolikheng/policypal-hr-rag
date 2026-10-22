@@ -15,9 +15,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import OperationalError
 
-from policypal.api.main import create_app
 from policypal.db import make_engine
-from tests.helpers import alembic_config, make_settings
+from tests.helpers import alembic_config, build_test_app
 
 DEFAULT_TEST_DATABASE_URL = (
     "postgresql+psycopg://policypal:policypal-local-dev@localhost:5433/policypal_test"
@@ -51,7 +50,7 @@ def migrated_database_url(test_database_url: str) -> str:
 
 @pytest.fixture
 def client(migrated_database_url: str) -> Iterator[TestClient]:
-    with TestClient(create_app(make_settings(migrated_database_url))) as test_client:
+    with TestClient(build_test_app(migrated_database_url)) as test_client:
         yield test_client
 
 

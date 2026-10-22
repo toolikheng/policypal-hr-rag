@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Request, Response, status
+from fastapi import APIRouter, Response, status
 
 from policypal import __version__
+from policypal.api.deps import EngineDep
 from policypal.api.schemas import HealthResponse
 from policypal.db import check_database
 
@@ -27,8 +28,8 @@ UNAVAILABLE_EXAMPLE = {
         }
     },
 )
-def health(request: Request, response: Response) -> HealthResponse:
-    check = check_database(request.app.state.engine)
+def health(engine: EngineDep, response: Response) -> HealthResponse:
+    check = check_database(engine)
     report = HealthResponse(
         database=check.status, documents=check.documents, chunks=check.chunks, version=__version__
     )

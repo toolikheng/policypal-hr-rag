@@ -2,10 +2,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
 from policypal import __version__
-from policypal.api.main import create_app
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_folder
 from tests.fakes import FakeEmbedder
-from tests.helpers import make_settings
+from tests.helpers import build_test_app
 
 
 def test_health_is_ok_when_database_is_up_and_migrated(client: TestClient, engine: Engine) -> None:
@@ -32,9 +31,9 @@ def test_health_reports_document_and_chunk_counts(client: TestClient, engine: En
 
 def test_health_is_503_when_database_is_unreachable() -> None:
     # Port 1 on localhost has nothing listening, so the connection is refused immediately.
-    settings = make_settings("postgresql+psycopg://nobody:nothing@localhost:1/none")
+    app = build_test_app("postgresql+psycopg://nobody:nothing@localhost:1/none")
 
-    with TestClient(create_app(settings)) as unreachable_client:
+    with TestClient(app) as unreachable_client:
         response = unreachable_client.get("/health")
 
     assert response.status_code == 503
