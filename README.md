@@ -137,8 +137,11 @@ Docker Desktop), with 8 questions per model. This is illustrative, not an evalua
 | `llama3.2:3b` (default) | about 24 s | about 3.6 GB | All 7 cited answers matched the policies when checked by hand |
 | `llama3.2:1b` | about 13 s | about 2.4 GB | Refused 2 answerable questions and gave one wrong answer; use only if memory is tight |
 
-The first answer after the model has been unloaded also includes loading it: about
-33 s in total for `3b`. Refusals take well under a second because the LLM isn't called.
+The first answer after the model has been unloaded also includes loading it: 33 s in
+total for `3b` on an idle laptop, and 58 s while a second copy of the stack was running.
+After `OLLAMA_TIMEOUT_SECONDS` (default 60) the API stops waiting and quotes the policy
+text instead, so on a slower machine raise it in `.env`. Refusals take well under a
+second because the LLM isn't called.
 
 ## Managing policies (admin)
 
