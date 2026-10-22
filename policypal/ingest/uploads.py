@@ -16,7 +16,7 @@ ingested, which also makes it survive a restart.
 import threading
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import BinaryIO, Literal
 
 from sqlalchemy import Engine
 
@@ -31,7 +31,7 @@ from policypal.ingest.pipeline import (
     slug_for,
 )
 
-MEGABYTE = 1024 * 1024
+_MEGABYTE = 1024 * 1024
 
 # Uploads and re-scans check the database, then write files and rows. Running them one
 # at a time means two requests can't both pass the conflict check. (The API runs as one
@@ -70,14 +70,16 @@ def add_upload(
     embedder: Embedder,
     upload_dir: Path,
     filename: str,
-    data: bytes,
+    stream: BinaryIO,
     *,
     replace: bool,
-    max_bytes: int,
+    max_mb: int,
 ) -> UploadResult:
     """Check, save and ingest one uploaded file. Raises an UploadRejected subclass."""
+    max_bytes = max_mb * _MEGABYTE
+    data = stream.read(max_bytes + 1)  # never read more than one byte past the limit
     if len(data) > max_bytes:
-        raise FileTooLarge(f"The file is larger than {max_bytes / MEGABYTE:g} MB.")
+        raise FileTooLarge(f"The file is larger than {max_mb} MB.")
     try:
         file_type = file_type_of(filename)
     except ValueError as exc:

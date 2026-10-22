@@ -19,7 +19,6 @@ from policypal.api.schemas import (
     validation_error_example,
 )
 from policypal.ingest.uploads import (
-    MEGABYTE,
     FileTooLarge,
     InvalidUpload,
     UnsupportedFileType,
@@ -130,17 +129,15 @@ def upload_document(
         Query(description="Replace an uploaded policy with the same name (never a sample)."),
     ] = False,
 ) -> UploadResponse:
-    max_bytes = settings.max_upload_mb * MEGABYTE
-    data = file.file.read(max_bytes + 1)  # never read more than one byte past the limit
     try:
         result = add_upload(
             engine,
             embedder,
             settings.upload_dir,
             file.filename or "",
-            data,
+            file.file,
             replace=replace,
-            max_bytes=max_bytes,
+            max_mb=settings.max_upload_mb,
         )
     except FileTooLarge as exc:
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, str(exc)) from exc

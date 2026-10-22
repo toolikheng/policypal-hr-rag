@@ -1,6 +1,7 @@
 """POST /documents (upload) and POST /documents/reingest, including the 409 conflict rules."""
 
 import hashlib
+import io
 import threading
 import time
 from collections.abc import Iterator
@@ -296,17 +297,16 @@ def add(
     *,
     embedder: FakeEmbedder | None = None,
     replace: bool = False,
-    max_bytes: int = 1024 * 1024,
 ) -> UploadResult:
-    """add_upload() called directly, without HTTP."""
+    """add_upload() called directly, without HTTP, with a 1 MB limit."""
     return add_upload(
         engine,
         embedder or FakeEmbedder(),
         upload_dir,
         f"{DEMO_SLUG}.md",
-        data,
+        io.BytesIO(data),
         replace=replace,
-        max_bytes=max_bytes,
+        max_mb=1,
     )
 
 
@@ -324,6 +324,15 @@ def test_size_limit_is_part_of_the_upload_rules(engine: Engine, upload_dir: Path
     with pytest.raises(FileTooLarge, match="The file is larger than 1 MB."):
         add(engine, upload_dir, b"#" * (1024 * 1024 + 1))
     assert not upload_dir.exists()
+
+
+def test_an_oversized_upload_is_never_read_past_the_limit(engine: Engine, upload_dir: Path) -> None:
+    stream = io.BytesIO(b"#" * (3 * 1024 * 1024))
+
+    with pytest.raises(FileTooLarge):
+        add_upload(engine, FakeEmbedder(), upload_dir, "big.md", stream, replace=False, max_mb=1)
+
+    assert stream.tell() == 1024 * 1024 + 1
 
 
 def test_same_bytes_after_a_pipeline_change_are_re_embedded_not_a_conflict(
