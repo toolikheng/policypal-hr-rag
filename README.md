@@ -146,13 +146,25 @@ docker-compose.yml  db (PostgreSQL + pgvector), api, ui
 
 - Keep the repository in the Linux filesystem (e.g. `~/projects/policypal`), not under
   `/mnt/c/...`. File watching and Docker volumes are much faster there.
-- Use Docker Desktop with WSL integration enabled for your distribution, or Docker
-  Engine installed inside WSL. Check with `docker compose version`.
-- Use one of the two. If Docker Engine is also installed inside WSL, it can take over
-  the Docker socket after WSL restarts. `docker compose` then fails with
-  "unknown command", and your containers seem to have disappeared. Start Docker
-  Desktop again (or stop the WSL engine) and check that `docker version` shows
-  "Docker Desktop" as the server.
+- Use **Docker Desktop with WSL integration** enabled for your distribution. This is
+  the setup the project is developed and tested with. Check both of these:
+
+  ```bash
+  docker version --format '{{.Server.Platform.Name}}'   # should name Docker Desktop
+  docker compose version
+  ```
+
+- Don't run a second Docker Engine inside WSL at the same time. After a WSL restart
+  it can take over the Docker socket. `docker compose` then fails with "unknown
+  command", and your containers seem to have disappeared (they are still in Docker
+  Desktop). If you have one installed, stop it from starting:
+
+  ```bash
+  sudo systemctl disable --now docker.service docker.socket
+  ```
+
+  Disable `docker.socket` as well as `docker.service`: the socket unit can start the
+  engine again on its own.
 - WSL2 gets half of the Windows machine's RAM by default. Later phases add a local LLM
   that needs several GB. If WSL feels short of memory, set a limit in
   `%UserProfile%\.wslconfig`, for example:
