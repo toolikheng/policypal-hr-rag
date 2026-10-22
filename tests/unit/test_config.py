@@ -12,6 +12,7 @@ SETTING_ENV_VARS = [
     "OLLAMA_BASE_URL",
     "OLLAMA_MODEL",
     "OLLAMA_TIMEOUT_SECONDS",
+    "MIN_SIMILARITY",
 ]
 
 
@@ -115,4 +116,20 @@ def test_invalid_ollama_timeout_is_rejected(monkeypatch: pytest.MonkeyPatch, tim
     monkeypatch.setenv("OLLAMA_TIMEOUT_SECONDS", timeout)
 
     with pytest.raises(ValidationError, match="ollama_timeout_seconds"):
+        Settings(_env_file=None)
+
+
+def test_min_similarity_has_the_provisional_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
+    # Provisional (Phase 2), set from hand-picked questions; calibrated in Phase 5.
+    assert Settings(_env_file=None).min_similarity == 0.65
+
+
+@pytest.mark.parametrize("value", ["-0.1", "1.5", "high"])
+def test_invalid_min_similarity_is_rejected(monkeypatch: pytest.MonkeyPatch, value: str) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("MIN_SIMILARITY", value)
+
+    with pytest.raises(ValidationError, match="min_similarity"):
         Settings(_env_file=None)

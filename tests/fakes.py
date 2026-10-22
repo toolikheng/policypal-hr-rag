@@ -3,8 +3,11 @@
 import hashlib
 import math
 import re
+from collections.abc import Sequence
 
 from policypal.embeddings import EMBEDDING_DIMENSION
+from policypal.llm.base import LLMError, LLMStatus
+from policypal.retrieval import RetrievedChunk
 
 
 class FakeEmbedder:
@@ -38,3 +41,36 @@ class FakeEmbedder:
             vector[bucket] += 1.0
         norm = math.sqrt(sum(value * value for value in vector)) or 1.0
         return [value / norm for value in vector]
+
+
+class FakeLLM:
+    """Deterministic stand-in for an LLM provider, used only in tests.
+
+    It returns a scripted reply (or raises a scripted LLMError) and records every call,
+    so tests can check what the model was given without running a model.
+    """
+
+    name = "fake"
+
+    def __init__(
+        self,
+        reply: str = "Employees get 16 days of annual leave [1].",
+        *,
+        error: LLMError | None = None,
+        status: LLMStatus = "ok",
+        model: str = "fake-model",
+    ) -> None:
+        self.reply = reply
+        self.error = error
+        self.model = model
+        self._status: LLMStatus = status
+        self.calls: list[tuple[str, list[RetrievedChunk]]] = []
+
+    def generate(self, question: str, excerpts: Sequence[RetrievedChunk]) -> str:
+        self.calls.append((question, list(excerpts)))
+        if self.error is not None:
+            raise self.error
+        return self.reply
+
+    def status(self) -> LLMStatus:
+        return self._status

@@ -31,3 +31,7 @@ class Settings(BaseSettings):
     embedding_query_instruction: str = "Represent this sentence for searching relevant passages: "
     # How many of the most similar chunks a search returns.
     retrieval_top_k: int = Field(default=5, ge=1, le=20)
+    # Refuse when the best chunk's cosine similarity is below this. It is a score, not a
+    # probability. 0.65 is provisional: set from 16 hand-picked questions, with the query
+    # instruction on (in scope scored 0.70-0.82, out of scope 0.49-0.60).
+    min_similarity: float = Field(default=0.65, ge=0, le=1)
