@@ -12,6 +12,11 @@ target-version = "py311"
 # E/F: pycodestyle + pyflakes errors, I: import order, B: common bugs, UP: modern syntax
 select = ["E", "F", "I", "B", "UP"]
 
+[tool.ruff.lint.isort]
+# Listed explicitly so import order doesn't change depending on whether a module
+# exists yet (tests are written before the code they import).
+known-first-party = ["policypal", "ui", "tests"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
