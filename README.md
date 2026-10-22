@@ -245,9 +245,9 @@ make help      # list all commands
 ## Project layout
 
 ```
-policypal/          FastAPI backend (config, logging, database, retrieval, answering)
+policypal/          FastAPI backend (config, logging, database, catalogue, retrieval, answering)
 policypal/api/      app factory, request/response models, routes
-policypal/llm/      prompt, provider interface, Ollama client, extractive answers
+policypal/llm/      prompt, provider interface and the Ollama client
 policypal/ingest/   parsing, chunking, the ingestion pipeline and uploads
 ui/                 Streamlit UI. It talks to the API over HTTP only
 migrations/         Alembic database migrations

@@ -5,10 +5,10 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from policypal.llm import build_llm
+from policypal.llm import LLMInfo, build_llm, describe_llm
 from policypal.llm.ollama import OllamaProvider
 from policypal.logging_setup import JsonFormatter
-from tests.fakes import FakeEmbedder
+from tests.fakes import FakeEmbedder, FakeLLM
 from tests.helpers import build_test_app, make_settings
 
 # Nothing listens on port 1; these tests never touch the database.
@@ -31,6 +31,18 @@ def test_ollama_provider_is_built_from_settings() -> None:
 
 def test_extractive_mode_has_no_llm() -> None:
     assert build_llm(make_settings(NO_DATABASE, llm_provider="extractive")) is None
+
+
+def test_no_llm_is_described_as_extractive_mode() -> None:
+    assert describe_llm(None) == LLMInfo(provider="extractive", model=None, status="ok")
+
+
+def test_an_llm_is_described_by_its_name_model_and_status() -> None:
+    llm = FakeLLM(model="llama3.2:3b", status="model_missing")
+
+    assert describe_llm(llm) == LLMInfo(
+        provider="fake", model="llama3.2:3b", status="model_missing"
+    )
 
 
 def test_app_refuses_to_start_if_the_embedding_size_does_not_match_the_database() -> None:

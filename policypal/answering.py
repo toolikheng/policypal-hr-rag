@@ -23,10 +23,13 @@ from sqlalchemy import Engine
 
 from policypal.embeddings import Embedder
 from policypal.llm.base import REFUSAL_SENTENCE, LLMError, LLMErrorReason, LLMProvider
-from policypal.llm.extractive import MAX_PASSAGES, extractive_text
 from policypal.retrieval import RetrievedChunk, retrieve
 
 logger = logging.getLogger("policypal.answering")
+
+# Extractive answers quote at most this many passages, exactly as written.
+EXTRACTIVE_HEADING = "No AI summary available — the most relevant policy passages are below."
+MAX_PASSAGES = 3
 
 Mode = Literal["llm", "extractive", "refused"]
 FallbackReason = LLMErrorReason | Literal["llm_no_valid_citation", "llm_empty_answer"]
@@ -151,15 +154,26 @@ def _extractive(
     fallback_reason: FallbackReason | None = None,
     generation_ms: int | None = None,
 ) -> Reply:
+    """The no-LLM answer: the top passages quoted as written. It never writes new text, so it
+    can't state anything the policies don't say."""
     shown = excerpts[:MAX_PASSAGES]
     citations = tuple(Citation(n, chunk) for n, chunk in enumerate(shown, start=1))
+    passages = [
+        f"[{c.number}] {c.chunk.document_title} — {c.chunk.section}\n{_quote(c.chunk.text)}"
+        for c in citations
+    ]
     return Reply(
-        extractive_text(shown),
+        "\n\n".join([EXTRACTIVE_HEADING, *passages]),
         "extractive",
         citations,
         fallback_reason=fallback_reason,
         generation_ms=generation_ms,
     )
+
+
+def _quote(text: str) -> str:
+    """Markdown block quote, line by line."""
+    return "\n".join(f"> {line}" if line else ">" for line in text.splitlines())
 
 
 def _remove_invalid_markers(text: str, excerpt_count: int) -> str:

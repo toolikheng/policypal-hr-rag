@@ -19,6 +19,8 @@ class LLMHealth(BaseModel):
     model: str | None
     status: LLMStatus
 
+    model_config = ConfigDict(from_attributes=True)  # built from llm.LLMInfo
+
 
 class HealthResponse(BaseModel):
     database: DatabaseStatus

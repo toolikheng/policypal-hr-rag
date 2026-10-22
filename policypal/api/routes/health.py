@@ -4,6 +4,7 @@ from policypal import __version__
 from policypal.api.deps import EngineDep, LLMDep
 from policypal.api.schemas import HealthResponse, LLMHealth
 from policypal.db import check_database
+from policypal.llm import describe_llm
 
 router = APIRouter(tags=["health"])
 
@@ -33,13 +34,9 @@ UNAVAILABLE_EXAMPLE = {
 )
 def health(engine: EngineDep, llm: LLMDep, response: Response) -> HealthResponse:
     check = check_database(engine)
-    if llm is None:
-        llm_health = LLMHealth(provider="extractive", model=None, status="ok")
-    else:
-        llm_health = LLMHealth(provider=llm.name, model=llm.model, status=llm.status())
     report = HealthResponse(
         database=check.status,
-        llm=llm_health,
+        llm=LLMHealth.model_validate(describe_llm(llm), from_attributes=True),
         documents=check.documents,
         chunks=check.chunks,
         version=__version__,

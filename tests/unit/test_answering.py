@@ -2,9 +2,8 @@
 
 import pytest
 
-from policypal.answering import build_reply
+from policypal.answering import EXTRACTIVE_HEADING, build_reply
 from policypal.llm.base import REFUSAL_SENTENCE, LLMError
-from policypal.llm.extractive import EXTRACTIVE_HEADING
 from tests.fakes import FakeLLM
 from tests.helpers import retrieved_chunk
 
@@ -250,6 +249,31 @@ def test_without_an_llm_the_answer_quotes_the_top_passages() -> None:
     assert [(c.number, c.chunk) for c in reply.citations] == [(1, LEAVE), (2, CARRY), (3, OVERTIME)]
     for chunk in (LEAVE, CARRY, OVERTIME):
         assert chunk.text in reply.text
+
+
+def test_extractive_answer_quotes_each_passage_as_written_under_its_source() -> None:
+    table = retrieved_chunk(
+        title="Leave Policy",
+        section="4.1 Annual Leave Entitlement",
+        text="| Years | Days |\n|---|---|\n| 0-2 | 14 |",
+        similarity=0.9,
+    )
+    paragraphs = retrieved_chunk(
+        title="Overtime Policy",
+        section="5. Overtime Rates",
+        text="Two times.\n\nOK.",
+        similarity=0.8,
+    )
+
+    reply = build_reply("Q?", [table, paragraphs], None, THRESHOLD)
+
+    assert reply.text == (
+        "No AI summary available — the most relevant policy passages are below.\n\n"
+        "[1] Leave Policy — 4.1 Annual Leave Entitlement\n"
+        "> | Years | Days |\n> |---|---|\n> | 0-2 | 14 |\n\n"
+        "[2] Overtime Policy — 5. Overtime Rates\n"
+        "> Two times.\n>\n> OK."
+    )
 
 
 def test_extractive_answer_shows_at_most_three_passages() -> None:

@@ -10,9 +10,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
+from policypal.answering import EXTRACTIVE_HEADING
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_file
 from policypal.llm.base import REFUSAL_SENTENCE, LLMError
-from policypal.llm.extractive import EXTRACTIVE_HEADING
 from policypal.llm.ollama import OllamaProvider
 from tests.fakes import FakeEmbedder, FakeLLM
 from tests.helpers import build_test_app
