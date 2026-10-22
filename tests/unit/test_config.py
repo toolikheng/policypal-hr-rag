@@ -9,6 +9,9 @@ SETTING_ENV_VARS = [
     "LOG_LEVEL",
     "EMBEDDING_QUERY_INSTRUCTION",
     "RETRIEVAL_TOP_K",
+    "OLLAMA_BASE_URL",
+    "OLLAMA_MODEL",
+    "OLLAMA_TIMEOUT_SECONDS",
 ]
 
 
@@ -93,4 +96,23 @@ def test_invalid_log_level_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("LOG_LEVEL", "LOUD")
 
     with pytest.raises(ValidationError, match="log_level"):
+        Settings(_env_file=None)
+
+
+def test_ollama_settings_have_local_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
+    settings = Settings(_env_file=None)
+
+    assert settings.ollama_base_url == "http://localhost:11434"
+    assert settings.ollama_model == "llama3.2:3b"
+    assert settings.ollama_timeout_seconds == 60
+
+
+@pytest.mark.parametrize("timeout", ["0", "-5", "601"])
+def test_invalid_ollama_timeout_is_rejected(monkeypatch: pytest.MonkeyPatch, timeout: str) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("OLLAMA_TIMEOUT_SECONDS", timeout)
+
+    with pytest.raises(ValidationError, match="ollama_timeout_seconds"):
         Settings(_env_file=None)

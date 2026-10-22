@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     database_url: str
     # "fake" is deliberately not allowed: the fake LLM exists only in the test suite.
     llm_provider: Literal["ollama", "extractive"] = "ollama"
+    # Inside Docker Compose this is http://ollama:11434 (set in docker-compose.yml).
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "llama3.2:3b"
+    # A CPU can take tens of seconds per answer; after this the app quotes the policies.
+    ollama_timeout_seconds: float = Field(default=60, gt=0, le=600)
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     # Local sentence-transformers model. Changing it needs an image rebuild (the model is
     # downloaded at build time) and must keep 384-number vectors (see migration 0002).
