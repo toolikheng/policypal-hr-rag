@@ -6,7 +6,13 @@ from policypal.db import check_database
 
 router = APIRouter(tags=["health"])
 
-UNAVAILABLE_EXAMPLE = {"status": "unavailable", "database": "unreachable", "version": "0.1.0"}
+UNAVAILABLE_EXAMPLE = {
+    "status": "unavailable",
+    "database": "unreachable",
+    "documents": None,
+    "chunks": None,
+    "version": "0.1.0",
+}
 
 
 @router.get(
@@ -22,7 +28,10 @@ UNAVAILABLE_EXAMPLE = {"status": "unavailable", "database": "unreachable", "vers
     },
 )
 def health(request: Request, response: Response) -> HealthResponse:
-    report = HealthResponse(database=check_database(request.app.state.engine), version=__version__)
+    check = check_database(request.app.state.engine)
+    report = HealthResponse(
+        database=check.status, documents=check.documents, chunks=check.chunks, version=__version__
+    )
     if report.status == "unavailable":
         response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
     return report

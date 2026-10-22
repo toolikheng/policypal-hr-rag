@@ -9,6 +9,8 @@ from policypal.db import DatabaseStatus
 
 class HealthResponse(BaseModel):
     database: DatabaseStatus
+    documents: int | None  # null when the database can't be checked
+    chunks: int | None
     version: str
 
     @computed_field
@@ -18,5 +20,15 @@ class HealthResponse(BaseModel):
         return "ok" if self.database == "ok" else "unavailable"
 
     model_config = ConfigDict(
-        json_schema_extra={"examples": [{"status": "ok", "database": "ok", "version": "0.1.0"}]}
+        json_schema_extra={
+            "examples": [
+                {
+                    "status": "ok",
+                    "database": "ok",
+                    "documents": 8,
+                    "chunks": 119,
+                    "version": "0.1.0",
+                }
+            ]
+        }
     )

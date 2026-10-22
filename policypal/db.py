@@ -1,13 +1,14 @@
 """Database engine and health check."""
 
 import logging
+from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 from typing import Literal
 
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger(__name__)
@@ -29,13 +30,26 @@ def latest_migration() -> str | None:
     return ScriptDirectory(str(MIGRATIONS_DIR)).get_current_head()
 
 
-def check_database(engine: Engine) -> DatabaseStatus:
-    """Report whether the database is reachable and its schema is at the newest migration."""
+@dataclass(frozen=True)
+class DatabaseCheck:
+    status: DatabaseStatus
+    # Only known when the database is reachable and migrated.
+    documents: int | None = None
+    chunks: int | None = None
+
+
+def check_database(engine: Engine) -> DatabaseCheck:
+    """Report whether the database is reachable and its schema is at the newest migration,
+    and if so how many documents and chunks it holds."""
     try:
         with engine.connect() as conn:
-            current = MigrationContext.configure(conn).get_current_revision()
+            if MigrationContext.configure(conn).get_current_revision() != latest_migration():
+                return DatabaseCheck("not_migrated")
+            documents, chunks = conn.execute(
+                text("SELECT (SELECT count(*) FROM documents), (SELECT count(*) FROM chunks)")
+            ).one()
     except SQLAlchemyError as exc:
         # Log the error type only: the full message can contain the connection string.
         logger.warning("database.unreachable", extra={"error": type(exc).__name__})
-        return "unreachable"
-    return "ok" if current == latest_migration() else "not_migrated"
+        return DatabaseCheck("unreachable")
+    return DatabaseCheck("ok", documents=documents, chunks=chunks)

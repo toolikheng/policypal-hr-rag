@@ -1,15 +1,33 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import Engine
 
 from policypal import __version__
 from policypal.api.main import create_app
+from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_folder
+from tests.fakes import FakeEmbedder
 from tests.helpers import make_settings
 
 
-def test_health_is_ok_when_database_is_up_and_migrated(client: TestClient) -> None:
+def test_health_is_ok_when_database_is_up_and_migrated(client: TestClient, engine: Engine) -> None:
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "database": "ok", "version": __version__}
+    assert response.json() == {
+        "status": "ok",
+        "database": "ok",
+        "documents": 0,
+        "chunks": 0,
+        "version": __version__,
+    }
+
+
+def test_health_reports_document_and_chunk_counts(client: TestClient, engine: Engine) -> None:
+    results = ingest_folder(engine, FakeEmbedder(), SAMPLE_POLICIES_DIR, origin="sample")
+
+    body = client.get("/health").json()
+
+    assert body["documents"] == 8
+    assert body["chunks"] == sum(result.chunks for result in results)
 
 
 def test_health_is_503_when_database_is_unreachable() -> None:
@@ -23,6 +41,8 @@ def test_health_is_503_when_database_is_unreachable() -> None:
     assert response.json() == {
         "status": "unavailable",
         "database": "unreachable",
+        "documents": None,
+        "chunks": None,
         "version": __version__,
     }
 
