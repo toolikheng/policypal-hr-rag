@@ -8,7 +8,7 @@ from collections import Counter
 
 from policypal.config import Settings
 from policypal.db import make_engine
-from policypal.embeddings import SentenceTransformerEmbedder
+from policypal.embeddings import build_embedder
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_folder
 from policypal.logging_setup import configure_logging
 
@@ -20,7 +20,7 @@ def main() -> None:
     configure_logging(settings.log_level)
     engine = make_engine(settings.database_url)
     try:
-        embedder = SentenceTransformerEmbedder(settings.embedding_model)
+        embedder = build_embedder(settings)
         results = ingest_folder(engine, embedder, SAMPLE_POLICIES_DIR, origin="sample")
     finally:
         engine.dispose()

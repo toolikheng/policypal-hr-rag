@@ -20,3 +20,6 @@ class Settings(BaseSettings):
     # Local sentence-transformers model. Changing it needs an image rebuild (the model is
     # downloaded at build time) and must keep 384-number vectors (see migration 0002).
     embedding_model: str = "BAAI/bge-small-en-v1.5"
+    # Added to the front of every question (never to policy passages), as the bge model
+    # card recommends for short-question-to-passage search. Set to "" to turn it off.
+    embedding_query_instruction: str = "Represent this sentence for searching relevant passages: "

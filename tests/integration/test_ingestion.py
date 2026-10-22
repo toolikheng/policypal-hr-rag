@@ -189,7 +189,7 @@ def test_command_line_ingests_the_sample_policies_twice_without_duplicates(
     restore_root_logging: None,
 ) -> None:
     monkeypatch.setenv("DATABASE_URL", migrated_database_url)
-    monkeypatch.setattr(ingest_cli, "SentenceTransformerEmbedder", FakeEmbedder)
+    monkeypatch.setattr(ingest_cli, "build_embedder", lambda settings: FakeEmbedder())
 
     ingest_cli.main()
     after_first = counts(engine)

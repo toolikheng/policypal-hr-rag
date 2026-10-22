@@ -3,7 +3,7 @@ from pydantic import ValidationError
 
 from policypal.config import Settings
 
-SETTING_ENV_VARS = ["DATABASE_URL", "LLM_PROVIDER", "LOG_LEVEL"]
+SETTING_ENV_VARS = ["DATABASE_URL", "LLM_PROVIDER", "LOG_LEVEL", "EMBEDDING_QUERY_INSTRUCTION"]
 
 
 @pytest.fixture(autouse=True)
@@ -24,6 +24,28 @@ def test_other_settings_have_safe_defaults(monkeypatch: pytest.MonkeyPatch) -> N
 
     assert settings.llm_provider == "ollama"
     assert settings.log_level == "INFO"
+
+
+def test_questions_use_the_bge_query_instruction_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
+    settings = Settings(_env_file=None)
+
+    # From the bge-small-en-v1.5 model card; note the trailing space.
+    assert (
+        settings.embedding_query_instruction
+        == "Represent this sentence for searching relevant passages: "
+    )
+
+
+def test_query_instruction_can_be_turned_off(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The Phase 5 evaluation compares retrieval with and without the instruction.
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("EMBEDDING_QUERY_INSTRUCTION", "")
+
+    assert Settings(_env_file=None).embedding_query_instruction == ""
 
 
 def test_values_come_from_environment_variables(monkeypatch: pytest.MonkeyPatch) -> None:
