@@ -6,6 +6,7 @@ startup with a clear validation error instead of failing later.
 
 from typing import Literal
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,3 +24,5 @@ class Settings(BaseSettings):
     # Added to the front of every question (never to policy passages), as the bge model
     # card recommends for short-question-to-passage search. Set to "" to turn it off.
     embedding_query_instruction: str = "Represent this sentence for searching relevant passages: "
+    # How many of the most similar chunks a search returns.
+    retrieval_top_k: int = Field(default=5, ge=1, le=20)

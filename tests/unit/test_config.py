@@ -3,7 +3,13 @@ from pydantic import ValidationError
 
 from policypal.config import Settings
 
-SETTING_ENV_VARS = ["DATABASE_URL", "LLM_PROVIDER", "LOG_LEVEL", "EMBEDDING_QUERY_INSTRUCTION"]
+SETTING_ENV_VARS = [
+    "DATABASE_URL",
+    "LLM_PROVIDER",
+    "LOG_LEVEL",
+    "EMBEDDING_QUERY_INSTRUCTION",
+    "RETRIEVAL_TOP_K",
+]
 
 
 @pytest.fixture(autouse=True)
@@ -38,6 +44,21 @@ def test_questions_use_the_bge_query_instruction_by_default(
         settings.embedding_query_instruction
         == "Represent this sentence for searching relevant passages: "
     )
+
+
+def test_retrieval_returns_five_chunks_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
+    assert Settings(_env_file=None).retrieval_top_k == 5
+
+
+@pytest.mark.parametrize("top_k", ["0", "21", "five"])
+def test_invalid_retrieval_top_k_is_rejected(monkeypatch: pytest.MonkeyPatch, top_k: str) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("RETRIEVAL_TOP_K", top_k)
+
+    with pytest.raises(ValidationError, match="retrieval_top_k"):
+        Settings(_env_file=None)
 
 
 def test_query_instruction_can_be_turned_off(monkeypatch: pytest.MonkeyPatch) -> None:
