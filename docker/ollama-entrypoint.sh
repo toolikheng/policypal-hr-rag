@@ -11,7 +11,13 @@ server=$!
 # Pass `docker compose stop` on to the server so it shuts down cleanly.
 trap 'kill "$server"; wait "$server"; exit 0' TERM INT
 
+# Wait for the server to answer, but stop if it has already exited (e.g. a broken volume),
+# so the failure shows up at once instead of as a container stuck in "starting".
 until ollama list > /dev/null 2>&1; do
+  if ! kill -0 "$server" 2> /dev/null; then
+    echo "The Ollama server did not start." >&2
+    exit 1
+  fi
   sleep 1
 done
 
