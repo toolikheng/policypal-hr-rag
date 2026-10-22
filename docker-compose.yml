@@ -33,6 +33,9 @@ services:
       # Inside Compose the database host is the "db" service, not localhost.
       # (The db service above already stops Compose if these variables are missing.)
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      # The same goes for Ollama. The api doesn't wait for it: until the model is ready,
+      # answers quote the policy text and /health reports "degraded".
+      OLLAMA_BASE_URL: http://ollama:11434
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:
@@ -75,6 +78,37 @@ services:
       retries: 6
       start_period: 15s
 
+  ollama:
+    # Runs the local LLM on the CPU. Downloaded models are kept in the ollama volume.
+    image: ollama/ollama:0.35.1
+    ports:
+      # Only reachable from this machine (127.0.0.1): Ollama has no authentication.
+      - "127.0.0.1:${OLLAMA_HOST_PORT:-11434}:11434"
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
+  # One-off job: downloads OLLAMA_MODEL on the first start (about 2 GB for llama3.2:3b),
+  # then exits. On later starts the model is already in the volume, so it exits at once.
+  ollama-pull:
+    image: ollama/ollama:0.35.1
+    environment:
+      OLLAMA_HOST: ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:?set OLLAMA_MODEL in .env (copy .env.example)}
+    entrypoint: ["/bin/sh", "-c"]
+    # $$ stops Compose from filling in the variable; the shell does it instead.
+    command: ['ollama show "$$OLLAMA_MODEL" > /dev/null 2>&1 || ollama pull "$$OLLAMA_MODEL"']
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+
 volumes:
   pgdata:
   uploads:
+  ollama:
