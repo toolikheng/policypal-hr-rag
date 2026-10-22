@@ -51,7 +51,11 @@ def configure_logging(level: str) -> None:
     root.handlers = [handler]
     root.setLevel(level)
     # uvicorn installs its own plain-text handlers at start-up; route its records to ours.
-    for name in ("uvicorn", "uvicorn.access"):
-        uvicorn_logger = logging.getLogger(name)
-        uvicorn_logger.handlers = []
-        uvicorn_logger.propagate = True
+    uvicorn_logger = logging.getLogger("uvicorn")
+    uvicorn_logger.handlers = []
+    uvicorn_logger.propagate = True
+    # No uvicorn access log: the app logs one "request.completed" line per request itself.
+    # (uvicorn writes access lines whenever this logger has a handler, even through the root.)
+    access_logger = logging.getLogger("uvicorn.access")
+    access_logger.handlers = []
+    access_logger.propagate = False

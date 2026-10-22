@@ -26,3 +26,17 @@ def test_create_app_from_env_reads_settings_and_sets_up_json_logging(
     assert app.title == "PolicyPal API"
     [handler] = logging.getLogger().handlers
     assert isinstance(handler.formatter, JsonFormatter)
+
+
+def test_the_api_process_does_not_log_alembic_details_on_every_health_check(
+    monkeypatch: pytest.MonkeyPatch, restore_root_logging: None
+) -> None:
+    # /health checks the database's migration on every call (every 10 s in Compose), and
+    # alembic logs two INFO lines each time. Warnings and errors still get through.
+    alembic_logger = logging.getLogger("alembic.runtime.migration")
+    monkeypatch.setattr(alembic_logger, "level", alembic_logger.level)  # restored afterwards
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://user:pw@localhost:1/db")
+
+    create_app_from_env()
+
+    assert alembic_logger.getEffectiveLevel() == logging.WARNING

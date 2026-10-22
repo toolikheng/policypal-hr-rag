@@ -35,6 +35,9 @@ def create_app_from_env() -> FastAPI:
     logging. Process-wide side effects live here, not in create_app()."""
     settings = Settings()
     configure_logging(settings.log_level)
+    # /health checks the database's migration on every call, and alembic would log two
+    # INFO lines each time. Its warnings and errors still get through.
+    logging.getLogger("alembic.runtime.migration").setLevel(logging.WARNING)
     return create_app(settings)
 
 

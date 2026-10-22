@@ -73,3 +73,20 @@ def test_extra_fields_cannot_overwrite_core_fields() -> None:
 
     assert (payload["level"], payload["logger"]) == ("INFO", "policypal.test")
     assert payload["timestamp"] != "never"
+
+
+def test_configure_logging_keeps_uvicorns_access_log_off() -> None:
+    # The app logs one "request.completed" line per request; uvicorn's own access line
+    # would log every request twice. uvicorn writes access lines only when the
+    # "uvicorn.access" logger has a handler (its own, or the root's through propagation).
+    root, access = logging.getLogger(), logging.getLogger("uvicorn.access")
+    saved_root = (list(root.handlers), root.level)
+    saved_access = (list(access.handlers), access.propagate)
+    access.handlers, access.propagate = [], False  # what `--no-access-log` sets up
+    try:
+        configure_logging("INFO")
+
+        assert not access.hasHandlers()
+    finally:
+        root.handlers, root.level = saved_root
+        access.handlers, access.propagate = saved_access
