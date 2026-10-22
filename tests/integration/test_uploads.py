@@ -289,6 +289,18 @@ def test_file_is_saved_under_its_slug(client: TestClient, upload_dir: Path) -> N
     assert [p.name for p in upload_dir.iterdir()] == [f"{DEMO_SLUG}.md"]
 
 
+def test_add_upload_returns_the_stored_document(engine: Engine, upload_dir: Path) -> None:
+    result = add_upload(
+        engine, FakeEmbedder(), upload_dir, f"{DEMO_SLUG}.md", DEMO_BYTES, replace=False
+    )
+
+    assert result.status == "created"
+    assert result.document.slug == DEMO_SLUG
+    assert result.document.title == "Training and Development Policy"
+    assert result.document.origin == "upload"
+    assert result.document.chunks == len(chunk_indexes(engine, DEMO_SLUG))
+
+
 class SlowEmbedder(FakeEmbedder):
     """Slow enough that two uploads overlap if nothing stops them."""
 

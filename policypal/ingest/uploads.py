@@ -13,11 +13,14 @@ ingested, which also makes it survive a restart.
 
 import hashlib
 import threading
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
+from policypal.catalogue import DocumentInfo, find_document
 from policypal.embeddings import Embedder
 from policypal.ingest.parsing import SUPPORTED_SUFFIXES, FileType, parse_document
 from policypal.ingest.pipeline import IngestResult, ingest_all, ingest_file, slug_for
@@ -27,6 +30,12 @@ from policypal.models import Document, DocumentChunk
 # at a time means two requests can't both pass the conflict check. (The API runs as one
 # process; the database's unique slug is the last line of defence.)
 _write_lock = threading.Lock()
+
+
+@dataclass(frozen=True)
+class UploadResult:
+    status: Literal["created", "updated", "unchanged"]
+    document: DocumentInfo  # the document as stored after the upload
 
 
 class UploadRejected(Exception):
@@ -53,7 +62,7 @@ def add_upload(
     data: bytes,
     *,
     replace: bool,
-) -> IngestResult:
+) -> UploadResult:
     """Check, save and ingest one uploaded file. Raises an UploadRejected subclass."""
     file_type = SUPPORTED_SUFFIXES.get(Path(filename).suffix.lower())
     if file_type is None:
@@ -67,9 +76,9 @@ def add_upload(
     with _write_lock:
         existing = _find(engine, slug)
         if existing is not None:
-            origin, existing_sha256, chunks = existing
+            origin, existing_sha256, _ = existing
             if existing_sha256 == content_sha256:
-                return IngestResult(slug, "unchanged", chunks)
+                return UploadResult("unchanged", _stored(engine, slug))
             if origin == "sample":
                 raise UploadConflict(
                     f"'{slug}' is a built-in sample policy and can't be replaced by upload."
@@ -81,13 +90,23 @@ def add_upload(
                     " Nothing was changed. To replace it, upload again with replace=true."
                 )
         path = _save(upload_dir, slug, file_type, data)
-        return ingest_file(engine, embedder, path, origin="upload")
+        result = ingest_file(engine, embedder, path, origin="upload")
+        # A new slug is "created"; an existing one passed the checks above, so "updated".
+        status = "created" if result.status == "created" else "updated"
+        return UploadResult(status, _stored(engine, slug))
 
 
 def rescan(engine: Engine, embedder: Embedder, upload_dir: Path) -> list[IngestResult]:
     """Re-ingest the sample and upload folders (no duplicates; unchanged files are skipped)."""
     with _write_lock:
         return ingest_all(engine, embedder, upload_dir)
+
+
+def _stored(engine: Engine, slug: str) -> DocumentInfo:
+    document = find_document(engine, slug)
+    if document is None:  # it was found or stored a moment ago, under the lock
+        raise RuntimeError(f"Document '{slug}' disappeared during the upload.")
+    return document
 
 
 def _check_content(data: bytes, file_type: FileType) -> None:

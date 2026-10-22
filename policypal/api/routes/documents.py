@@ -1,23 +1,19 @@
-from itertools import groupby
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
-from sqlalchemy import Engine, func, select
-from sqlalchemy.orm import Session
 
+from policypal import catalogue
 from policypal.api.deps import EmbedderDep, EngineDep, SettingsDep, require_admin
 from policypal.api.schemas import (
     ADMIN_ERRORS,
     DATABASE_UNAVAILABLE,
     DOCUMENT_SUMMARY_EXAMPLE,
     UPLOAD_EXAMPLE,
-    ChunkText,
     DocumentDetail,
     DocumentSummary,
     ErrorResponse,
     IngestResultResponse,
     ReingestResponse,
-    SectionResponse,
     UploadResponse,
     error_example,
     validation_error_example,
@@ -29,7 +25,6 @@ from policypal.ingest.uploads import (
     add_upload,
     rescan,
 )
-from policypal.models import Document, DocumentChunk
 
 router = APIRouter(tags=["documents"])
 
@@ -44,15 +39,10 @@ router = APIRouter(tags=["documents"])
     },
 )
 def list_documents(engine: EngineDep) -> list[DocumentSummary]:
-    chunk_count = func.count(DocumentChunk.id)
-    query = (
-        select(Document, chunk_count)
-        .outerjoin(DocumentChunk, DocumentChunk.document_id == Document.id)
-        .group_by(Document.id)
-        .order_by(Document.title, Document.id)
-    )
-    with Session(engine) as session:
-        return [_summary(document, chunks) for document, chunks in session.execute(query)]
+    return [
+        DocumentSummary.model_validate(document, from_attributes=True)
+        for document in catalogue.list_documents(engine)
+    ]
 
 
 @router.get(
@@ -68,33 +58,10 @@ def list_documents(engine: EngineDep) -> list[DocumentSummary]:
     },
 )
 def get_document(document_id: int, engine: EngineDep) -> DocumentDetail:
-    with Session(engine) as session:
-        document = session.get(Document, document_id)
-        if document is None:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found.")
-        query = (
-            select(
-                DocumentChunk.id,
-                DocumentChunk.section,
-                DocumentChunk.section_path,
-                DocumentChunk.content,
-            )
-            .where(DocumentChunk.document_id == document_id)
-            .order_by(DocumentChunk.chunk_index)
-        )
-        chunks = session.execute(query).all()
-        # A long section is split into several chunks, which are next to each other.
-        sections = [
-            SectionResponse(
-                section=section,
-                section_path=section_path,
-                chunks=[ChunkText(id=chunk.id, text=chunk.content) for chunk in group],
-            )
-            for (section, section_path), group in groupby(
-                chunks, key=lambda chunk: (chunk.section, chunk.section_path)
-            )
-        ]
-        return DocumentDetail(**_summary(document, len(chunks)).model_dump(), sections=sections)
+    document = catalogue.get_document(engine, document_id)
+    if document is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found.")
+    return DocumentDetail.model_validate(document, from_attributes=True)
 
 
 @router.post(
@@ -181,7 +148,7 @@ def upload_document(
 
     if result.status != "created":
         response.status_code = status.HTTP_200_OK
-    return UploadResponse(status=result.status, document=_summary_for_slug(engine, result.slug))
+    return UploadResponse.model_validate(result, from_attributes=True)
 
 
 @router.post(
@@ -200,29 +167,4 @@ def reingest(settings: SettingsDep, engine: EngineDep, embedder: EmbedderDep) ->
             IngestResultResponse(slug=result.slug, status=result.status, chunks=result.chunks)
             for result in results
         ]
-    )
-
-
-def _summary_for_slug(engine: Engine, slug: str) -> DocumentSummary:
-    chunk_count = func.count(DocumentChunk.id)
-    query = (
-        select(Document, chunk_count)
-        .outerjoin(DocumentChunk, DocumentChunk.document_id == Document.id)
-        .where(Document.slug == slug)
-        .group_by(Document.id)
-    )
-    with Session(engine) as session:
-        document, chunks = session.execute(query).one()
-        return _summary(document, chunks)
-
-
-def _summary(document: Document, chunks: int) -> DocumentSummary:
-    return DocumentSummary(
-        id=document.id,
-        slug=document.slug,
-        title=document.title,
-        file_type=document.file_type,
-        origin=document.origin,
-        chunks=chunks,
-        updated_at=document.updated_at,
     )

@@ -266,15 +266,22 @@ class DocumentSummary(BaseModel):
     chunks: int
     updated_at: datetime
 
-    model_config = ConfigDict(json_schema_extra={"examples": [DOCUMENT_SUMMARY_EXAMPLE]})
+    # from_attributes: built from the catalogue's dataclasses.
+    model_config = ConfigDict(
+        from_attributes=True, json_schema_extra={"examples": [DOCUMENT_SUMMARY_EXAMPLE]}
+    )
 
 
 class ChunkText(BaseModel):
     id: int
     text: str
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class SectionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     section: str
     section_path: str = Field(description='Headings above it, e.g. "4. Annual Leave > 4.1 ..."')
     chunks: list[ChunkText]
@@ -327,6 +334,8 @@ def validation_error_example(location: list[str], message: str, value: Any) -> d
 class UploadResponse(BaseModel):
     status: Literal["created", "updated", "unchanged"]
     document: DocumentSummary
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 UPLOAD_EXAMPLE = {
