@@ -112,7 +112,7 @@ def test_ollama_settings_have_local_defaults(monkeypatch: pytest.MonkeyPatch) ->
 
     assert settings.ollama_base_url == "http://localhost:11434"
     assert settings.ollama_model == "llama3.2:3b"
-    assert settings.ollama_timeout_seconds == 60
+    assert settings.ollama_timeout_seconds == 120
 
 
 @pytest.mark.parametrize("timeout", ["0", "-5", "601"])

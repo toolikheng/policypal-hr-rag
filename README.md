@@ -124,7 +124,7 @@ To run without an LLM at all, set `LLM_PROVIDER=extractive` in `.env`.
    a source. But a citation shows where an answer came from, not that it is correct or
    complete.
 5. **Fallback, never silent:** if Ollama is down, times out (`OLLAMA_TIMEOUT_SECONDS`,
-   default 60) or hasn't downloaded the model, the API quotes the policy text and sets
+   default 120) or hasn't downloaded the model, the API quotes the policy text and sets
    `fallback_reason`.
 
 ### Speed and model choice
@@ -137,11 +137,11 @@ Docker Desktop), with 8 questions per model. This is illustrative, not an evalua
 | `llama3.2:3b` (default) | about 24 s | about 3.6 GB | All 7 cited answers matched the policies when checked by hand |
 | `llama3.2:1b` | about 13 s | about 2.4 GB | Refused 2 answerable questions and gave one wrong answer; use only if memory is tight |
 
-The first answer after the model has been unloaded also includes loading it: 33 s in
-total for `3b` on an idle laptop, and 58 s while a second copy of the stack was running.
-After `OLLAMA_TIMEOUT_SECONDS` (default 60) the API stops waiting and quotes the policy
-text instead, so on a slower machine raise it in `.env`. Refusals take well under a
-second because the LLM isn't called.
+The first answer after the model has been unloaded also includes loading it (a cold
+start): 33 s in total for `3b` on an idle laptop, and 58 s while a second copy of the
+stack was running. That is why `OLLAMA_TIMEOUT_SECONDS` defaults to 120: after that the
+API stops waiting and quotes the policy text instead. On a slower machine, raise it in
+`.env`. Refusals take well under a second because the LLM isn't called.
 
 ## Managing policies (admin)
 
