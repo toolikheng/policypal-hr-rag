@@ -68,7 +68,7 @@ class Source:
 
     rank: int  # 1 = most similar
     chunk: RetrievedChunk
-    cited: bool  # shown to the user as citation [rank]
+    cited: bool  # shown to the user as a citation
 
 
 @dataclass(frozen=True)
@@ -100,11 +100,12 @@ def answer_question(
     retrieved = retrieve(engine, embedder, question, top_k)
     retrieval_ms = _ms_since(started)
     reply = build_reply(question, retrieved, llm, min_similarity)
-    cited = {citation.number for citation in reply.citations}
+    cited = {citation.chunk.chunk_id for citation in reply.citations}
     return Answer(
         reply=reply,
         sources=tuple(
-            Source(rank, chunk, rank in cited) for rank, chunk in enumerate(retrieved, start=1)
+            Source(rank, chunk, chunk.chunk_id in cited)
+            for rank, chunk in enumerate(retrieved, start=1)
         ),
         retrieval_ms=retrieval_ms,
         total_ms=_ms_since(started),
