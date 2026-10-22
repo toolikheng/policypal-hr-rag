@@ -214,7 +214,7 @@ def test_different_content_for_an_existing_upload_is_a_409_and_changes_nothing(
     response = upload(client, EDITED_DEMO)
 
     assert response.status_code == 409
-    assert response.json() == {"detail": CONFLICT_MESSAGE}
+    assert response.json() == {"detail": CONFLICT_MESSAGE, "conflict": "name_taken"}
     assert snapshot(engine, upload_dir) == before
 
 
@@ -256,7 +256,7 @@ def test_a_sample_policy_can_never_be_replaced_by_upload(
     response = upload(client, edited, "leave-policy.md", replace=replace)
 
     assert response.status_code == 409
-    assert response.json() == {"detail": SAMPLE_MESSAGE}
+    assert response.json() == {"detail": SAMPLE_MESSAGE, "conflict": "sample_policy"}
     assert snapshot(engine, upload_dir) == before
 
 

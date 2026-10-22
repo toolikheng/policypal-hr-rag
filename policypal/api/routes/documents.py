@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
+from fastapi.responses import JSONResponse
 
 from policypal import catalogue
 from policypal.api.deps import EmbedderDep, EngineDep, SettingsDep, require_admin
@@ -9,6 +10,7 @@ from policypal.api.errors import (
     DATABASE_UNAVAILABLE,
     DOCUMENT_NOT_FOUND,
     UPLOAD_ERRORS,
+    ConflictResponse,
     documented,
     validation_error,
 )
@@ -102,7 +104,7 @@ def upload_document(
         bool,
         Query(description="Replace an uploaded policy with the same name (never a sample)."),
     ] = False,
-) -> UploadResponse:
+) -> UploadResponse | JSONResponse:
     try:
         result = add_upload(
             engine,
@@ -120,7 +122,8 @@ def upload_document(
     except InvalidUpload as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
     except UploadConflict as exc:
-        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+        body = ConflictResponse(detail=str(exc), conflict=exc.conflict)
+        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content=body.model_dump())
 
     if result.status != "created":
         response.status_code = status.HTTP_200_OK

@@ -74,8 +74,15 @@ class InvalidUpload(UploadRejected):
     pass
 
 
+# name_taken: an uploaded policy has this name (replace=true replaces it).
+# sample_policy: a built-in sample has this name (it can't be replaced by upload).
+ConflictKind = Literal["name_taken", "sample_policy"]
+
+
 class UploadConflict(UploadRejected):
-    pass
+    def __init__(self, message: str, conflict: ConflictKind) -> None:
+        super().__init__(message)
+        self.conflict = conflict
 
 
 def add_upload(
@@ -107,9 +114,9 @@ def add_upload(
         if change == "same":
             return UploadResult("unchanged", _stored(engine, slug))
         if change == "sample_owns_slug":
-            raise UploadConflict(SAMPLE_NAME.format(slug=slug))
+            raise UploadConflict(SAMPLE_NAME.format(slug=slug), "sample_policy")
         if change == "new_content" and not replace:
-            raise UploadConflict(NAME_TAKEN.format(slug=slug))
+            raise UploadConflict(NAME_TAKEN.format(slug=slug), "name_taken")
         path = _save(upload_dir, slug, file_type, data)
         ingest_file(engine, embedder, path, origin="upload")
         return UploadResult("created" if change == "new" else "updated", _stored(engine, slug))

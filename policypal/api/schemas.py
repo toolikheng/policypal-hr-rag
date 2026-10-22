@@ -219,6 +219,35 @@ ASK_EXAMPLES = {
 }
 
 
+# --- POST /feedback -------------------------------------------------------------------
+
+Comment = Annotated[str, StringConstraints(strip_whitespace=True, max_length=500)]
+
+
+class FeedbackRequest(BaseModel):
+    message_id: UUID = Field(description="The message_id returned by POST /ask.")
+    rating: Literal["up", "down"]
+    comment: Comment | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "message_id": "6f1c2a9e-3b1d-4c55-9a51-2f0f7d1e8b3a",
+                    "rating": "down",
+                    "comment": "Didn't mention site workers",
+                }
+            ]
+        }
+    )
+
+
+class FeedbackResponse(BaseModel):
+    status: Literal["accepted"]
+
+    model_config = ConfigDict(json_schema_extra={"examples": [{"status": "accepted"}]})
+
+
 # --- /documents -------------------------------------------------------------------------
 
 

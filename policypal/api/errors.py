@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from fastapi import HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from policypal.ingest import uploads
 
@@ -20,11 +20,28 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
+class ConflictResponse(ErrorResponse):
+    """An upload whose name is taken. `conflict` tells a client whether replacing is allowed."""
+
+    conflict: uploads.ConflictKind = Field(
+        description="name_taken: upload again with replace=true to replace it. "
+        "sample_policy: a built-in policy that can't be replaced; rename the file."
+    )
+
+
 @dataclass(frozen=True)
 class ApiError:
     status_code: int
     detail: str  # the message the client receives
     description: str  # when it happens (shown in Swagger)
+    conflict: uploads.ConflictKind | None = None  # only for upload conflicts (409)
+
+    @property
+    def body(self) -> dict[str, str]:
+        """The JSON the client receives."""
+        if self.conflict is None:
+            return {"detail": self.detail}
+        return {"detail": self.detail, "conflict": self.conflict}
 
     def exception(self) -> HTTPException:
         return HTTPException(self.status_code, self.detail)
@@ -56,11 +73,13 @@ UPLOAD_ERRORS = (
         status.HTTP_409_CONFLICT,
         uploads.NAME_TAKEN.format(slug="leave-guide"),
         "An uploaded policy with this name has different content (use replace=true).",
+        conflict="name_taken",
     ),
     ApiError(
         status.HTTP_409_CONFLICT,
         uploads.SAMPLE_NAME.format(slug="leave-policy"),
         "The name belongs to a built-in sample policy.",
+        conflict="sample_policy",
     ),
     ApiError(
         status.HTTP_413_CONTENT_TOO_LARGE,
@@ -89,13 +108,11 @@ def documented(*errors: ApiError) -> dict[int | str, dict[str, Any]]:
         by_status.setdefault(error.status_code, []).append(error)
     return {
         status_code: {
-            "model": ErrorResponse,
+            "model": ConflictResponse if group[0].conflict else ErrorResponse,
             "description": " Or: ".join(error.description for error in group),
             "content": {
                 "application/json": {
-                    "examples": {
-                        error.description: {"value": {"detail": error.detail}} for error in group
-                    }
+                    "examples": {error.description: {"value": error.body} for error in group}
                 }
             },
         }

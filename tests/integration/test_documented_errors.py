@@ -98,3 +98,8 @@ def test_database_unavailable_error() -> None:
         assert_documented(client, "get", "/documents", client.get("/documents"))
         response = client.post("/ask", json={"question": "Annual leave?"})
         assert_documented(client, "post", "/ask", response)
+
+
+def test_feedback_validation_error(client: TestClient) -> None:
+    payload = {"message_id": "6f1c2a9e-3b1d-4c55-9a51-2f0f7d1e8b3a", "rating": "meh"}
+    assert_documented(client, "post", "/feedback", client.post("/feedback", json=payload))
