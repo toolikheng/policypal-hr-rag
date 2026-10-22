@@ -41,7 +41,9 @@ _REFUSAL = re.compile(r"[^.!?\n]*could(?:n't| not) find this in the policies[^.!
 
 @dataclass(frozen=True)
 class Citation:
-    number: int  # the [n] marker in the answer text
+    # The [n] marker in the answer text. It is also the chunk's search rank: the excerpts
+    # are the top search results that passed the threshold, numbered from 1.
+    number: int
     chunk: RetrievedChunk
 
 
@@ -58,13 +60,27 @@ class Reply:
 
 
 @dataclass(frozen=True)
+class Source:
+    """One retrieved chunk, whether or not the answer cites it."""
+
+    rank: int  # 1 = most similar
+    chunk: RetrievedChunk
+    cited: bool  # shown to the user as citation [rank]
+
+
+@dataclass(frozen=True)
 class Answer:
-    """A reply plus facts about how it was produced."""
+    """A reply plus how it was produced: everything retrieved (best first) and timings."""
 
     reply: Reply
-    top_similarity: float | None  # None when nothing was retrieved
+    sources: tuple[Source, ...]
     retrieval_ms: int
     total_ms: int
+
+    @property
+    def top_similarity(self) -> float | None:
+        """The best match's similarity; None when nothing was retrieved."""
+        return self.sources[0].chunk.similarity if self.sources else None
 
 
 def answer_question(
@@ -81,9 +97,12 @@ def answer_question(
     retrieved = retrieve(engine, embedder, question, top_k)
     retrieval_ms = _ms_since(started)
     reply = build_reply(question, retrieved, llm, min_similarity)
+    cited = {citation.number for citation in reply.citations}
     return Answer(
         reply=reply,
-        top_similarity=retrieved[0].similarity if retrieved else None,
+        sources=tuple(
+            Source(rank, chunk, rank in cited) for rank, chunk in enumerate(retrieved, start=1)
+        ),
         retrieval_ms=retrieval_ms,
         total_ms=_ms_since(started),
     )
