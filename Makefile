@@ -2,7 +2,7 @@
 VENV := .venv
 BIN := $(VENV)/bin
 
-.PHONY: help setup up down logs db-up test lint format lint-workflows migrate
+.PHONY: help setup up down logs db-up test lint format lint-workflows migrate pdfs
 
 help: ## List available commands
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -41,3 +41,6 @@ lint-workflows: ## Check GitHub Actions workflow files with actionlint (runs in 
 
 migrate: ## Apply database migrations inside the running api container
 	docker compose exec api alembic upgrade head
+
+pdfs: ## Re-render the sample policy PDFs from their Markdown (needs fonts-dejavu-core)
+	$(BIN)/python scripts/build_pdfs.py

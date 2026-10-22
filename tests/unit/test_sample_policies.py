@@ -112,3 +112,8 @@ def test_core_policies_do_not_cover_the_held_out_documents_topic() -> None:
     mentions = [p.name for p in CORE_POLICIES if pattern.search(read(p))]
 
     assert mentions == []
+
+
+def test_every_policy_has_a_rendered_pdf_and_no_stray_pdfs_exist() -> None:
+    assert sorted(p.stem for p in (POLICY_DIR / "pdf").glob("*.pdf")) == sorted(CORE_POLICY_SLUGS)
+    assert [p.stem for p in UPLOAD_DEMO_DIR.glob("*.pdf")] == [UPLOAD_DEMO_SLUG]
