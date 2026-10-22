@@ -79,34 +79,26 @@ services:
       start_period: 15s
 
   ollama:
-    # Runs the local LLM on the CPU. Downloaded models are kept in the ollama volume.
+    # Runs the local LLM on the CPU. On the first start it downloads OLLAMA_MODEL
+    # (about 2 GB for llama3.2:3b) into the ollama volume; later starts work offline.
     image: ollama/ollama:0.35.1
+    entrypoint: ["/bin/sh", "/ollama-entrypoint.sh"]
+    environment:
+      PULL_MODEL: ${OLLAMA_MODEL:?set OLLAMA_MODEL in .env (copy .env.example)}
     ports:
       # Only reachable from this machine (127.0.0.1): Ollama has no authentication.
       - "127.0.0.1:${OLLAMA_HOST_PORT:-11434}:11434"
     volumes:
       - ollama:/root/.ollama
+      - ./docker/ollama-entrypoint.sh:/ollama-entrypoint.sh:ro
     healthcheck:
-      test: ["CMD", "ollama", "list"]
+      # Healthy once the model is downloaded. The long start period allows for a slow
+      # first download; `docker compose up --wait` waits for it.
+      test: ["CMD-SHELL", "ollama show \"$$PULL_MODEL\" > /dev/null 2>&1"]
       interval: 10s
       timeout: 5s
-      retries: 6
-      start_period: 10s
-
-  # One-off job: downloads OLLAMA_MODEL on the first start (about 2 GB for llama3.2:3b),
-  # then exits. On later starts the model is already in the volume, so it exits at once.
-  ollama-pull:
-    image: ollama/ollama:0.35.1
-    environment:
-      OLLAMA_HOST: ollama:11434
-      OLLAMA_MODEL: ${OLLAMA_MODEL:?set OLLAMA_MODEL in .env (copy .env.example)}
-    entrypoint: ["/bin/sh", "-c"]
-    # $$ stops Compose from filling in the variable; the shell does it instead.
-    command: ['ollama show "$$OLLAMA_MODEL" > /dev/null 2>&1 || ollama pull "$$OLLAMA_MODEL"']
-    depends_on:
-      ollama:
-        condition: service_healthy
-    restart: "no"
+      retries: 3
+      start_period: 30m
 
 volumes:
   pgdata:
