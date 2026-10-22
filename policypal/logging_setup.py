@@ -23,7 +23,11 @@ _NON_EXTRA_ATTRS = set(vars(logging.makeLogRecord({}))) | {"message", "asctime",
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
+        # Fields from `extra=` first, so they can never overwrite the core fields below.
         payload: dict[str, object] = {
+            key: value for key, value in vars(record).items() if key not in _NON_EXTRA_ATTRS
+        }
+        payload |= {
             "timestamp": datetime.fromtimestamp(record.created, UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
@@ -31,9 +35,6 @@ class JsonFormatter(logging.Formatter):
         }
         if request_id := request_id_var.get():
             payload["request_id"] = request_id
-        payload.update(
-            {key: value for key, value in vars(record).items() if key not in _NON_EXTRA_ATTRS}
-        )
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
         return json.dumps(payload, default=str)

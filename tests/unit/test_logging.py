@@ -64,3 +64,12 @@ def test_uvicorn_terminal_colour_copy_of_the_message_is_dropped() -> None:
     payload = json.loads(JsonFormatter().format(record))
 
     assert "color_message" not in payload
+
+
+def test_extra_fields_cannot_overwrite_core_fields() -> None:
+    record = make_record("real message", level="FAKE", logger="fake.logger", timestamp="never")
+
+    payload = json.loads(JsonFormatter().format(record))
+
+    assert (payload["level"], payload["logger"]) == ("INFO", "policypal.test")
+    assert payload["timestamp"] != "never"
