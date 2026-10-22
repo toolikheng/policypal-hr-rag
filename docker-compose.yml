@@ -51,7 +51,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 6
-      start_period: 15s
+      # The first start embeds every policy into an empty database and loads the embedding
+      # model; with Ollama downloading at the same time this took about 80 s on the
+      # development laptop. A passing check ends the start period early.
+      start_period: 180s
 
   ui:
     build: *app-build
