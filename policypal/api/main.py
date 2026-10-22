@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
 from policypal import __version__
-from policypal.api.routes import ask, health
+from policypal.api.routes import ask, documents, health
 from policypal.config import Settings
 from policypal.db import make_engine
 from policypal.embeddings import Embedder, build_embedder, check_dimension
@@ -69,6 +69,7 @@ def create_app(
     app.exception_handler(OperationalError)(database_unavailable)
     app.include_router(health.router)
     app.include_router(ask.router)
+    app.include_router(documents.router)
     return app
 
 

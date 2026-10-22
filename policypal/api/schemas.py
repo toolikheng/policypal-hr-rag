@@ -1,5 +1,6 @@
 """Request and response models. The examples appear in Swagger at /docs."""
 
+from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
@@ -7,6 +8,8 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_f
 
 from policypal.answering import Answer, FallbackReason, Mode
 from policypal.db import DatabaseStatus
+from policypal.ingest.parsing import FileType
+from policypal.models import Origin
 
 
 class HealthResponse(BaseModel):
@@ -215,3 +218,81 @@ ASK_EXAMPLES = {
         },
     },
 }
+
+
+# --- /documents -------------------------------------------------------------------------
+
+
+DOCUMENT_SUMMARY_EXAMPLE = {
+    "id": 3,
+    "slug": "leave-policy",
+    "title": "Leave Policy",
+    "file_type": "md",
+    "origin": "sample",
+    "chunks": 18,
+    "updated_at": "2026-10-22T09:30:00Z",
+}
+
+
+class DocumentSummary(BaseModel):
+    id: int
+    slug: str = Field(description="Taken from the file name; identifies the policy.")
+    title: str
+    file_type: FileType
+    origin: Origin = Field(description="sample (built in) or upload.")
+    chunks: int
+    updated_at: datetime
+
+    model_config = ConfigDict(json_schema_extra={"examples": [DOCUMENT_SUMMARY_EXAMPLE]})
+
+
+class ChunkText(BaseModel):
+    id: int
+    text: str
+
+
+class SectionResponse(BaseModel):
+    section: str
+    section_path: str = Field(description='Headings above it, e.g. "4. Annual Leave > 4.1 ..."')
+    chunks: list[ChunkText]
+
+
+class DocumentDetail(DocumentSummary):
+    sections: list[SectionResponse]
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    **DOCUMENT_SUMMARY_EXAMPLE,
+                    "sections": [
+                        {
+                            "section": "4.1 Annual Leave Entitlement",
+                            "section_path": "4. Annual Leave > 4.1 Annual Leave Entitlement",
+                            "chunks": [
+                                {
+                                    "id": 41,
+                                    "text": "Annual leave depends on job grade and on "
+                                    "completed years of service ...",
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ]
+        }
+    )
+
+
+def validation_error_example(location: list[str], message: str, value: Any) -> dict[str, Any]:
+    """A 422 entry for a route's `responses=` (FastAPI's own format, with one problem)."""
+    return {
+        "description": "The request is invalid.",
+        "content": {
+            "application/json": {
+                "example": {
+                    "detail": [{"type": "invalid", "loc": location, "msg": message, "input": value}]
+                }
+            }
+        },
+    }
