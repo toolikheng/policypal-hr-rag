@@ -4,9 +4,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from alembic import command
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import IntegrityError
 
 from policypal.api.main import create_app
 from tests.helpers import alembic_config, make_settings
@@ -78,3 +80,20 @@ def test_alembic_command_line_works_locally_and_logs_json(migrated_database_url:
     assert lines, "expected alembic to log something"
     for line in lines:
         json.loads(line)  # raises if any line is not JSON
+
+
+def test_documents_and_chunks_tables_have_vector_index_and_checks(engine) -> None:
+    with engine.connect() as conn:
+        index = conn.execute(
+            text("SELECT indexdef FROM pg_indexes WHERE indexname = 'chunks_embedding_hnsw_idx'")
+        ).scalar_one()
+    assert "USING hnsw (embedding vector_cosine_ops)" in index
+
+    with pytest.raises(IntegrityError), engine.begin() as conn:
+        conn.execute(
+            text(
+                "INSERT INTO documents (slug, title, source_filename, file_type, origin,"
+                " content_sha256, pipeline_version) VALUES"
+                " ('x', 'X', 'x.txt', 'txt', 'sample', repeat('0', 64), 'v')"
+            )
+        )

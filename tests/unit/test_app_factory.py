@@ -1,19 +1,10 @@
 import logging
-from collections.abc import Iterator
 
 import pytest
 
 from policypal.api.main import create_app, create_app_from_env
 from policypal.logging_setup import JsonFormatter
 from tests.helpers import make_settings
-
-
-@pytest.fixture
-def restore_root_logging() -> Iterator[None]:
-    root = logging.getLogger()
-    handlers, level = list(root.handlers), root.level
-    yield
-    root.handlers, root.level = handlers, level
 
 
 def test_create_app_does_not_touch_global_logging(caplog: pytest.LogCaptureFixture) -> None:

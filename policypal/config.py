@@ -17,3 +17,6 @@ class Settings(BaseSettings):
     # "fake" is deliberately not allowed: the fake LLM exists only in the test suite.
     llm_provider: Literal["ollama", "extractive"] = "ollama"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+    # Local sentence-transformers model. Changing it needs an image rebuild (the model is
+    # downloaded at build time) and must keep 384-number vectors (see migration 0002).
+    embedding_model: str = "BAAI/bge-small-en-v1.5"

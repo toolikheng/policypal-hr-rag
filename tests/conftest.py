@@ -5,16 +5,18 @@ Locally they are skipped with a clear reason if the database isn't running
 (start it with `make db-up`). CI sets REQUIRE_DB=1 so a missing database fails instead.
 """
 
+import logging
 import os
 from collections.abc import Iterator
 
 import pytest
 from alembic import command
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, text
+from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import OperationalError
 
 from policypal.api.main import create_app
+from policypal.db import make_engine
 from tests.helpers import alembic_config, make_settings
 
 DEFAULT_TEST_DATABASE_URL = (
@@ -51,3 +53,22 @@ def migrated_database_url(test_database_url: str) -> str:
 def client(migrated_database_url: str) -> Iterator[TestClient]:
     with TestClient(create_app(make_settings(migrated_database_url))) as test_client:
         yield test_client
+
+
+@pytest.fixture
+def engine(migrated_database_url: str) -> Iterator[Engine]:
+    """An engine on an empty, migrated test database (tables are emptied before each test)."""
+    engine = make_engine(migrated_database_url)
+    with engine.begin() as conn:
+        conn.execute(text("TRUNCATE documents RESTART IDENTITY CASCADE"))
+    yield engine
+    engine.dispose()
+
+
+@pytest.fixture
+def restore_root_logging() -> Iterator[None]:
+    """For tests that call configure_logging(), which changes global logging state."""
+    root = logging.getLogger()
+    handlers, level = list(root.handlers), root.level
+    yield
+    root.handlers, root.level = handlers, level
