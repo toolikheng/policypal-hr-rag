@@ -10,8 +10,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # Install dependencies first so this layer is cached when only the code changes.
+# The build fails if a CUDA build of torch or any NVIDIA package slips in: this image
+# must stay CPU-only (requirements.txt installs torch from the PyTorch CPU index).
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt \
+ && python -c "import sys, torch; sys.exit(f'CUDA torch installed ({torch.version.cuda})' if torch.version.cuda else 0)" \
+ && if pip list 2>/dev/null | grep -i '^nvidia'; then echo 'NVIDIA packages found: torch must be the CPU build' >&2; exit 1; fi
 
 # Copy only what the app needs (never `COPY . .`), so local files such as .env
 # can never end up inside the image.

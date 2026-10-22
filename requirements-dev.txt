@@ -4,3 +4,6 @@ pytest==9.1.1
 ruff==0.17.1
 black==26.10.1
 pre-commit==4.7.0
+# Only used by scripts/build_pdfs.py to render the sample policies to PDF.
+fpdf2==2.8.9
+markdown==3.11

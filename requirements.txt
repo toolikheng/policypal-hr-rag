@@ -1,10 +1,22 @@
 # Runtime dependencies (installed in the Docker image and in local/CI environments).
 # Pin exact versions so every machine installs the same thing.
+
+# CPU-only PyTorch: the PyTorch CPU index provides torch builds without the several GB
+# of NVIDIA CUDA libraries that the default PyPI build pulls in. The "+cpu" pin makes
+# pip choose the CPU build; it fails loudly rather than falling back to a CUDA build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
+
 fastapi==0.158.2
 uvicorn[standard]==0.54.0
 pydantic-settings==2.16.1
 sqlalchemy==2.1.6
 psycopg[binary]==3.3.6
 alembic==1.20.0
+pgvector==0.5.1
 httpx==0.28.1
 streamlit==1.66.1
+pypdf==6.19.0
+sentence-transformers==6.1.0
+# Pinned explicitly because sentence-transformers relies heavily on it.
+transformers==5.18.0
