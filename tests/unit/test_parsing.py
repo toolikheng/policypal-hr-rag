@@ -3,8 +3,14 @@ import re
 import pytest
 from fpdf import FPDF
 
-from policypal.ingest.parsing import DOCUMENT_INFO_HEADING, parse_markdown, parse_pdf
-from tests.unit.test_sample_policies import (
+from policypal.ingest.parsing import (
+    DOCUMENT_INFO_HEADING,
+    file_type_of,
+    parse_document,
+    parse_markdown,
+    parse_pdf,
+)
+from tests.sample_data import (
     CORE_POLICY_SLUGS,
     FICTIONAL_LABEL,
     POLICY_DIR,
@@ -151,3 +157,66 @@ def test_pdf_paragraphs_are_separated_by_blank_lines() -> None:
 
     harassment = section(from_pdf, "5.2 Anti-Harassment").text
     assert len(harassment.split("\n\n")) == 6  # clauses 5.2.1 to 5.2.6
+
+
+def plain_pdf(*pages: list[str], size: int = 11) -> bytes:
+    """A PDF where every line uses the same font size (no bigger title or headings)."""
+    pdf = FPDF()
+    pdf.set_font("helvetica", size=size)
+    for lines in pages:
+        pdf.add_page()
+        for line in lines:
+            pdf.cell(0, 8, line, new_x="LMARGIN", new_y="NEXT")
+    return bytes(pdf.output())
+
+
+def test_pdf_without_a_bigger_title_uses_its_first_line_and_keeps_the_rest() -> None:
+    doc = parse_pdf(
+        plain_pdf(["Staff Handbook", "Working hours are 9 to 5.", "Lunch is one hour."])
+    )
+
+    assert doc.title == "Staff Handbook"
+    [info] = doc.sections
+    # The rest of page 1 is kept (these lines are far apart, so they are two paragraphs).
+    assert info.text.split() == "Working hours are 9 to 5. Lunch is one hour.".split()
+
+
+def test_pdf_title_is_only_the_first_run_of_biggest_lines() -> None:
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("helvetica", size=20)
+    pdf.cell(0, 10, "Big Title", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("helvetica", size=11)
+    pdf.cell(0, 8, "Body text under the title.", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("helvetica", size=20)
+    pdf.cell(0, 10, "1. Later Section", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("helvetica", size=11)
+    pdf.cell(0, 8, "Section text.", new_x="LMARGIN", new_y="NEXT")
+
+    doc = parse_pdf(bytes(pdf.output()))
+
+    assert doc.title == "Big Title"
+    assert [s.heading for s in doc.sections] == [DOCUMENT_INFO_HEADING, "1. Later Section"]
+
+
+def test_pdf_with_only_a_title_is_rejected_with_a_clear_error() -> None:
+    with pytest.raises(ValueError, match="no text"):
+        parse_pdf(plain_pdf(["Just A Title"]))
+
+
+def test_file_type_comes_from_the_file_name() -> None:
+    assert file_type_of("Leave Policy.MD") == "md"
+    assert file_type_of("scan.pdf") == "pdf"
+    with pytest.raises(ValueError, match=r"only \.md and \.pdf"):
+        file_type_of("notes.txt")
+
+
+def test_parse_document_dispatches_on_file_type() -> None:
+    assert parse_document(EXAMPLE.encode(), "md").title == "Example Policy"
+    pdf_bytes = (POLICY_DIR / "pdf" / "leave-policy.pdf").read_bytes()
+    assert parse_document(pdf_bytes, "pdf").title == "Leave Policy"
+
+
+def test_markdown_that_is_not_utf8_is_rejected_with_a_clear_error() -> None:
+    with pytest.raises(ValueError, match="UTF-8"):
+        parse_document("# Café policy\n\nText.".encode("latin-1"), "md")

@@ -5,27 +5,16 @@ from pathlib import Path
 
 import pytest
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "data"
-POLICY_DIR = DATA_DIR / "policies"
-UPLOAD_DEMO_DIR = DATA_DIR / "upload-demo"
-
-FICTIONAL_LABEL = "FICTIONAL SAMPLE DATA — NOT A REAL COMPANY POLICY"
-
-CORE_POLICY_SLUGS = [
-    "leave-policy",
-    "medical-claims-policy",
-    "overtime-policy",
-    "expense-claims-policy",
-    "travel-policy",
-    "code-of-conduct",
-    "probation-and-confirmation-policy",
-    "work-from-home-policy",
-]
-UPLOAD_DEMO_SLUG = "training-and-development-policy"
-
-CORE_POLICIES = [POLICY_DIR / f"{slug}.md" for slug in CORE_POLICY_SLUGS]
-UPLOAD_DEMO_POLICY = UPLOAD_DEMO_DIR / f"{UPLOAD_DEMO_SLUG}.md"
-ALL_POLICIES = [*CORE_POLICIES, UPLOAD_DEMO_POLICY]
+from tests.sample_data import (
+    ALL_POLICIES,
+    CORE_POLICIES,
+    CORE_POLICY_SLUGS,
+    FICTIONAL_LABEL,
+    POLICY_DIR,
+    UPLOAD_DEMO_DIR,
+    UPLOAD_DEMO_POLICY,
+    UPLOAD_DEMO_SLUG,
+)
 
 # Topics that no policy covers, so questions about them must be refused later.
 UNCOVERED_TOPICS = {

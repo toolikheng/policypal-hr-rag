@@ -4,7 +4,7 @@ import pytest
 
 from policypal.ingest.chunking import MAX_WORDS, Chunk, chunk_document, embedding_text
 from policypal.ingest.parsing import ParsedDocument, Section, parse_markdown
-from tests.unit.test_sample_policies import CORE_POLICIES
+from tests.sample_data import CORE_POLICIES
 
 
 def paragraph(label: str, words: int) -> str:

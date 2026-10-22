@@ -3,6 +3,9 @@
 A section is one heading, the text under it, and the path of headings above it, e.g.
 path ("4. Annual Leave", "4.3 Carry Forward of Annual Leave"). Citations are built from
 this, so every piece of text keeps track of where it came from.
+
+Both formats are first turned into the same simple form, a list of lines that are either
+a Heading or a line of text, and then `assemble()` groups those lines into sections.
 """
 
 import io
@@ -10,9 +13,14 @@ import re
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass
+from pathlib import PurePath
+from typing import Literal
 
 from pypdf import PageObject, PdfReader
 from pypdf.errors import PyPdfError
+
+FileType = Literal["md", "pdf"]
+SUPPORTED_SUFFIXES: dict[str, FileType] = {".md": "md", ".pdf": "pdf"}
 
 # Text before the first heading (fictional-data label, reference, version, dates).
 DOCUMENT_INFO_HEADING = "Document information"
@@ -31,31 +39,52 @@ class ParsedDocument:
     sections: tuple[Section, ...]
 
 
-# One line of a document: a heading with its level (1 = top), or body text (level 0).
-# An empty body line marks a paragraph break.
-Line = tuple[int, str]
+@dataclass(frozen=True)
+class Heading:
+    level: int  # 1 = top-level section, 2 = sub-section, ...
+    text: str
+
+
+# A line of a document: a heading, or a line of text ("" is a blank line between paragraphs).
+Line = Heading | str
+
+
+def file_type_of(filename: str) -> FileType:
+    file_type = SUPPORTED_SUFFIXES.get(PurePath(filename).suffix.lower())
+    if file_type is None:
+        raise ValueError(f"Unsupported file '{filename}': only .md and .pdf files are supported.")
+    return file_type
+
+
+def parse_document(data: bytes, file_type: FileType) -> ParsedDocument:
+    if file_type == "pdf":
+        return parse_pdf(data)
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("The Markdown file is not valid UTF-8 text.") from exc
+    return parse_markdown(text)
 
 
 def assemble(title: str, lines: Iterable[Line]) -> ParsedDocument:
     """Group lines into sections. Headings with no text of their own only appear in paths."""
     sections: list[Section] = []
-    path = [DOCUMENT_INFO_HEADING]
+    path: list[str] = []  # headings above the current line; empty before the first heading
     body: list[str] = []
 
     def close_section() -> None:
         text = re.sub(r"\n{3,}", "\n\n", "\n".join(body)).strip()
         if text:
-            sections.append(Section(heading=path[-1], path=tuple(path), text=text))
+            section_path = tuple(path) or (DOCUMENT_INFO_HEADING,)
+            sections.append(Section(heading=section_path[-1], path=section_path, text=text))
         body.clear()
 
-    for level, text in lines:
-        if level == 0:
-            body.append(text)
-        else:
+    for line in lines:
+        if isinstance(line, Heading):
             close_section()
-            # The document-information pseudo-section is never part of a real path.
-            parents = [] if path == [DOCUMENT_INFO_HEADING] else path[: level - 1]
-            path = [*parents, text]
+            path = [*path[: line.level - 1], line.text]
+        else:
+            body.append(line)
     close_section()
 
     if not sections:
@@ -77,9 +106,9 @@ def parse_markdown(text: str) -> ParsedDocument:
         if heading and len(heading[1]) == 1 and title is None:
             title = heading[2]
         elif heading and len(heading[1]) > 1:
-            lines.append((len(heading[1]) - 1, heading[2]))
+            lines.append(Heading(level=len(heading[1]) - 1, text=heading[2]))
         else:
-            lines.append((0, raw.rstrip()))
+            lines.append(raw.rstrip())
     if title is None:
         raise ValueError("The Markdown file has no title line ('# Title').")
     return assemble(title, lines)
@@ -97,11 +126,13 @@ class _PdfLine:
 
 
 def parse_pdf(data: bytes) -> ParsedDocument:
-    """Find headings by font size: lines printed bigger than the body text are headings.
+    """Find structure from font sizes: text printed bigger than the body text is a heading.
 
-    The biggest text on the first page is the title. Heading levels follow font size
-    (biggest = level 1). Page headers and footers are removed, and a larger-than-normal
-    vertical gap between lines starts a new paragraph.
+    - Page headers and footers (same text, same place, on most pages) are removed.
+    - The title is the first run of the biggest lines on page 1, if they are bigger than
+      the body text; otherwise it is simply the first line.
+    - Bigger-than-body lines after the title are headings; bigger font = higher level.
+    - A larger-than-normal vertical gap between lines starts a new paragraph.
     """
     try:
         reader = PdfReader(io.BytesIO(data))
@@ -116,20 +147,13 @@ def parse_pdf(data: bytes) -> ParsedDocument:
         )
     lines = _remove_page_headers_and_footers(lines, page_count=len(reader.pages))
 
-    chars_by_size: Counter[float] = Counter()
-    for line in lines:
-        chars_by_size[line.size] += len(line.text)
-    body_size = chars_by_size.most_common(1)[0][0]
+    body_size = _most_common_size(lines)
+    start, end = _title_span(lines, body_size)
+    title = " ".join(line.text for line in lines[start:end])
+    content = lines[:start] + lines[end:]
 
-    title_size = max(line.size for line in lines if line.page == 0)
-    title_lines = [line for line in lines if line.page == 0 and line.size == title_size]
-    heading_sizes = sorted(
-        {line.size for line in lines if body_size < line.size < title_size}, reverse=True
-    )
+    heading_sizes = sorted({line.size for line in content if line.size > body_size}, reverse=True)
     level_of = {size: rank + 1 for rank, size in enumerate(heading_sizes)}
-
-    content = [line for line in lines if line not in title_lines]
-    title = " ".join(line.text for line in title_lines)
     return assemble(title, _to_document_lines(content, level_of, body_size))
 
 
@@ -170,11 +194,34 @@ def _remove_page_headers_and_footers(lines: list[_PdfLine], page_count: int) -> 
     return [line for line in lines if pages_with[key(line)] < max(2, page_count / 2)]
 
 
+def _most_common_size(lines: list[_PdfLine]) -> float:
+    """The body text size: the font size used for the most characters."""
+    chars_by_size: Counter[float] = Counter()
+    for line in lines:
+        chars_by_size[line.size] += len(line.text)
+    return chars_by_size.most_common(1)[0][0]
+
+
+def _title_span(lines: list[_PdfLine], body_size: float) -> tuple[int, int]:
+    """Start and end index of the title lines: the first run of the biggest lines on the
+    first page, or just the first line if nothing there is bigger than the body text."""
+    first_page = [line for line in lines if line.page == lines[0].page]
+    biggest = max(line.size for line in first_page)
+    if biggest <= body_size:
+        return 0, 1
+    start = next(i for i, line in enumerate(lines) if line.size == biggest)
+    end = start + 1
+    while end < len(lines) and lines[end].size == biggest:
+        end += 1
+    return start, end
+
+
 def _to_document_lines(
     lines: list[_PdfLine], level_of: dict[float, int], body_size: float
 ) -> list[Line]:
     result: list[Line] = []
-    for previous, line in zip([None, *lines[:-1]], lines, strict=True):
+    previous: _PdfLine | None = None
+    for line in lines:
         level = level_of.get(line.size, 0)
         continues = (
             previous is not None
@@ -183,12 +230,13 @@ def _to_document_lines(
         )
         if level == 0:
             if not continues:
-                result.append((0, ""))  # paragraph break (dropped if right after a heading)
-            result.append((0, line.text))
-        elif continues:
-            result[-1] = (level, f"{result[-1][1]} {line.text}")  # heading wrapped onto 2 lines
+                result.append("")  # paragraph break (dropped if right after a heading)
+            result.append(line.text)
+        elif continues and isinstance(result[-1], Heading):
+            result[-1] = Heading(level, f"{result[-1].text} {line.text}")  # wrapped heading
         else:
-            result.append((level, line.text))
+            result.append(Heading(level, line.text))
+        previous = line
     return result
 
 
