@@ -1,6 +1,7 @@
 """Ollama: a local LLM server, called over its HTTP API (no SDK needed for two endpoints)."""
 
 from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 
 import httpx
 
@@ -8,8 +9,14 @@ from policypal.llm.base import LLMError, LLMStatus
 from policypal.llm.prompt import build_messages
 from policypal.retrieval import RetrievedChunk
 
-# /health runs often and must stay fast even when Ollama hangs.
-STATUS_TIMEOUT_SECONDS = 2
+# /health runs often and must stay fast even when Ollama is down or hangs.
+STATUS_TIMEOUT_SECONDS = 1  # for each HTTP step (connect, read)
+# For the whole check. It also covers the DNS lookup, which no HTTP timeout interrupts: with
+# the ollama container gone, the lookup alone took 3.3 s, longer than Docker's healthcheck.
+STATUS_DEADLINE_SECONDS = 1.0
+# Status checks run here so /health can stop waiting. A check stuck on DNS keeps its thread
+# until the lookup fails; four threads are plenty for one health check every few seconds.
+_status_checks = ThreadPoolExecutor(max_workers=4, thread_name_prefix="ollama-status")
 # Keep the model in memory between questions: loading it again takes seconds on CPU.
 KEEP_ALIVE = "30m"
 GENERATION_OPTIONS = {
@@ -66,6 +73,14 @@ class OllamaProvider:
         return reply
 
     def status(self) -> LLMStatus:
+        """ok, model_missing, or unavailable, within STATUS_DEADLINE_SECONDS."""
+        check = _status_checks.submit(self._check_status)
+        try:
+            return check.result(timeout=STATUS_DEADLINE_SECONDS)
+        except TimeoutError:
+            return "unavailable"
+
+    def _check_status(self) -> LLMStatus:
         try:
             with self._client(STATUS_TIMEOUT_SECONDS) as client:
                 response = client.get("/api/tags")

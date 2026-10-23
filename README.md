@@ -98,7 +98,8 @@ PyTorch, and the embedding model. On the laptop used for development this took a
 ```
 
 - `status` is `ok`, or `degraded` (still HTTP 200) when the LLM isn't ready: questions
-  are then answered by quoting the policy text.
+  are then answered by quoting the policy text. The LLM check gives up after about 1 s,
+  so `/health` stays fast even when the Ollama container is missing.
 - `files_not_loaded` lists policy files whose current content isn't searchable, for
   example a file that failed to load at start-up. It doesn't change `status`.
 - If the database is down or behind the code, it returns HTTP 503 with the reason.

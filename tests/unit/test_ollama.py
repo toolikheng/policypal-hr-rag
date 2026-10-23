@@ -1,6 +1,7 @@
 """OllamaProvider against a fake HTTP layer (httpx.MockTransport): no network, no Ollama."""
 
 import json
+import time
 from collections.abc import Callable
 
 import httpx
@@ -128,4 +129,20 @@ def test_status_check_uses_a_short_timeout() -> None:
     provider(handler).status()
 
     assert requests[0].url == "http://ollama:11434/api/tags"
-    assert requests[0].extensions["timeout"]["read"] == 2
+    timeouts = requests[0].extensions["timeout"]
+    assert timeouts["connect"] == timeouts["read"] == 1
+
+
+def test_status_gives_up_after_one_second_even_if_the_lookup_hangs() -> None:
+    """With the ollama container gone, the DNS lookup alone took 3.3 s, and no HTTP timeout
+    covers it. /health (and Docker's 3 s healthcheck) must still get an answer in ~1 s."""
+
+    def hangs(request: httpx.Request) -> httpx.Response:
+        time.sleep(2)  # stands in for a lookup that can't be interrupted
+        return httpx.Response(200, json={"models": [{"name": "llama3.2:3b"}]})
+
+    started = time.perf_counter()
+    status = provider(hangs).status()
+
+    assert status == "unavailable"
+    assert time.perf_counter() - started < 1.5
