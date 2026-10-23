@@ -28,7 +28,7 @@ def save_answer(
     question: str,
     answer: Answer,
     *,
-    conversation_id: uuid.UUID | None,
+    conversation_id: uuid.UUID | None = None,
     channel: Channel,
 ) -> SavedAnswer:
     """Store a question, its answer and every retrieved source in one transaction.

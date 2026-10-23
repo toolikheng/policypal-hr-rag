@@ -9,10 +9,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from policypal.answering import Answer, Reply
 from policypal.history import save_answer
-from policypal.llm.base import REFUSAL_SENTENCE
-from tests.helpers import build_test_app
+from tests.helpers import build_test_app, make_answer
 
 
 @pytest.fixture
@@ -23,8 +21,7 @@ def client(migrated_database_url: str, engine: Engine) -> Iterator[TestClient]:
 
 @pytest.fixture
 def message_id(engine: Engine) -> str:
-    answer = Answer(Reply(REFUSAL_SENTENCE, "refused"), (), retrieval_ms=1, total_ms=1)
-    saved = save_answer(engine, "Is there a bonus?", answer, conversation_id=None, channel="ui")
+    saved = save_answer(engine, "Is there a bonus?", make_answer(), channel="ui")
     return str(saved.message_id)
 
 

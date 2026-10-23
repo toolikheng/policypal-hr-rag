@@ -6,10 +6,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from policypal.answering import Answer, Reply
 from policypal.history import record_feedback, save_answer
-from policypal.llm.base import REFUSAL_SENTENCE
-from tests.helpers import build_test_app
+from tests.helpers import build_test_app, make_answer
 
 TOKEN = "test-admin-token"
 ADMIN = {"X-Admin-Token": TOKEN}
@@ -48,16 +46,17 @@ def test_the_period_defaults_to_30_days_and_can_be_changed(client: TestClient) -
 
 
 def test_stored_questions_and_votes_are_reported(client: TestClient, engine: Engine) -> None:
-    refusal = Answer(Reply(REFUSAL_SENTENCE, "refused"), (), retrieval_ms=5, total_ms=20)
-    saved = save_answer(engine, "Is there a bonus?", refusal, conversation_id=None, channel="ui")
+    refusal = make_answer(retrieval_ms=5, total_ms=20)
+    saved = save_answer(engine, "Is there a bonus?", refusal, channel="ui")
     record_feedback(engine, saved.message_id, "down", None)
-    fallback = Answer(
-        Reply("quoted", "extractive", fallback_reason="llm_timeout", generation_ms=120000),
-        (),
+    fallback = make_answer(
+        "extractive",
+        fallback_reason="llm_timeout",
         retrieval_ms=5,
+        generation_ms=120000,
         total_ms=120010,
     )
-    save_answer(engine, "Dress code?", fallback, conversation_id=None, channel="ui")
+    save_answer(engine, "Dress code?", fallback, channel="ui")
 
     body = client.get("/analytics", headers=ADMIN).json()
 

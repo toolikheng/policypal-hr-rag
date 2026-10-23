@@ -6,13 +6,13 @@ import pytest
 from sqlalchemy import Engine, text
 from sqlalchemy.exc import IntegrityError
 
-from policypal.answering import Answer, Citation, Reply, Source
+from policypal.answering import Answer
 from policypal.history import save_answer
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_file
 from policypal.llm.base import REFUSAL_SENTENCE
 from policypal.retrieval import RetrievedChunk
 from tests.fakes import FakeEmbedder
-from tests.helpers import retrieved_chunk
+from tests.helpers import make_answer, retrieved_chunk
 
 QUESTION = "How many days of annual leave do I get?"
 
@@ -45,20 +45,16 @@ def leave_chunks(engine: Engine, count: int) -> list[RetrievedChunk]:
 
 def llm_answer(chunks: list[RetrievedChunk]) -> Answer:
     """An LLM answer that cites only the second chunk."""
-    reply = Reply(
-        "You get 16 days [1].",
+    return make_answer(
         "llm",
-        (Citation(1, chunks[1]),),
+        sources=chunks,
+        cited=[2],
+        text="You get 16 days [1].",
         model="tiny:1b",
+        retrieval_ms=40,
         generation_ms=900,
+        total_ms=950,
     )
-    sources = tuple(Source(rank, chunk, rank == 2) for rank, chunk in enumerate(chunks, start=1))
-    return Answer(reply, sources, retrieval_ms=40, total_ms=950)
-
-
-def refused_answer(chunks: list[RetrievedChunk]) -> Answer:
-    sources = tuple(Source(rank, chunk, False) for rank, chunk in enumerate(chunks, start=1))
-    return Answer(Reply(REFUSAL_SENTENCE, "refused"), sources, retrieval_ms=30, total_ms=31)
 
 
 def message_row(engine: Engine, message_id: uuid.UUID):
@@ -82,7 +78,7 @@ def count(engine: Engine, table: str) -> int:
 def test_an_answer_is_saved_with_its_mode_model_and_timings(engine: Engine) -> None:
     chunks = leave_chunks(engine, 3)
 
-    saved = save_answer(engine, QUESTION, llm_answer(chunks), conversation_id=None, channel="ui")
+    saved = save_answer(engine, QUESTION, llm_answer(chunks), channel="ui")
 
     row = message_row(engine, saved.message_id)
     assert row.conversation_id == saved.conversation_id
@@ -98,7 +94,7 @@ def test_every_retrieved_source_is_saved_with_rank_snapshot_and_cited_flag(
 ) -> None:
     chunks = leave_chunks(engine, 3)
 
-    saved = save_answer(engine, QUESTION, llm_answer(chunks), conversation_id=None, channel="ui")
+    saved = save_answer(engine, QUESTION, llm_answer(chunks), channel="ui")
 
     rows = source_rows(engine, saved.message_id)
     assert [row.rank for row in rows] == [1, 2, 3]
@@ -113,9 +109,7 @@ def test_every_retrieved_source_is_saved_with_rank_snapshot_and_cited_flag(
 def test_a_refusal_is_saved_with_what_was_retrieved(engine: Engine) -> None:
     chunks = leave_chunks(engine, 2)
 
-    saved = save_answer(
-        engine, QUESTION, refused_answer(chunks), conversation_id=None, channel="api"
-    )
+    saved = save_answer(engine, QUESTION, make_answer(sources=chunks), channel="api")
 
     row = message_row(engine, saved.message_id)
     assert (row.answer, row.mode, row.llm_model, row.generation_ms) == (
@@ -128,15 +122,15 @@ def test_a_refusal_is_saved_with_what_was_retrieved(engine: Engine) -> None:
 
 
 def test_a_refusal_with_nothing_retrieved_has_no_sources(engine: Engine) -> None:
-    saved = save_answer(engine, QUESTION, refused_answer([]), conversation_id=None, channel="api")
+    saved = save_answer(engine, QUESTION, make_answer(), channel="api")
 
     assert message_row(engine, saved.message_id).top_similarity is None
     assert source_rows(engine, saved.message_id) == []
 
 
 def test_without_a_conversation_id_a_new_conversation_is_created(engine: Engine) -> None:
-    first = save_answer(engine, QUESTION, refused_answer([]), conversation_id=None, channel="ui")
-    second = save_answer(engine, QUESTION, refused_answer([]), conversation_id=None, channel="ui")
+    first = save_answer(engine, QUESTION, make_answer(), channel="ui")
+    second = save_answer(engine, QUESTION, make_answer(), channel="ui")
 
     assert first.conversation_id != second.conversation_id
     with engine.connect() as conn:
@@ -145,9 +139,9 @@ def test_without_a_conversation_id_a_new_conversation_is_created(engine: Engine)
 
 
 def test_a_known_conversation_id_groups_the_messages(engine: Engine) -> None:
-    first = save_answer(engine, QUESTION, refused_answer([]), conversation_id=None, channel="ui")
+    first = save_answer(engine, QUESTION, make_answer(), channel="ui")
     second = save_answer(
-        engine, QUESTION, refused_answer([]), conversation_id=first.conversation_id, channel="ui"
+        engine, QUESTION, make_answer(), conversation_id=first.conversation_id, channel="ui"
     )
 
     assert second.conversation_id == first.conversation_id
@@ -160,7 +154,7 @@ def test_an_unknown_conversation_id_is_created_with_that_id(engine: Engine) -> N
     conversation_id = uuid.uuid4()
 
     saved = save_answer(
-        engine, QUESTION, refused_answer([]), conversation_id=conversation_id, channel="widget"
+        engine, QUESTION, make_answer(), conversation_id=conversation_id, channel="widget"
     )
 
     assert saved.conversation_id == conversation_id
@@ -179,7 +173,7 @@ def test_a_chunk_deleted_after_retrieval_is_saved_as_null_with_its_snapshot(
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM chunks WHERE id = :id"), {"id": chunks[0].chunk_id})
 
-    saved = save_answer(engine, QUESTION, llm_answer(chunks), conversation_id=None, channel="ui")
+    saved = save_answer(engine, QUESTION, llm_answer(chunks), channel="ui")
 
     rows = source_rows(engine, saved.message_id)
     assert [row.chunk_id for row in rows] == [None, chunks[1].chunk_id, chunks[2].chunk_id]
@@ -188,11 +182,9 @@ def test_a_chunk_deleted_after_retrieval_is_saved_as_null_with_its_snapshot(
 
 def test_the_message_and_its_sources_are_saved_all_or_nothing(engine: Engine) -> None:
     broken = retrieved_chunk(chunk_id=999, title=None)  # type: ignore[arg-type]
-    answer = Answer(
-        Reply(REFUSAL_SENTENCE, "refused"), (Source(1, broken, False),), retrieval_ms=1, total_ms=1
-    )
+    answer = make_answer(sources=[broken])
 
     with pytest.raises(IntegrityError):
-        save_answer(engine, QUESTION, answer, conversation_id=None, channel="ui")
+        save_answer(engine, QUESTION, answer, channel="ui")
 
     assert (count(engine, "conversations"), count(engine, "messages")) == (0, 0)

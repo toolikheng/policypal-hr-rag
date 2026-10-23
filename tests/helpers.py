@@ -1,15 +1,18 @@
 """Small helpers shared by tests (fixtures live in conftest.py)."""
 
+from collections.abc import Collection, Sequence
 from typing import Any
 
 from alembic.config import Config
 from fastapi import FastAPI
 
+from policypal.answering import Answer, Citation, Reply, Source
 from policypal.api.main import create_app
 from policypal.config import Settings
 from policypal.embeddings import Embedder
-from policypal.llm.base import LLMProvider
+from policypal.llm.base import REFUSAL_SENTENCE, LLMProvider
 from policypal.retrieval import RetrievedChunk
+from policypal.vocabulary import FallbackReason, Mode
 from tests.fakes import FakeEmbedder, FakeLLM
 
 
@@ -61,4 +64,40 @@ def retrieved_chunk(
         section_path=section_path,
         text=text,
         similarity=similarity,
+    )
+
+
+def make_answer(
+    mode: Mode = "refused",
+    *,
+    sources: Sequence[RetrievedChunk] = (),
+    cited: Collection[int] = (),
+    text: str | None = None,
+    model: str | None = None,
+    fallback_reason: FallbackReason | None = None,
+    retrieval_ms: int = 5,
+    generation_ms: int | None = None,
+    total_ms: int = 10,
+) -> Answer:
+    """A finished answer, as answer_question() returns it, without retrieval or an LLM.
+
+    `sources` are the retrieved chunks, best first; `cited` lists the ranks shown to the
+    user as citations [1], [2], ... in that order.
+    """
+    citations = tuple(Citation(number, sources[rank - 1]) for number, rank in enumerate(cited, 1))
+    reply = Reply(
+        text=text or (REFUSAL_SENTENCE if mode == "refused" else "An answer [1]."),
+        mode=mode,
+        citations=citations,
+        model=model,
+        fallback_reason=fallback_reason,
+        generation_ms=generation_ms,
+    )
+    return Answer(
+        reply=reply,
+        sources=tuple(
+            Source(rank, chunk, rank in cited) for rank, chunk in enumerate(sources, start=1)
+        ),
+        retrieval_ms=retrieval_ms,
+        total_ms=total_ms,
     )
