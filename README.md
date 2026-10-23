@@ -24,6 +24,8 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
   in PostgreSQL (users are anonymous: a conversation is only a random ID). `GET /analytics`
   and an analytics page show top and unanswered questions, feedback, answer times and
   LLM fallbacks.
+- **Evaluation:** fixed question sets, a repeatable evaluation command and measured
+  results for search, refusals, answers and speed (see [Evaluation](#evaluation)).
 
 ## Using the UI
 
@@ -179,6 +181,9 @@ stack was running. That is why `OLLAMA_TIMEOUT_SECONDS` defaults to 120: after t
 API stops waiting and quotes the policy text instead. On a slower machine, raise it in
 `.env`. Refusals take well under a second because the LLM isn't called.
 
+The evaluation later measured `llama3.2:3b` on 31 golden-set answers: a median of 14.2 s
+per answer (maximum 30.7 s) with the model already loaded; see [Evaluation](#evaluation).
+
 ## Managing policies (admin)
 
 Admin endpoints need the `X-Admin-Token` header, set with `ADMIN_TOKEN` in `.env`. It
@@ -291,14 +296,97 @@ make eval-llm         # golden set: answers from the local LLM (Ollama must be h
 
 Reports are written to `evaluation/results/` as Markdown and JSON. Each one starts with
 the settings and machine it ran on, and the golden reports explain every mistake.
+There is also `make eval-held-out`, the "unseen document" test described below.
 
-**Threshold calibration (dev set, measured 2026-10-23).** Every threshold from 0.50 to
-0.85 was tried; the one with the best balanced accuracy (the average of "answerable
-questions answered" and "questions that should be refused, refused") was chosen:
-**0.69** with the query instruction (95.8%: 11 of 12 answered, 8 of 8 refused), and 0.71
-without it (also 95.8%). The dev set doesn't favour turning the instruction off, so it
-stays on. The margin is thin: the nearest should-refuse question scored 0.689 and two
-answerable ones 0.697 and 0.699. Full tables: `evaluation/results/dev-calibration.md`.
+### Results (measured 2026-10-23)
+
+Run on an Intel Core i5-10300H laptop (4 cores / 8 threads, CPU only), Docker Desktop
+4.86.0 on WSL2 with 11.6 GiB visible to Docker, commit `7f3b687` (golden) and `9dc7dbb`
+(held-out). Embedding model `BAAI/bge-small-en-v1.5`, top k = 5, LLM `llama3.2:3b`
+through Ollama 0.35.1. The full reports, with every question, are in `evaluation/results/`.
+
+**1. Threshold calibration (dev set, 20 questions).** Every threshold from 0.50 to 0.85
+was tried; the one with the best balanced accuracy (the average of "answerable questions
+answered" and "questions that should be refused, refused") was chosen: **0.69** with the
+query instruction (95.8%) and 0.71 without it (also 95.8%). The dev set doesn't favour
+turning the instruction off, so it stays on. The margin was thin: the nearest
+should-refuse question scored 0.689, two answerable ones 0.697 and 0.699.
+
+**2. Search (golden set: 40 answerable, 12 should be refused).** Hit rate@k is the share
+of answerable questions with an expected section in the top k results. The first column
+is the app's setting. The other columns are reported only; the golden set never chooses
+a setting.
+
+| | Markdown, instruction on | Markdown, instruction off | PDF, instruction on | PDF, instruction off |
+|---|---|---|---|---|
+| Section hit@1 | 35/40 (87.5%) | 35/40 (87.5%) | 35/40 (87.5%) | 34/40 (85.0%) |
+| Section hit@3 | 39/40 (97.5%) | 39/40 (97.5%) | 39/40 (97.5%) | 40/40 (100%) |
+| Section hit@5 | 40/40 (100%) | 40/40 (100%) | 40/40 (100%) | 40/40 (100%) |
+| Document hit@1 | 38/40 (95.0%) | 38/40 (95.0%) | 38/40 (95.0%) | 38/40 (95.0%) |
+| Threshold (from the dev set) | 0.69 | 0.71 | 0.69 | 0.71 |
+| Answerable questions answered | 32/40 (80.0%) | 33/40 (82.5%) | 33/40 (82.5%) | 34/40 (85.0%) |
+| Should-refuse questions refused | 11/12 (91.7%) | 11/12 (91.7%) | 11/12 (91.7%) | 11/12 (91.7%) |
+| Balanced accuracy | 85.8% | 87.1% | 87.1% | 88.3% |
+| Search time per question (median) | 19 ms | 18 ms | 20 ms | 19 ms |
+
+By question type (Markdown, instruction on), section hit@1 was: plain 9/10, look-alike
+6/9, table 7/7, amendment 7/8, two-section 6/6; every type was 100% at hit@5.
+
+**3. Full answers (golden set, Markdown, instruction on, threshold 0.69).** A refusal is
+the refusal sentence; a fallback to quoted text counts as an answer.
+
+| | Extractive (no LLM) | `llama3.2:3b` |
+|---|---|---|
+| Answerable questions answered | 32/40 (80.0%) | 32/40 (80.0%) |
+| Should-refuse questions refused | 11/12 (91.7%) | 11/12 (91.7%) |
+| Questions that reached the LLM | — | 33 |
+| Answers with a valid citation (of those) | — | 31/33 (93.9%); 2 fell back to quoting |
+| Answers citing an expected section | 30/32 quoted | 28/31 LLM answers |
+| Answer time, median (mean, max) | 21 ms | 14.2 s (14.2 s, 30.7 s) |
+| Refusal time, median | 22 ms | 30 ms |
+
+The first LLM answer, which loads the model, took 29.1 s and is not counted above.
+
+**4. Unseen document (held-out Training policy, 10 questions).** The ninth policy was
+never used to write the other question sets or to choose the threshold; its questions
+were written and committed after both were frozen. It was added as an upload and tested
+with the frozen settings: section hit@1 **8/8** (Markdown and PDF, instruction on and
+off); 7 of 8 answerable questions answered, each citing the expected section (5 LLM
+answers, 2 fallbacks to quoting); one conversational question was refused by the
+threshold (0.656); neither of the 2 should-refuse questions was refused (see below).
+
+### What the results show
+
+- **Search works well; the threshold is the weak point.** Every answerable golden
+  question had an expected section in the top 5, but 8 of 40 were refused because their
+  best score was below 0.69: mostly conversational questions ("A colleague keeps making
+  sexual jokes about me…" scored 0.608), often with the right section ranked first. The
+  threshold was tuned on 20 dev questions whose answerable scores happened to be higher.
+  The scores also overlap: the lowest answerable golden question scored 0.587, the
+  highest uncovered topic 0.665, so no single threshold separates them.
+- **Look-alike sections are the hardest search case** (6/9 at hit@1): for example the
+  Medical Claims "Medical Certificates" section outranked the Leave Policy's sick-leave
+  rules for an MC question.
+- **A citation shows where an answer came from, not that it is true.** For the 2
+  held-out questions about details the policy doesn't cover (redundancy during a training
+  bond; who pays for a safety card), the threshold let them through, and the model
+  invented an answer and cited the policy. In the golden set, one cited answer used the
+  wrong section (workplace parking instead of a parking fine), and two replies that
+  hedged ("…this does not directly answer the question. I couldn't find this in the
+  policies.") still counted as answers because they also cited an excerpt.
+- **PDF and Markdown search the same** here, but these PDFs are rendered from the same
+  Markdown by `scripts/build_pdfs.py`, which is the easy case for a PDF parser.
+
+### Limits of these numbers
+
+- Small sets: one golden answerable question is 2.5 percentage points; the held-out set
+  has 10 questions.
+- The questions were written by the person who built the system. The golden and dev
+  sets were committed before any run; the held-out questions were written after the
+  golden search results had been seen (in the golden set's style and type mix).
+- Whether an answer's text is correct is **not** measured automatically; the error
+  analysis in each report shows the answers that went wrong so they can be read.
+- One run each; temperature 0 makes the LLM mostly repeatable, but not guaranteed.
 
 ## Sample data
 
@@ -385,6 +473,7 @@ policypal/ingest/   parsing, chunking, the ingestion pipeline and uploads
 ui/                 Streamlit UI (Chat.py, pages/1_Admin.py, pages/2_Analytics.py). It
                     talks to the API over HTTP only, through ui/api_client.py
 migrations/         Alembic database migrations
+evaluation/         question sets, metrics, the evaluation runner and its results
 data/               fictional sample policies (Markdown + PDF)
 scripts/            developer scripts (PDF rendering)
 tests/              unit tests (no database) and integration tests (PostgreSQL)
