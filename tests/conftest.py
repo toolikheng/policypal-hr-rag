@@ -59,7 +59,7 @@ def engine(migrated_database_url: str) -> Iterator[Engine]:
     """An engine on an empty, migrated test database (tables are emptied before each test)."""
     engine = make_engine(migrated_database_url)
     with engine.begin() as conn:
-        conn.execute(text("TRUNCATE documents RESTART IDENTITY CASCADE"))
+        conn.execute(text("TRUNCATE documents, conversations RESTART IDENTITY CASCADE"))
     yield engine
     engine.dispose()
 

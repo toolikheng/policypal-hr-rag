@@ -6,10 +6,13 @@ from pathlib import Path
 
 import pytest
 from alembic import command
+from alembic.autogenerate import compare_metadata
+from alembic.runtime.migration import MigrationContext
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
+from policypal.models import Base
 from tests.helpers import alembic_config, build_test_app
 
 
@@ -96,3 +99,14 @@ def test_documents_and_chunks_tables_have_vector_index_and_checks(engine) -> Non
                 " ('x', 'X', 'x.txt', 'txt', 'sample', repeat('0', 64), 'v')"
             )
         )
+
+
+def test_models_have_the_same_tables_columns_and_nulls_as_the_migrations(engine) -> None:
+    """The migrations own the schema; the model classes must mirror its columns.
+    Indexes and constraints live only in the migrations, so they are not compared."""
+    column_level = {"add_table", "remove_table", "add_column", "remove_column", "modify_nullable"}
+    with engine.connect() as conn:
+        diffs = compare_metadata(MigrationContext.configure(conn), Base.metadata)
+    # A column change comes as a list of operations; a table or index change as a tuple.
+    operations = [op for diff in diffs for op in (diff if isinstance(diff, list) else [diff])]
+    assert [op for op in operations if op[0] in column_level] == []
