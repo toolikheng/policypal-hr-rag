@@ -20,8 +20,10 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
   the policy text when no LLM is available. Admins can upload new policies.
 - **Streamlit UI:** a chat page with sources and 👍/👎 feedback, and an admin page for
   uploads and re-ingesting.
-- **Question history:** every question, answer, source and vote is stored in PostgreSQL
-  (users are anonymous: a conversation is only a random ID).
+- **Question history and analytics:** every question, answer, source and vote is stored
+  in PostgreSQL (users are anonymous: a conversation is only a random ID). `GET /analytics`
+  and an analytics page show top and unanswered questions, feedback, answer times and
+  LLM fallbacks.
 
 ## Using the UI
 
@@ -43,6 +45,10 @@ Open <http://localhost:8501>.
   If an uploaded policy with the same name already exists, the page shows the API's
   message and a **Replace existing policy** button. Built-in sample policies can't be
   replaced, so they get no button.
+- **Analytics** (sidebar): enter the admin token and choose a period (7 to 365 days) to
+  see the number of questions and refusals, the feedback and helpful rates, the average
+  answer time per mode, the top and unanswered questions, and how often answers fell back
+  to quoted policy text, with the reason.
 
 ## Prerequisites
 
@@ -194,10 +200,59 @@ Other errors: `401`/`403` (missing or wrong token), `413` (larger than `MAX_UPLO
 `415` (not `.md` or `.pdf`), `422` (unreadable file, e.g. a scanned PDF with no text).
 Uploaded files are kept in the `uploads` volume and loaded again on every start.
 
+## Question history and analytics
+
+`POST /ask` saves each question in PostgreSQL in one transaction, together with:
+- the answer, its mode, the LLM used and the fallback reason;
+- the time spent searching, generating and in total;
+- every retrieved chunk, with its rank, its score and whether it was cited.
+
+The document title and section of each source are copied in. When a re-ingest replaces a
+policy's chunks, old answers therefore keep their sources; only the link to the deleted
+chunk becomes empty.
+
+**Privacy:** there are no user accounts. A conversation is a random ID kept by the chat
+page, and no names, emails or IP addresses are stored. Questions and feedback comments
+are stored, because HR needs them for analytics. They are never written to the logs, and
+reading them needs the admin token.
+
 `POST /feedback` takes `{"message_id": ..., "rating": "up" | "down", "comment": ...}` (the
 `message_id` comes from `/ask`). It stores one vote per answer and returns
 `200 {"status": "recorded"}`; voting again replaces the rating and comment. An unknown
 `message_id` gets `404`. The log line has the rating but never the comment text.
+
+`GET /analytics?days=30` (admin, `days` from 1 to 365) reports on the questions asked in
+that period:
+
+```bash
+curl -s -H "X-Admin-Token: <your ADMIN_TOKEN>" 'localhost:8000/analytics?days=30'
+```
+
+A real response from the development laptop after five test questions (shortened):
+
+```json
+{"period_days": 30, "total_questions": 5, "answered": 3, "refused": 2, "refusal_rate": 0.4,
+ "feedback": {"count": 2, "up": 1, "down": 1, "feedback_rate": 0.4, "helpful_rate": 0.5},
+ "avg_latency_ms": {"overall": 11539, "llm": 27135, "extractive": 3362},
+ "top_questions": [{"question": "is there a bonus this year?", "count": 2, "last_asked": "..."}, ...],
+ "unanswered_questions": [{"question": "is there a bonus this year?", "count": 2, "last_asked": "..."}],
+ "fallbacks": [{"reason": "llm_unavailable", "count": 1}]}
+```
+
+| Figure | How it is calculated |
+|---|---|
+| `answered` / `refused` | Mode `llm` or `extractive` / mode `refused` |
+| `refusal_rate` | Refused ÷ all questions |
+| `feedback_rate` | Answers with a vote ÷ all answers (refusals can be rated too) |
+| `helpful_rate` | 👍 ÷ all votes |
+| `avg_latency_ms` | Average total time to answer: all, `llm`, `extractive` |
+| `top_questions` | The 10 most asked, grouped after lower-casing and trimming |
+| `unanswered_questions` | The 10 most asked among the refused ones |
+| `fallbacks` | Answers that fell back to quoted policy text, by `fallback_reason`. Extractive answers with AI switched off are not fallbacks |
+
+A rate or average is `null` (a dash on the page) when there is nothing to divide by, so
+an empty period never claims "0% helpful". The average above mixes a 50 s first answer
+(the model was being loaded) with a 4 s answer, so it is not a speed measurement.
 
 ## Sample data
 
@@ -276,12 +331,13 @@ make help      # list all commands
 ## Project layout
 
 ```
-policypal/          FastAPI backend (config, logging, database, catalogue, retrieval, answering)
+policypal/          FastAPI backend (config, logging, database, catalogue, retrieval, answering,
+                    question history and analytics)
 policypal/api/      app factory, request/response models, routes
 policypal/llm/      prompt, provider interface and the Ollama client
 policypal/ingest/   parsing, chunking, the ingestion pipeline and uploads
-ui/                 Streamlit UI (Chat.py, pages/1_Admin.py). It talks to the API over
-                    HTTP only, through ui/api_client.py
+ui/                 Streamlit UI (Chat.py, pages/1_Admin.py, pages/2_Analytics.py). It
+                    talks to the API over HTTP only, through ui/api_client.py
 migrations/         Alembic database migrations
 data/               fictional sample policies (Markdown + PDF)
 scripts/            developer scripts (PDF rendering)
