@@ -89,6 +89,30 @@ class IngestResult(TypedDict):
     chunks: int
 
 
+class QuestionCount(TypedDict):
+    question: str
+    count: int
+    last_asked: str
+
+
+class FallbackCount(TypedDict):
+    reason: str
+    count: int
+
+
+class Analytics(TypedDict):
+    period_days: int
+    total_questions: int
+    answered: int
+    refused: int
+    refusal_rate: float | None
+    feedback: dict[str, Any]  # count, up, down, feedback_rate, helpful_rate
+    avg_latency_ms: dict[str, int | None]  # overall, llm, extractive
+    top_questions: list[QuestionCount]
+    unanswered_questions: list[QuestionCount]
+    fallbacks: list[FallbackCount]
+
+
 def make_client() -> "PolicyPalClient":
     """A client for the API at API_URL (the pages call this; tests replace it)."""
     base_url = os.environ.get("API_URL", "http://localhost:8000")
@@ -142,6 +166,11 @@ class PolicyPalClient:
             timeout=SLOW_TIMEOUT_SECONDS,
         )
         return reply["results"]
+
+    def analytics(self, days: int, *, token: str) -> Analytics:
+        return self._send(
+            "GET", "/analytics", params={"days": days}, headers={"X-Admin-Token": token}
+        )
 
     def _send(self, method: str, path: str, ok: tuple[int, ...] = (200,), **kwargs: Any) -> Any:
         """Make one request; return its JSON, or raise ApiError with a readable message."""

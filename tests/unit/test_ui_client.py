@@ -187,3 +187,23 @@ def test_an_error_page_that_is_not_json_still_reports_its_status() -> None:
         proxy_page.ask("Q?")
 
     assert caught.value.status_code == 502
+
+
+def test_analytics_sends_the_period_and_the_admin_token() -> None:
+    requests: list[httpx.Request] = []
+    body = {"period_days": 7, "total_questions": 0}
+
+    assert recording(200, body, requests).analytics(7, token="t0k") == body
+
+    [request] = requests
+    assert (request.method, request.url.path) == ("GET", "/analytics")
+    assert request.url.params["days"] == "7"
+    assert request.headers["X-Admin-Token"] == "t0k"
+
+
+def test_analytics_with_a_wrong_token_raises_the_api_message() -> None:
+    client = client_returning(403, {"detail": "Admin token is not valid."})
+
+    with pytest.raises(ApiError, match="Admin token is not valid.") as error:
+        client.analytics(30, token="guess")
+    assert error.value.status_code == 403

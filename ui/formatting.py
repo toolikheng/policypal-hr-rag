@@ -74,3 +74,21 @@ def reingest_summary(results: list[dict[str, Any]]) -> str:
     noun = "policy" if len(results) == 1 else "policies"
     parts = ", ".join(f"{count} {status}" for status, count in counts.items())
     return f"Re-ingested {len(results)} {noun}: {parts}."
+
+
+def fallback_label(reason: str) -> str:
+    """'the AI model took too long (llm_timeout)'; an unknown reason is shown as it is."""
+    words = _FALLBACK_REASONS.get(reason)
+    return f"{words} ({reason})" if words else reason
+
+
+def percent(rate: float | None) -> str:
+    """'75%', '33.3%', or '—' when there is no rate (nothing to divide by)."""
+    if rate is None:
+        return "—"
+    return f"{rate * 100:.1f}".removesuffix(".0") + "%"
+
+
+def seconds(ms: int | None) -> str:
+    """'18.5 s', or '—' when there is no average."""
+    return "—" if ms is None else f"{ms / 1000:.1f} s"

@@ -1,7 +1,10 @@
 from ui.formatting import (
     badge,
+    fallback_label,
+    percent,
     reingest_summary,
     safe_markdown,
+    seconds,
     section_text,
     source_label,
     upload_summary,
@@ -107,3 +110,28 @@ def test_safe_markdown_leaves_ordinary_text_alone() -> None:
     text = "| Years | Days |\n|---|---|\n| 0-2 | 14 |\n\n> Quoted! [1]"
 
     assert safe_markdown(text) == text
+
+
+def test_percent_shows_a_dash_when_there_is_no_rate() -> None:
+    assert [percent(rate) for rate in (None, 0.0, 0.75, 1 / 3, 1.0)] == [
+        "—",
+        "0%",
+        "75%",
+        "33.3%",
+        "100%",
+    ]
+
+
+def test_seconds_shows_a_dash_when_there_is_no_average() -> None:
+    assert [seconds(ms) for ms in (None, 0, 870, 18460, 120010)] == [
+        "—",
+        "0.0 s",
+        "0.9 s",
+        "18.5 s",
+        "120.0 s",
+    ]
+
+
+def test_fallback_label_uses_plain_words_and_keeps_the_code() -> None:
+    assert fallback_label("llm_timeout") == "the AI model took too long (llm_timeout)"
+    assert fallback_label("something_new") == "something_new"

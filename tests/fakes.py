@@ -89,11 +89,13 @@ class FakeApiClient:
         answers: list[dict] | None = None,
         documents: dict[int, dict] | None = None,
         uploads: list[dict | Exception] | None = None,
+        analytics: dict | Exception | None = None,
     ) -> None:
         self._health = health or {"status": "ok", "database": "ok", "version": "0.1.0"}
         self.answers = list(answers or [])
         self.documents = documents or {}
         self.uploads = list(uploads or [])
+        self._analytics = analytics
         self.calls: list[tuple] = []
 
     def _next(self, replies: list) -> object:
@@ -132,3 +134,9 @@ class FakeApiClient:
     def reingest(self, *, token: str) -> list[dict]:
         self.calls.append(("reingest", token))
         return [{"slug": "leave-policy", "status": "unchanged", "chunks": 20}]
+
+    def analytics(self, days: int, *, token: str) -> dict:
+        self.calls.append(("analytics", days, token))
+        if isinstance(self._analytics, Exception):
+            raise self._analytics
+        return self._analytics  # type: ignore[return-value]
