@@ -6,12 +6,13 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_field
 
-from policypal.answering import Answer, FallbackReason, Mode
+from policypal.answering import Answer
 from policypal.db import DatabaseStatus
 from policypal.ingest.parsing import FileType
 from policypal.ingest.pipeline import IngestStatus
 from policypal.llm.base import LLMStatus
-from policypal.models import Channel, Origin, Rating
+from policypal.models import Origin
+from policypal.vocabulary import Channel, FallbackReason, Mode, Rating
 
 
 class LLMHealth(BaseModel):
@@ -403,7 +404,9 @@ class QuestionCountResponse(BaseModel):
 
 
 class FallbackCountResponse(BaseModel):
-    reason: FallbackReason
+    # Plain text, not FallbackReason: a stored answer keeps its reason even after the code
+    # renames or drops it, and old rows must never break analytics.
+    reason: str = Field(description="e.g. llm_timeout, llm_unavailable (shown as stored).")
     count: int
 
 

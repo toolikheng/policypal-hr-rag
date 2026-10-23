@@ -13,15 +13,8 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from policypal.answering import Answer
-from policypal.models import (
-    Channel,
-    Conversation,
-    DocumentChunk,
-    Feedback,
-    Message,
-    MessageSource,
-    Rating,
-)
+from policypal.models import Conversation, DocumentChunk, Feedback, Message, MessageSource
+from policypal.vocabulary import Channel, Rating
 
 
 @dataclass(frozen=True)

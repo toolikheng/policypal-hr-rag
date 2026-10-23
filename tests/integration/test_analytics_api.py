@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine
+from sqlalchemy import Engine, text
 
 from policypal.answering import Answer, Reply
 from policypal.history import record_feedback, save_answer
@@ -94,3 +94,26 @@ def test_the_admin_token_is_required(
 def test_analytics_is_off_without_an_admin_token_setting(migrated_database_url: str) -> None:
     with TestClient(build_test_app(migrated_database_url)) as client:
         assert client.get("/analytics", headers=ADMIN).status_code == 503
+
+
+def test_an_old_fallback_reason_the_code_no_longer_has_is_shown_as_it_is(
+    client: TestClient, engine: Engine
+) -> None:
+    """Stored rows outlive the code: renaming a reason must never break analytics."""
+    with engine.begin() as conn:
+        conversation_id = conn.execute(
+            text("INSERT INTO conversations (channel) VALUES ('ui') RETURNING id")
+        ).scalar_one()
+        conn.execute(
+            text(
+                "INSERT INTO messages (conversation_id, question, answer, mode, fallback_reason,"
+                " retrieval_ms, total_ms) VALUES (:id, 'Dress code?', 'quoted', 'extractive',"
+                " 'ollama_timeout', 5, 60005)"
+            ),
+            {"id": conversation_id},
+        )
+
+    response = client.get("/analytics", headers=ADMIN)
+
+    assert response.status_code == 200
+    assert response.json()["fallbacks"] == [{"reason": "ollama_timeout", "count": 1}]

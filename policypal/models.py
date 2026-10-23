@@ -22,12 +22,10 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from policypal.embeddings import EMBEDDING_DIMENSION
 from policypal.ingest.parsing import FileType
+from policypal.vocabulary import Channel, Mode, Rating
 
 # Where a document came from: the sample policies folder, or an upload.
 Origin = Literal["sample", "upload"]
-# Which client asked a question.
-Channel = Literal["ui", "widget", "api"]
-Rating = Literal["up", "down"]
 
 
 class Base(DeclarativeBase):
@@ -93,8 +91,10 @@ class Message(Base):
     )
     question: Mapped[str] = mapped_column(Text)
     answer: Mapped[str] = mapped_column(Text)
-    mode: Mapped[str] = mapped_column(Text)  # answering.Mode
-    fallback_reason: Mapped[str | None] = mapped_column(Text)  # answering.FallbackReason
+    mode: Mapped[Mode] = mapped_column(Text)
+    # Written from a FallbackReason, but an old row may hold a reason the code no longer
+    # has, so reads get plain text.
+    fallback_reason: Mapped[str | None] = mapped_column(Text)
     llm_model: Mapped[str | None] = mapped_column(Text)
     top_similarity: Mapped[float | None] = mapped_column(REAL)
     retrieval_ms: Mapped[int]

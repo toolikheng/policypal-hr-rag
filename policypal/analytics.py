@@ -45,7 +45,7 @@ class QuestionCount:
 
 @dataclass(frozen=True)
 class FallbackCount:
-    reason: str  # e.g. llm_timeout, llm_unavailable
+    reason: str  # as stored, e.g. llm_timeout; may be a reason the code no longer has
     count: int
 
 

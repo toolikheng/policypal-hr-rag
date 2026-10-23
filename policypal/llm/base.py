@@ -10,18 +10,10 @@ from collections.abc import Sequence
 from typing import Literal, Protocol
 
 from policypal.retrieval import RetrievedChunk
+from policypal.vocabulary import LLMErrorReason
 
 # The exact sentence used for every refusal, whether the app or the model refuses.
 REFUSAL_SENTENCE = "I couldn't find this in the policies."
-
-# Why an LLM answer couldn't be used. Shown to the user as `fallback_reason`.
-LLMErrorReason = Literal[
-    "llm_unavailable",  # the service couldn't be reached
-    "llm_timeout",  # no answer within the configured timeout
-    "llm_model_missing",  # the model hasn't been downloaded
-    "llm_error",  # the service returned an error
-    "llm_bad_response",  # the reply wasn't in the expected format
-]
 
 LLMStatus = Literal["ok", "unavailable", "model_missing"]
 

@@ -17,22 +17,19 @@ import re
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal
 
 from sqlalchemy import Engine
 
 from policypal.embeddings import Embedder
-from policypal.llm.base import REFUSAL_SENTENCE, LLMError, LLMErrorReason, LLMProvider
+from policypal.llm.base import REFUSAL_SENTENCE, LLMError, LLMProvider
 from policypal.retrieval import RetrievedChunk, retrieve
+from policypal.vocabulary import FallbackReason, Mode
 
 logger = logging.getLogger("policypal.answering")
 
 # Extractive answers quote at most this many passages, exactly as written.
 EXTRACTIVE_HEADING = "No AI summary available — the most relevant policy passages are below."
 MAX_PASSAGES = 3
-
-Mode = Literal["llm", "extractive", "refused"]
-FallbackReason = LLMErrorReason | Literal["llm_no_valid_citation", "llm_empty_answer"]
 
 # A citation marker: [1], or a list such as [1, 3]. The spaces before it are captured so
 # a removed marker doesn't leave a gap before the full stop.
