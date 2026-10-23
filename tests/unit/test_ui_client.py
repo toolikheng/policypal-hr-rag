@@ -1,9 +1,11 @@
+import inspect
 import json
 
 import httpx
 import pytest
 
-from ui.api_client import ApiError, PolicyPalClient, make_client
+from tests.fakes import FakeApiClient
+from ui.api_client import ApiError, PolicyPalApi, PolicyPalClient, make_client
 
 
 def client_with(handler) -> PolicyPalClient:
@@ -207,3 +209,29 @@ def test_analytics_with_a_wrong_token_raises_the_api_message() -> None:
     with pytest.raises(ApiError, match="Admin token is not valid.") as error:
         client.analytics(30, token="guess")
     assert error.value.status_code == 403
+
+
+# --- The interface the pages use, and its two adapters --------------------------------
+
+
+def public_methods(cls: type) -> set[str]:
+    return {
+        name
+        for name in dir(cls)
+        if not name.startswith("_") and inspect.isfunction(getattr(cls, name))
+    }
+
+
+def parameters(function: object) -> list[tuple[str, object, object]]:
+    """Name, kind (positional / keyword-only) and default of each parameter."""
+    signature = inspect.signature(function)  # type: ignore[arg-type]
+    return [(p.name, p.kind, p.default) for p in signature.parameters.values()]
+
+
+@pytest.mark.parametrize("adapter", [PolicyPalClient, FakeApiClient], ids=lambda c: c.__name__)
+def test_each_adapter_has_exactly_the_interface_methods(adapter: type) -> None:
+    """The pages see only PolicyPalApi; the HTTP client and the test fake must both fit it,
+    so page tests can't pass against a fake that has drifted from the real client."""
+    assert public_methods(adapter) == public_methods(PolicyPalApi)
+    for name in public_methods(PolicyPalApi):
+        assert parameters(getattr(adapter, name)) == parameters(getattr(PolicyPalApi, name)), name

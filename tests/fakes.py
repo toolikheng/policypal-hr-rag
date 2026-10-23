@@ -77,7 +77,7 @@ class FakeLLM:
 
 
 class FakeApiClient:
-    """Stand-in for ui.api_client.PolicyPalClient in Streamlit page tests.
+    """The test adapter for ui.api_client.PolicyPalApi, used in Streamlit page tests.
 
     Replies are scripted; every call is recorded in `calls`.
     """

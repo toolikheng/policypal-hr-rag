@@ -9,7 +9,7 @@ never allowed.
 import streamlit as st
 
 from ui import api_client
-from ui.api_client import Answer, ApiError, PolicyPalClient
+from ui.api_client import Answer, ApiError, PolicyPalApi
 from ui.formatting import badge, safe_markdown, section_text, source_label
 
 st.set_page_config(page_title="PolicyPal", page_icon="📘")
@@ -27,7 +27,7 @@ state.setdefault("votes", {})  # message_id -> "up" / "down"
 state.setdefault("sections", {})
 
 
-def show_health(client: PolicyPalClient) -> None:
+def show_health(client: PolicyPalApi) -> None:
     """Warn when the API can't answer properly; stop the page if it can't be reached."""
     try:
         health = client.health()
@@ -40,7 +40,7 @@ def show_health(client: PolicyPalClient) -> None:
         st.error(f"The API is running but not ready: database is {health['database']}.")
 
 
-def show_turn(client: PolicyPalClient, index: int, question: str, answer: Answer) -> None:
+def show_turn(client: PolicyPalApi, index: int, question: str, answer: Answer) -> None:
     with st.chat_message("user"):
         st.markdown(safe_markdown(question))
     with st.chat_message("assistant"):
@@ -51,7 +51,7 @@ def show_turn(client: PolicyPalClient, index: int, question: str, answer: Answer
         show_feedback(client, index, answer["message_id"])
 
 
-def show_source(client: PolicyPalClient, index: int, citation: dict) -> None:
+def show_source(client: PolicyPalApi, index: int, citation: dict) -> None:
     key = (index, citation["number"])
     with st.expander(source_label(citation)):
         st.markdown(safe_markdown(citation["text"]))
@@ -69,7 +69,7 @@ def show_source(client: PolicyPalClient, index: int, citation: dict) -> None:
             st.markdown(safe_markdown(state.sections[key]))
 
 
-def show_feedback(client: PolicyPalClient, index: int, message_id: str) -> None:
+def show_feedback(client: PolicyPalApi, index: int, message_id: str) -> None:
     if message_id in state.votes:
         st.caption("Thanks for your feedback.")
         return

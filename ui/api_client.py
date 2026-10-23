@@ -5,7 +5,7 @@ message that is safe to show on the page.
 """
 
 import os
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, Protocol, TypedDict
 
 import httpx
 
@@ -111,6 +111,29 @@ class Analytics(TypedDict):
     top_questions: list[QuestionCount]
     unanswered_questions: list[QuestionCount]
     fallbacks: list[FallbackCount]
+
+
+class PolicyPalApi(Protocol):
+    """Everything the pages may ask of the API. PolicyPalClient does it over HTTP; page
+    tests use a fake (tests/fakes.py). A test checks that both match this interface."""
+
+    def health(self) -> Health: ...
+
+    def ask(self, question: str, conversation_id: str | None = None) -> Answer: ...
+
+    def feedback(self, message_id: str, rating: str, comment: str | None = None) -> None: ...
+
+    def list_documents(self) -> list[Document]: ...
+
+    def get_document(self, document_id: int) -> DocumentDetail: ...
+
+    def upload(
+        self, filename: str, data: bytes, *, token: str, replace: bool = False
+    ) -> UploadResult: ...
+
+    def reingest(self, *, token: str) -> list[IngestResult]: ...
+
+    def analytics(self, days: int, *, token: str) -> Analytics: ...
 
 
 def make_client() -> "PolicyPalClient":
