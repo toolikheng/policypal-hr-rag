@@ -15,7 +15,7 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.ruff.lint.isort]
 # Listed explicitly so import order doesn't change depending on whether a module
 # exists yet (tests are written before the code they import).
-known-first-party = ["policypal", "ui", "tests"]
+known-first-party = ["policypal", "ui", "tests", "evaluation"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
