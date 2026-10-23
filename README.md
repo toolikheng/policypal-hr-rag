@@ -18,8 +18,29 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
 - **Question answering API:** `POST /ask` answers from the policies with citations
   (document and section), refuses when the policies don't cover a question, and quotes
   the policy text when no LLM is available. Admins can upload new policies.
+- **Streamlit UI:** a chat page with sources and 👍/👎 feedback, and an admin page for
+  uploads and re-ingesting. Feedback is logged for now; storing it comes next.
 
-The chat UI arrives in the next phase; for now, use the API (Swagger at `/docs`).
+## Using the UI
+
+Open <http://localhost:8501>.
+
+- **Chat:** type a question. Each answer shows how it was produced:
+  - 🤖 an AI answer;
+  - 📄 quoted policy text, with the reason no AI answer was given;
+  - 🚫 not covered by the policies.
+
+  Open a source to see the policy text it used and its similarity score, and use
+  **View full section** to read the whole section. Rate answers with 👍 or 👎. An AI
+  answer can take a minute on a CPU; a spinner shows while you wait.
+- **Admin** (sidebar): enter the admin token (`ADMIN_TOKEN` in `.env`). Then you can:
+  - upload a `.md` or `.pdf` policy;
+  - re-ingest the folders;
+  - see every document.
+
+  If an uploaded policy with the same name already exists, the page shows the API's
+  message and a **Replace existing policy** button. Built-in sample policies can't be
+  replaced, so they get no button.
 
 ## Prerequisites
 
@@ -163,13 +184,17 @@ never silently replace anything:
 |---|---|
 | A new name | `201 created` |
 | The same bytes again | `200 unchanged` |
-| An existing uploaded policy, different content | `409` with a clear message; nothing changes |
+| An existing uploaded policy, different content | `409` with a clear message and `"conflict": "name_taken"`; nothing changes |
 | The same, with `?replace=true` | `200 updated` (old chunks replaced, not duplicated) |
-| The name of a built-in sample policy | Always `409`: samples can't be replaced by upload |
+| The name of a built-in sample policy | Always `409` with `"conflict": "sample_policy"`: samples can't be replaced by upload |
 
 Other errors: `401`/`403` (missing or wrong token), `413` (larger than `MAX_UPLOAD_MB`),
 `415` (not `.md` or `.pdf`), `422` (unreadable file, e.g. a scanned PDF with no text).
 Uploaded files are kept in the `uploads` volume and loaded again on every start.
+
+`POST /feedback` takes `{"message_id": ..., "rating": "up" | "down", "comment": ...}` (the
+`message_id` comes from `/ask`). It returns `202 accepted` and logs the vote, but never the
+comment text. Votes aren't stored in the database yet.
 
 ## Sample data
 
@@ -252,7 +277,8 @@ policypal/          FastAPI backend (config, logging, database, catalogue, retri
 policypal/api/      app factory, request/response models, routes
 policypal/llm/      prompt, provider interface and the Ollama client
 policypal/ingest/   parsing, chunking, the ingestion pipeline and uploads
-ui/                 Streamlit UI. It talks to the API over HTTP only
+ui/                 Streamlit UI (Chat.py, pages/1_Admin.py). It talks to the API over
+                    HTTP only, through ui/api_client.py
 migrations/         Alembic database migrations
 data/               fictional sample policies (Markdown + PDF)
 scripts/            developer scripts (PDF rendering)
