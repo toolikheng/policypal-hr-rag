@@ -144,10 +144,11 @@ To run without an LLM at all, set `LLM_PROVIDER=extractive` in `.env`.
 1. **Search:** the question is embedded with the model's recommended query instruction
    ("Represent this sentence for searching relevant passages: "), and pgvector finds
    the 5 most similar chunks by cosine similarity.
-2. **Refuse early:** if the best similarity is below `MIN_SIMILARITY` (0.65), the API
+2. **Refuse early:** if the best similarity is below `MIN_SIMILARITY` (0.69), the API
    refuses without calling the LLM. The value is a similarity score, not a probability.
-   0.65 is provisional: it sits between the scores of 8 answerable and 8 unrelated
-   hand-picked questions, and will be calibrated in the evaluation.
+   0.69 was chosen on a separate dev set of 20 questions, as the threshold with the best
+   balanced accuracy (see [Evaluation](#evaluation)). It is a thin line: on the dev set the
+   nearest question that should be refused scored 0.689.
 3. **Generate:** the excerpts that passed go to the LLM, numbered `[1]`…`[n]`. The
    prompt tells it to use only the excerpts, cite them, reply with the refusal
    sentence if they don't answer the question, and treat the excerpts as data, not
@@ -261,6 +262,43 @@ A real response from the development laptop after five test questions (shortened
 A rate or average is `null` (a dash on the page) when there is nothing to divide by, so
 an empty period never claims "0% helpful". The average above mixes a 50 s first answer
 (the model was being loaded) with a 4 s answer, so it is not a speed measurement.
+
+## Evaluation
+
+The evaluation measures search quality, refusals and answer time on fixed question sets
+in `evaluation/`. The questions are about the fictional sample policies.
+
+| Set | Questions | Used for |
+|---|---|---|
+| `dev_set.yaml` | 20 (12 answerable, 8 should be refused) | Choosing settings: the refusal threshold and the query instruction |
+| `golden_set.yaml` | 52 (40 answerable, 12 should be refused) | Reporting results only; nothing is tuned on it |
+
+Each question names the policy section(s) that answer it, and has a type: plain,
+look-alike (a similar section elsewhere could be picked instead), table, amendment
+(the value was changed and the old value is still in the text), two-section, or one of
+two kinds that should be refused (a topic no policy covers, or a missing detail of a
+covered topic). Both sets were committed before any evaluation run.
+
+Every run builds its own database, `policypal_eval`, next to the app's and loads exactly
+the 8 sample policies into it, so your documents, uploads and question history are never
+touched. Start the stack first (`docker compose up -d --wait`), then:
+
+```bash
+make eval-calibrate   # dev set: choose the threshold (search only, a few minutes)
+make eval             # golden set: search (Markdown and PDF, instruction on and off) + quoted answers
+make eval-llm         # golden set: answers from the local LLM (Ollama must be healthy; slow on a CPU)
+```
+
+Reports are written to `evaluation/results/` as Markdown and JSON. Each one starts with
+the settings and machine it ran on, and the golden reports explain every mistake.
+
+**Threshold calibration (dev set, measured 2026-10-23).** Every threshold from 0.50 to
+0.85 was tried; the one with the best balanced accuracy (the average of "answerable
+questions answered" and "questions that should be refused, refused") was chosen:
+**0.69** with the query instruction (95.8%: 11 of 12 answered, 8 of 8 refused), and 0.71
+without it (also 95.8%). The dev set doesn't favour turning the instruction off, so it
+stays on. The margin is thin: the nearest should-refuse question scored 0.689 and two
+answerable ones 0.697 and 0.699. Full tables: `evaluation/results/dev-calibration.md`.
 
 ## Sample data
 

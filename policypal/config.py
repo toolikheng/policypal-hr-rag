@@ -35,9 +35,10 @@ class Settings(BaseSettings):
     # How many of the most similar chunks a search returns.
     retrieval_top_k: int = Field(default=5, ge=1, le=20)
     # Refuse when the best chunk's cosine similarity is below this. It is a score, not a
-    # probability. 0.65 is provisional: set from 16 hand-picked questions, with the query
-    # instruction on (in scope scored 0.70-0.82, out of scope 0.49-0.60).
-    min_similarity: float = Field(default=0.65, ge=0, le=1)
+    # probability. 0.69 was chosen on the evaluation's dev set (20 questions, query
+    # instruction on) by the best balanced accuracy: evaluation/results/dev-calibration.md.
+    # With the instruction off, the dev set's threshold is 0.71.
+    min_similarity: float = Field(default=0.69, ge=0, le=1)
 
     # Shared demo token for the admin endpoints (upload, re-ingest), sent in the
     # X-Admin-Token header. Unset or empty: admin endpoints are switched off.

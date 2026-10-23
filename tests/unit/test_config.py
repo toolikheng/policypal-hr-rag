@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from evaluation.run_eval import RESULTS_DIR, load_thresholds
 from policypal.config import Settings
 
 SETTING_ENV_VARS = [
@@ -124,11 +125,14 @@ def test_invalid_ollama_timeout_is_rejected(monkeypatch: pytest.MonkeyPatch, tim
         Settings(_env_file=None)
 
 
-def test_min_similarity_has_the_provisional_default(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_min_similarity_default_is_the_dev_set_calibration(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    # The default has the query instruction on, so it uses that setting's threshold.
+    calibrated = load_thresholds(RESULTS_DIR / "dev-calibration.json")["on"]
 
-    # Provisional (Phase 2), set from hand-picked questions; calibrated in Phase 5.
-    assert Settings(_env_file=None).min_similarity == 0.65
+    assert Settings(_env_file=None).min_similarity == calibrated
+    env_example = (Path(__file__).parents[2] / ".env.example").read_text(encoding="utf-8")
+    assert f"\nMIN_SIMILARITY={calibrated:g}\n" in env_example
 
 
 @pytest.mark.parametrize("value", ["-0.1", "1.5", "high"])
