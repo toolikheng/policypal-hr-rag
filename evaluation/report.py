@@ -8,7 +8,6 @@ import json
 import os
 import platform
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
@@ -17,10 +16,12 @@ from evaluation.metrics import (
     ANSWERABLE_TYPES,
     UNANSWERABLE_TYPES,
     AnswerOutcome,
+    AnswerRun,
     Latency,
     Rate,
     RefusalCounts,
     RetrievalOutcome,
+    RetrievalRun,
     SweepRow,
     Verdict,
     all_found_rate,
@@ -29,7 +30,7 @@ from evaluation.metrics import (
     expected_source_cited_rate,
     group_by_type,
     hit_rate,
-    refused_at,
+    refusals_at,
     reply_breakdown,
     retrieval_problems,
     section_rank,
@@ -53,8 +54,6 @@ REQUIRED_CONFIG_FIELDS = (
     "Docker",
 )
 
-Source = Literal["md", "pdf"]
-SOURCE_NAMES: dict[Source, str] = {"md": "Markdown", "pdf": "PDF"}
 HIT_RANKS = (1, 3, 5)
 HIT_LEVELS: tuple[Literal["section", "document"], ...] = ("section", "document")
 
@@ -77,31 +76,6 @@ LIMITATIONS = """\
 - The policies and questions are fictional sample data in English."""
 
 
-@dataclass(frozen=True)
-class RetrievalRun:
-    """One search configuration's results on a question set."""
-
-    source: Source
-    instruction: bool
-    threshold: float  # the refusal threshold for this instruction setting (from the dev set)
-    outcomes: tuple[RetrievalOutcome, ...]
-
-    @property
-    def label(self) -> str:
-        return f"{SOURCE_NAMES[self.source]}, instruction {'on' if self.instruction else 'off'}"
-
-
-@dataclass(frozen=True)
-class AnswerRun:
-    """The full pipeline's answers to a question set."""
-
-    provider: str  # "ollama", or "extractive" when there is no LLM
-    model: str | None
-    threshold: float
-    outcomes: tuple[AnswerOutcome, ...]
-    warm_up_ms: int | None  # one unmeasured first answer (loads the model); None without an LLM
-
-
 # --- The three reports --------------------------------------------------------------
 
 
@@ -118,7 +92,7 @@ def calibration_report(
     header = ("", *(f"Instruction {setting}" for setting in settings))
     summary = [
         ("Chosen threshold", *(_threshold(runs[s].threshold) for s in settings)),
-        *_refusal_rows([_counts_at_threshold(runs[s]) for s in settings]),
+        *_refusal_rows([refusals_at(runs[s].outcomes, runs[s].threshold) for s in settings]),
         ("Lowest best similarity, answerable", *(_extreme(runs[s], True) for s in settings)),
         ("Highest best similarity, should refuse", *(_extreme(runs[s], False) for s in settings)),
         *_hit_rows([runs[s] for s in settings]),
@@ -155,7 +129,7 @@ def retrieval_report(
             *(all_found_rate(_of_type(run.outcomes, "two-section"), 5) for run in runs),
         ),
         ("Threshold", *(_threshold(run.threshold) for run in runs)),
-        *_refusal_rows([_counts_at_threshold(run) for run in runs]),
+        *_refusal_rows([refusals_at(run.outcomes, run.threshold) for run in runs]),
         (
             "Search time per question (median / mean)",
             *(_latency(summarize_latency([o.retrieval_ms for o in run.outcomes])) for run in runs),
@@ -455,15 +429,10 @@ def _row(cells: Sequence[object]) -> str:
 # --- Small helpers --------------------------------------------------------------------
 
 
-def _counts_at_threshold(run: RetrievalRun) -> RefusalCounts:
-    return count_refusals(
-        (o.answerable, refused_at(o.top_similarity, run.threshold)) for o in run.outcomes
-    )
-
-
 def _refused_rate(run: RetrievalRun, kind: str) -> Rate:
+    """Of the should-refuse questions of this type, how many the threshold refuses."""
     group = _of_type(run.outcomes, kind)
-    return Rate(sum(refused_at(o.top_similarity, run.threshold) for o in group), len(group))
+    return Rate(refusals_at(group, run.threshold).refused, len(group))
 
 
 def _extreme(run: RetrievalRun, answerable: bool) -> str:

@@ -6,11 +6,17 @@ from pathlib import Path
 import pytest
 
 from evaluation.datasets import EvalQuestion, QuestionSet
-from evaluation.metrics import AnswerOutcome, Match, RetrievalOutcome, Section, sweep
+from evaluation.metrics import (
+    AnswerOutcome,
+    AnswerRun,
+    Match,
+    RetrievalOutcome,
+    RetrievalRun,
+    Section,
+    sweep,
+)
 from evaluation.report import (
     REQUIRED_CONFIG_FIELDS,
-    AnswerRun,
-    RetrievalRun,
     calibration_report,
     end_to_end_report,
     environment,
@@ -92,11 +98,6 @@ PDF_RUN = RetrievalRun(
         search("q3", (MC, 0.50)),
     ),
 )
-
-
-def test_run_labels_name_the_source_and_the_instruction() -> None:
-    assert MD_RUN.label == "Markdown, instruction on"
-    assert RetrievalRun("pdf", False, 0.6, ()).label == "PDF, instruction off"
 
 
 # --- Configuration --------------------------------------------------------------------

@@ -8,6 +8,7 @@ End to end (the full pipeline):
 - refusals from the answer's mode, how each reply was produced, expected-source-cited rate
 
 Both: latency (mean, median, max) and the problems listed in a report's error analysis.
+The runs (RetrievalRun, AnswerRun) are the data the reports are made from.
 """
 
 import math
@@ -23,6 +24,10 @@ UNANSWERABLE_TYPES = ("uncovered-topic", "missing-detail")
 
 # The thresholds the calibration sweep tries: 0.50, 0.51, ..., 0.85.
 THRESHOLD_GRID = tuple(round(0.50 + step / 100, 2) for step in range(36))
+
+# The format the policies were loaded from.
+Source = Literal["md", "pdf"]
+SOURCE_NAMES: dict[Source, str] = {"md": "Markdown", "pdf": "PDF"}
 
 
 @dataclass(frozen=True)
@@ -109,6 +114,31 @@ class AnswerOutcome:
     @property
     def top_similarity(self) -> float | None:
         return self.retrieved[0].similarity if self.retrieved else None
+
+
+@dataclass(frozen=True)
+class RetrievalRun:
+    """One search configuration's results on a question set."""
+
+    source: Source
+    instruction: bool
+    threshold: float  # the refusal threshold for this instruction setting (from the dev set)
+    outcomes: tuple[RetrievalOutcome, ...]
+
+    @property
+    def label(self) -> str:
+        return f"{SOURCE_NAMES[self.source]}, instruction {'on' if self.instruction else 'off'}"
+
+
+@dataclass(frozen=True)
+class AnswerRun:
+    """The full pipeline's answers to a question set."""
+
+    provider: str  # "ollama", or "extractive" when there is no LLM
+    model: str | None
+    threshold: float
+    outcomes: tuple[AnswerOutcome, ...]
+    warm_up_ms: int | None  # one unmeasured first answer (loads the model); None without an LLM
 
 
 # --- Retrieval: ranks and hit rates -------------------------------------------------
@@ -205,6 +235,13 @@ def count_refusals(cases: Iterable[tuple[bool, bool]]) -> RefusalCounts:
     )
 
 
+def refusals_at(outcomes: Iterable[RetrievalOutcome], threshold: float) -> RefusalCounts:
+    """Refusal counts if the app used this threshold on these search results."""
+    return count_refusals(
+        (outcome.answerable, refused_at(outcome.top_similarity, threshold)) for outcome in outcomes
+    )
+
+
 @dataclass(frozen=True)
 class SweepRow:
     threshold: float
@@ -216,16 +253,7 @@ def sweep(
 ) -> list[SweepRow]:
     """Refusal counts at each threshold. Nothing is searched again: the same best
     similarities are compared with each threshold."""
-    return [
-        SweepRow(
-            threshold,
-            count_refusals(
-                (outcome.answerable, refused_at(outcome.top_similarity, threshold))
-                for outcome in outcomes
-            ),
-        )
-        for threshold in thresholds
-    ]
+    return [SweepRow(threshold, refusals_at(outcomes, threshold)) for threshold in thresholds]
 
 
 def choose_threshold(rows: Sequence[SweepRow]) -> float:
@@ -253,15 +281,31 @@ def choose_threshold(rows: Sequence[SweepRow]) -> float:
 Verdict = Literal["keep-on", "off-better", "mixed"]
 
 
-def instruction_verdict(*, on: tuple[float, float], off: tuple[float, float]) -> Verdict:
+@dataclass(frozen=True)
+class DevScore:
+    """What the query-instruction choice compares for one setting on the dev set."""
+
+    hit_at_5: float  # section hit@5
+    balanced_accuracy: float  # at the threshold chosen for this setting
+
+
+def dev_score(run: RetrievalRun) -> DevScore:
+    return DevScore(
+        hit_at_5=hit_rate(run.outcomes, 5).value or 0.0,
+        balanced_accuracy=refusals_at(run.outcomes, run.threshold).balanced_accuracy or 0.0,
+    )
+
+
+def instruction_verdict(*, on: DevScore, off: DevScore) -> Verdict:
     """Whether the dev set favours turning the query instruction off.
 
-    Each side is (section hit@5, best balanced accuracy). "off-better" needs off to be
-    better on one and worse on neither. A tie keeps the current setting: no change
-    without evidence. The golden set is never used for this choice.
+    "off-better" needs off to be better on one score and worse on neither. A tie keeps
+    the current setting: no change without evidence. The golden set is never used for
+    this choice.
     """
-    better = any(o > n and not math.isclose(o, n) for o, n in zip(off, on, strict=True))
-    worse = any(o < n and not math.isclose(o, n) for o, n in zip(off, on, strict=True))
+    pairs = [(off.hit_at_5, on.hit_at_5), (off.balanced_accuracy, on.balanced_accuracy)]
+    better = any(o > n and not math.isclose(o, n) for o, n in pairs)
+    worse = any(o < n and not math.isclose(o, n) for o, n in pairs)
     if better and worse:
         return "mixed"
     return "off-better" if better else "keep-on"

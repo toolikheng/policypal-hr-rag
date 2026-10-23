@@ -5,21 +5,25 @@ import pytest
 from evaluation.metrics import (
     THRESHOLD_GRID,
     AnswerOutcome,
+    DevScore,
     Match,
     Rate,
     RefusalCounts,
     RetrievalOutcome,
+    RetrievalRun,
     Section,
     SweepRow,
     all_found_rate,
     answer_problems,
     choose_threshold,
     count_refusals,
+    dev_score,
     document_rank,
     expected_source_cited_rate,
     group_by_type,
     hit_rate,
     instruction_verdict,
+    refusals_at,
     refused_at,
     reply_breakdown,
     retrieval_problems,
@@ -382,5 +386,36 @@ def test_answer_problems_cover_refusals_fallbacks_and_wrong_citations() -> None:
 def test_instruction_verdict_changes_nothing_without_evidence(
     on: tuple[float, float], off: tuple[float, float], verdict: str
 ) -> None:
-    # (section hit@5, best balanced accuracy) for each setting
-    assert instruction_verdict(on=on, off=off) == verdict
+    # (section hit@5, balanced accuracy at the chosen threshold) for each setting
+    assert instruction_verdict(on=DevScore(*on), off=DevScore(*off)) == verdict
+
+
+def test_refusals_at_applies_the_threshold_to_each_best_match() -> None:
+    outcomes = [
+        search((ANNUAL,), (ANNUAL,), similarities=(0.80,)),  # answered
+        search((ANNUAL,), (ANNUAL,), similarities=(0.60,)),  # false refusal
+        search((), (CARRY,), similarities=(0.50,)),  # refused
+        search((), (CARRY,), similarities=(0.70,)),  # false answer
+        search((), ()),  # nothing retrieved: refused
+    ]
+
+    assert refusals_at(outcomes, 0.65) == RefusalCounts(
+        answered=1, false_refusals=1, refused=2, false_answers=1
+    )
+
+
+def test_dev_score_is_hit_at_5_and_balanced_accuracy_at_the_runs_threshold() -> None:
+    outcomes = (
+        search((ANNUAL,), (CARRY, ANNUAL), similarities=(0.80, 0.70)),  # found, answered
+        search((SICK,), (CARRY,), similarities=(0.60,)),  # not found, refused
+        search((), (CARRY,), similarities=(0.50,)),  # refused
+    )
+
+    score = dev_score(RetrievalRun("md", True, 0.65, outcomes))
+
+    assert score == DevScore(hit_at_5=0.5, balanced_accuracy=0.75)
+
+
+def test_a_run_is_labelled_by_format_and_instruction() -> None:
+    assert RetrievalRun("md", True, 0.6, ()).label == "Markdown, instruction on"
+    assert RetrievalRun("pdf", False, 0.6, ()).label == "PDF, instruction off"

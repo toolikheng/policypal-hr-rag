@@ -37,22 +37,20 @@ from evaluation.datasets import (
     load_question_set,
 )
 from evaluation.metrics import (
+    SOURCE_NAMES,
     AnswerOutcome,
+    AnswerRun,
     Match,
     RetrievalOutcome,
+    RetrievalRun,
     Section,
+    Source,
     choose_threshold,
-    count_refusals,
-    hit_rate,
+    dev_score,
     instruction_verdict,
-    refused_at,
     sweep,
 )
 from evaluation.report import (
-    SOURCE_NAMES,
-    AnswerRun,
-    RetrievalRun,
-    Source,
     calibration_report,
     end_to_end_report,
     environment,
@@ -266,7 +264,7 @@ def calibrate(
     finally:
         engine.dispose()
 
-    verdict = instruction_verdict(on=_dev_scores(runs["on"]), off=_dev_scores(runs["off"]))
+    verdict = instruction_verdict(on=dev_score(runs["on"]), off=dev_score(runs["off"]))
     thresholds = {setting: run.threshold for setting, run in runs.items()}
     config = {
         **base,
@@ -509,14 +507,6 @@ def _describe_set(questions: QuestionSet) -> str:
         f"{questions.name} ({total} questions: {answerable} answerable,"
         f" {total - answerable} should be refused)"
     )
-
-
-def _dev_scores(run: RetrievalRun) -> tuple[float, float]:
-    """(section hit@5, balanced accuracy at the chosen threshold) for the instruction rule."""
-    counts = count_refusals(
-        (o.answerable, refused_at(o.top_similarity, run.threshold)) for o in run.outcomes
-    )
-    return hit_rate(run.outcomes, 5).value or 0.0, counts.balanced_accuracy or 0.0
 
 
 def _run_data(run: RetrievalRun) -> dict[str, object]:
