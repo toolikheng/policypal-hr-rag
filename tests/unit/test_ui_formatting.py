@@ -1,4 +1,4 @@
-from ui.formatting import badge, section_text, source_label
+from ui.formatting import badge, reingest_summary, section_text, source_label, upload_summary
 
 LLM_ANSWER = {"mode": "llm", "model": "llama3.2:3b", "fallback_reason": None}
 
@@ -68,3 +68,19 @@ def test_section_text_joins_the_sections_chunks_without_the_repeated_paragraph()
 
 def test_section_text_of_a_missing_section_is_empty() -> None:
     assert section_text({"sections": []}, "9. Nothing") == ""
+
+
+def test_upload_summary() -> None:
+    result = {"status": "created", "document": {"title": "Training Policy", "chunks": 11}}
+
+    assert upload_summary(result) == "Training Policy: created (11 chunks)."
+
+
+def test_reingest_summary_counts_each_status() -> None:
+    results = [
+        {"slug": "a", "status": "unchanged", "chunks": 3},
+        {"slug": "b", "status": "unchanged", "chunks": 4},
+        {"slug": "c", "status": "removed", "chunks": 0},
+    ]
+
+    assert reingest_summary(results) == "Re-ingested 3 policies: 2 unchanged, 1 removed."

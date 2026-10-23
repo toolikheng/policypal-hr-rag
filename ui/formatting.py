@@ -48,3 +48,19 @@ def section_text(document: dict[str, Any], section: str) -> str:
                 if paragraph not in paragraphs:
                     paragraphs.append(paragraph)
     return "\n\n".join(paragraphs)
+
+
+def upload_summary(result: dict[str, Any]) -> str:
+    """'Training Policy: created (11 chunks).'"""
+    document = result["document"]
+    return f"{document['title']}: {result['status']} ({document['chunks']} chunks)."
+
+
+def reingest_summary(results: list[dict[str, Any]]) -> str:
+    """'Re-ingested 9 policies: 8 unchanged, 1 removed.' (statuses in order of first appearance)"""
+    counts: dict[str, int] = {}
+    for result in results:
+        counts[result["status"]] = counts.get(result["status"], 0) + 1
+    noun = "policy" if len(results) == 1 else "policies"
+    parts = ", ".join(f"{count} {status}" for status, count in counts.items())
+    return f"Re-ingested {len(results)} {noun}: {parts}."
