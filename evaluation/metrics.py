@@ -250,6 +250,23 @@ def choose_threshold(rows: Sequence[SweepRow]) -> float:
     return round((longest[0] + longest[-1]) / 2, 3)
 
 
+Verdict = Literal["keep-on", "off-better", "mixed"]
+
+
+def instruction_verdict(*, on: tuple[float, float], off: tuple[float, float]) -> Verdict:
+    """Whether the dev set favours turning the query instruction off.
+
+    Each side is (section hit@5, best balanced accuracy). "off-better" needs off to be
+    better on one and worse on neither. A tie keeps the current setting: no change
+    without evidence. The golden set is never used for this choice.
+    """
+    better = any(o > n and not math.isclose(o, n) for o, n in zip(off, on, strict=True))
+    worse = any(o < n and not math.isclose(o, n) for o, n in zip(off, on, strict=True))
+    if better and worse:
+        return "mixed"
+    return "off-better" if better else "keep-on"
+
+
 # --- Latency ------------------------------------------------------------------------
 
 

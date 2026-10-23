@@ -19,6 +19,7 @@ from evaluation.metrics import (
     expected_source_cited_rate,
     group_by_type,
     hit_rate,
+    instruction_verdict,
     refused_at,
     reply_breakdown,
     retrieval_problems,
@@ -363,3 +364,23 @@ def test_answer_problems_cover_refusals_fallbacks_and_wrong_citations() -> None:
         "answered (llm) instead of refusing"
     ]
     assert answer_problems(answered("refused", expected=(), cited=())) == []
+
+
+# --- Query instruction on or off (decided on the dev set only) ----------------------
+
+
+@pytest.mark.parametrize(
+    ("on", "off", "verdict"),
+    [
+        ((1.0, 0.90), (1.0, 0.90), "keep-on"),  # a tie keeps the current setting
+        ((1.0, 0.95), (1.0, 0.90), "keep-on"),
+        ((11 / 12, 0.90), (1.0, 0.90), "off-better"),
+        ((1.0, 0.90), (1.0, 0.95), "off-better"),
+        ((1.0, 0.90), (11 / 12, 0.95), "mixed"),
+    ],
+)
+def test_instruction_verdict_changes_nothing_without_evidence(
+    on: tuple[float, float], off: tuple[float, float], verdict: str
+) -> None:
+    # (section hit@5, best balanced accuracy) for each setting
+    assert instruction_verdict(on=on, off=off) == verdict

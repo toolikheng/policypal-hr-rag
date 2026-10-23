@@ -31,6 +31,7 @@ ENV HF_HUB_OFFLINE=1 \
 COPY alembic.ini ./
 COPY migrations/ migrations/
 COPY policypal/ policypal/
+COPY evaluation/ evaluation/
 COPY ui/ ui/
 COPY data/policies/ data/policies/
 COPY docker/api-entrypoint.sh docker/api-entrypoint.sh

@@ -2,7 +2,18 @@
 VENV := .venv
 BIN := $(VENV)/bin
 
-.PHONY: help setup up down logs db-up test lint format lint-workflows migrate ingest pdfs
+.PHONY: help setup up down logs db-up test lint format lint-workflows migrate ingest pdfs \
+	eval-calibrate eval eval-llm
+
+# The evaluation runs in a one-off container from the api image (it has the embedding
+# model), on its own database (policypal_eval). Reports are written to evaluation/results/
+# on your machine. The commit and the Docker version are only known here, so they are
+# passed in ("-dirty" means tracked files had uncommitted changes, results excluded).
+EVAL = docker compose run --rm --build \
+	-v "$(CURDIR)/evaluation/results:/app/evaluation/results" \
+	-e EVAL_GIT_COMMIT="$$(git rev-parse --short HEAD)$$(git diff --quiet HEAD -- . ':!evaluation/results' || echo -dirty)" \
+	-e EVAL_DOCKER_VERSION="$$(docker version --format '{{.Server.Platform.Name}}, engine {{.Server.Version}}')" \
+	api python -m evaluation.run_eval
 
 help: ## List available commands
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-16s %s\n", $$1, $$2}'
@@ -47,3 +58,16 @@ ingest: ## Load the sample policies again inside the running api container (idem
 
 pdfs: ## Re-render the sample policy PDFs from their Markdown (needs fonts-dejavu-core)
 	$(BIN)/python scripts/build_pdfs.py
+
+eval-calibrate: ## Choose the refusal threshold on the dev set (search only, a few minutes)
+	mkdir -p evaluation/results
+	$(EVAL) calibrate
+
+eval: ## Evaluate on the golden set: search (Markdown/PDF, instruction on/off) and quoted answers
+	mkdir -p evaluation/results
+	$(EVAL) retrieval
+	$(EVAL) end-to-end --provider extractive
+
+eval-llm: ## Evaluate answers from the local LLM on the golden set (Ollama must be healthy; slow on a CPU)
+	mkdir -p evaluation/results
+	$(EVAL) end-to-end --provider ollama
