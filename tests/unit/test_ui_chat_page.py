@@ -191,3 +191,21 @@ def test_a_failed_vote_shows_the_error(monkeypatch: pytest.MonkeyPatch) -> None:
     page = page.button(key="up-0").click().run()
 
     assert "Cannot reach the PolicyPal API at http://api:8000." in texts(page.error)
+
+
+def test_images_in_answers_and_sources_are_never_loaded(monkeypatch: pytest.MonkeyPatch) -> None:
+    image = "![x](https://attacker.example/p.png)"
+    answer = {
+        **ANSWER,
+        "answer": f"Sixteen days {image} [1].",
+        "citations": [{**ANSWER["citations"][0], "text": f"Table {image}"}],
+    }
+    document = {**LEAVE_DOCUMENT, "sections": [{**LEAVE_DOCUMENT["sections"][0], "chunks": [
+        {"id": 41, "text": f"Full {image}"}]}]}  # fmt: skip
+    client = FakeApiClient(answers=[answer], documents={3: document})
+    page = ask(run_page(monkeypatch, client), "Leave?")
+    page = page.button(key="section-0-1").click().run()
+
+    shown = [text for text in texts(page.markdown) if "attacker.example" in text]
+    assert len(shown) == 3  # the answer, the source and the full section
+    assert all("![" not in text.replace("\\![", "") for text in shown)

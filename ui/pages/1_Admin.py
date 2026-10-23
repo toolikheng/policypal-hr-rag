@@ -9,7 +9,7 @@ import streamlit as st
 
 from ui import api_client
 from ui.api_client import ApiError
-from ui.formatting import reingest_summary, upload_summary
+from ui.formatting import reingest_summary, safe_markdown, upload_summary
 
 st.set_page_config(page_title="PolicyPal admin", page_icon="📘")
 st.title("Admin")
@@ -55,7 +55,8 @@ def reingest() -> None:
 
 if state.notice:
     kind, message = state.notice
-    (st.success if kind == "success" else st.error)(message)
+    # Messages can include a document's title, which comes from the uploaded file.
+    (st.success if kind == "success" else st.error)(safe_markdown(message))
 
 st.subheader("Upload a policy")
 file = st.file_uploader("Policy file (.md or .pdf)", key="policy_file")
@@ -63,7 +64,7 @@ if st.button("Upload", key="upload", disabled=not (token and file)):
     upload(file.name, file.getvalue(), replace=False)
 
 if state.conflict:
-    st.warning(state.conflict["message"])
+    st.warning(safe_markdown(state.conflict["message"]))
     # Only an uploaded policy can be replaced; a built-in sample never can.
     if state.conflict["conflict"] == "name_taken" and st.button(
         "Replace existing policy", key="replace", disabled=not token

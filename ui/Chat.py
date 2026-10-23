@@ -2,14 +2,15 @@
 
 Streamlit runs this script again from the top on every click, so everything that must
 last (the conversation, votes, open sections) lives in st.session_state.
-Text from the API is shown as Markdown only; HTML is never allowed.
+Text is shown as Markdown through safe_markdown() (no images load by themselves); HTML is
+never allowed.
 """
 
 import streamlit as st
 
 from ui import api_client
 from ui.api_client import Answer, ApiError, PolicyPalClient
-from ui.formatting import badge, section_text, source_label
+from ui.formatting import badge, safe_markdown, section_text, source_label
 
 st.set_page_config(page_title="PolicyPal", page_icon="📘")
 st.title("PolicyPal")
@@ -40,10 +41,10 @@ def show_health(client: PolicyPalClient) -> None:
 
 def show_turn(client: PolicyPalClient, index: int, question: str, answer: Answer) -> None:
     with st.chat_message("user"):
-        st.markdown(question)
+        st.markdown(safe_markdown(question))
     with st.chat_message("assistant"):
         st.caption(badge(answer))
-        st.markdown(answer["answer"])
+        st.markdown(safe_markdown(answer["answer"]))
         for citation in answer["citations"]:
             show_source(client, index, citation)
         show_feedback(client, index, answer["message_id"])
@@ -52,7 +53,7 @@ def show_turn(client: PolicyPalClient, index: int, question: str, answer: Answer
 def show_source(client: PolicyPalClient, index: int, citation: dict) -> None:
     key = (index, citation["number"])
     with st.expander(source_label(citation)):
-        st.markdown(citation["text"])
+        st.markdown(safe_markdown(citation["text"]))
         if key in state.open_sections:
             try:
                 document = client.get_document(citation["document_id"])
@@ -60,7 +61,7 @@ def show_source(client: PolicyPalClient, index: int, citation: dict) -> None:
                 st.error(str(exc))
             else:
                 st.markdown("**Full section**")
-                st.markdown(section_text(document, citation["section"]))
+                st.markdown(safe_markdown(section_text(document, citation["section"])))
         elif st.button("View full section", key=f"section-{index}-{citation['number']}"):
             state.open_sections.add(key)
             st.rerun()

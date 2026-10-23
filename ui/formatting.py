@@ -14,6 +14,16 @@ _FALLBACK_REASONS = {
 }
 
 
+def safe_markdown(text: str) -> str:
+    """Text from the API (policies, LLM answers), made safe to show with st.markdown.
+
+    A browser loads a Markdown image (`![alt](url)` or `![alt][ref]`) by itself, so a
+    policy or an answer could make every viewer call any server. Escaping the "!" turns
+    it into an ordinary link, which needs a click. (Streamlit already escapes HTML.)
+    """
+    return text.replace("![", "\\![")
+
+
 def badge(answer: dict[str, Any]) -> str:
     """One line saying how the answer was produced (the API's `mode`)."""
     if answer["mode"] == "llm":
