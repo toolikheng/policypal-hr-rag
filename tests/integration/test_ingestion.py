@@ -1,10 +1,14 @@
+import json
 import shutil
 from pathlib import Path
 
 import pytest
 from sqlalchemy import Engine, text
+from sqlalchemy.exc import OperationalError
 
+from policypal.db import make_engine
 from policypal.ingest import __main__ as ingest_cli
+from policypal.ingest import pipeline
 from policypal.ingest.chunking import chunk_document
 from policypal.ingest.parsing import parse_markdown
 from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_file, ingest_folder
@@ -299,3 +303,104 @@ def test_each_document_is_logged_as_it_is_processed(
         ("leave-policy", "unchanged"),
         ("overtime-policy", "removed"),
     ]
+
+
+NUL_POLICY = b"# Broken Policy\n\n## 1. Scope\n\nApplies to all\x00 staff.\n"
+
+
+def test_a_file_that_fails_is_logged_and_skipped_and_the_rest_are_loaded(
+    engine: Engine, policy_folder: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    (policy_folder / "broken-policy.md").write_bytes(NUL_POLICY)
+    caplog.set_level("INFO", logger="policypal.ingest")
+
+    results = ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+
+    assert statuses(results) == {
+        "broken-policy": "failed",
+        "leave-policy": "created",
+        "overtime-policy": "created",
+    }
+    assert counts(engine)[0] == 2
+    [record] = [r for r in caplog.records if r.getMessage() == "ingest.failed"]
+    assert record.levelname == "ERROR"
+    assert (record.slug, record.file, record.error) == (
+        "broken-policy",
+        "broken-policy.md",
+        "ValueError",
+    )
+    assert "NUL character" in record.reason
+
+
+def test_a_failed_file_keeps_its_last_good_version(engine: Engine, policy_folder: Path) -> None:
+    ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+    before = counts(engine)
+    (policy_folder / "overtime-policy.md").write_bytes(NUL_POLICY)
+
+    results = ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+
+    assert statuses(results)["overtime-policy"] == "failed"
+    assert counts(engine) == before  # not removed, not half-replaced
+
+
+def test_an_unexpected_error_in_one_file_does_not_stop_the_others(
+    engine: Engine, policy_folder: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Defence in depth: any error from one file (e.g. a parser bug) only skips that file."""
+    real_parse = pipeline.parse_document
+
+    def parse_or_crash(data: bytes, file_type: str):
+        if data.startswith(b"# Overtime"):
+            raise KeyError("a parser bug")
+        return real_parse(data, file_type)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(pipeline, "parse_document", parse_or_crash)
+
+    results = ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+
+    assert statuses(results) == {"leave-policy": "created", "overtime-policy": "failed"}
+
+
+def test_a_database_outage_still_stops_ingestion(policy_folder: Path) -> None:
+    """Without the database nothing can be loaded, so start-up must stop, not skip."""
+    unreachable = make_engine("postgresql+psycopg://nobody:nothing@localhost:1/none")
+
+    with pytest.raises(OperationalError):
+        ingest_folder(unreachable, FakeEmbedder(), policy_folder, origin="sample")
+
+
+def test_the_command_line_finishes_when_a_file_fails(
+    engine: Engine,
+    migrated_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+    restore_root_logging: None,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The API container runs this before starting; a bad upload must not block start-up."""
+    uploads = tmp_path / "uploads"
+    uploads.mkdir()
+    (uploads / "broken-policy.md").write_bytes(NUL_POLICY)
+    monkeypatch.setenv("DATABASE_URL", migrated_database_url)
+    monkeypatch.setenv("UPLOAD_DIR", str(uploads))
+    monkeypatch.setattr(ingest_cli, "build_embedder", lambda settings: FakeEmbedder())
+
+    ingest_cli.main()
+
+    assert counts(engine)[0] == 8
+    # The command line logs JSON lines to stdout.
+    lines = [json.loads(line) for line in capsys.readouterr().out.splitlines() if line]
+    [summary] = [line for line in lines if line["message"] == "ingest.completed"]
+    assert summary["documents_by_status"] == {"created": 8, "failed": 1}
+
+
+def test_a_missing_folder_is_an_error_not_an_empty_folder(
+    engine: Engine, policy_folder: Path, tmp_path: Path
+) -> None:
+    """Treating a missing folder as empty would remove every document from it."""
+    ingest_folder(engine, FakeEmbedder(), policy_folder, origin="sample")
+
+    with pytest.raises(FileNotFoundError):
+        ingest_folder(engine, FakeEmbedder(), tmp_path / "missing", origin="sample")
+
+    assert counts(engine)[0] == 2

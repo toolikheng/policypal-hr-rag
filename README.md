@@ -73,7 +73,10 @@ The first build downloads the Python dependencies, including a CPU-only build of
 PyTorch, and the embedding model. On the laptop used for development this took about
 5–6 minutes, and the image is about 2.8 GB. On start:
 - the API container applies database migrations, loads the sample policies and any
-  uploaded ones (skipping files that haven't changed), and then starts the API;
+  uploaded ones (skipping files that haven't changed), and then starts the API. A file
+  that can't be loaded is logged (`ingest.failed`, with the reason) and skipped; its last
+  good version stays searchable, and `/health` lists it. If the database can't be
+  reached, the container stops instead;
 - the Ollama container downloads the LLM (`OLLAMA_MODEL`, default `llama3.2:3b`, about
   2 GB) the first time only. Until it is ready, answers quote the policy text instead.
 
@@ -91,11 +94,13 @@ PyTorch, and the embedding model. On the laptop used for development this took a
 
 ```json
 {"database":"ok","llm":{"provider":"ollama","model":"llama3.2:3b","status":"ok"},
- "documents":8,"chunks":119,"version":"0.1.0","status":"ok"}
+ "documents":8,"chunks":119,"files_not_loaded":[],"version":"0.1.0","status":"ok"}
 ```
 
 - `status` is `ok`, or `degraded` (still HTTP 200) when the LLM isn't ready: questions
   are then answered by quoting the policy text.
+- `files_not_loaded` lists policy files whose current content isn't searchable, for
+  example a file that failed to load at start-up. It doesn't change `status`.
 - If the database is down or behind the code, it returns HTTP 503 with the reason.
 
 Stop everything with `docker compose down`. Data is kept in volumes: `pgdata` (the

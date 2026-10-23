@@ -1,9 +1,11 @@
+from pathlib import Path
+
 import httpx
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
 from policypal import __version__
-from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_folder
+from policypal.ingest.pipeline import SAMPLE_POLICIES_DIR, ingest_all, ingest_folder
 from policypal.llm.ollama import OllamaProvider
 from tests.fakes import FakeEmbedder, FakeLLM
 from tests.helpers import build_test_app
@@ -21,6 +23,8 @@ def test_health_is_ok_when_database_is_up_and_migrated(client: TestClient, engin
         "llm": FAKE_LLM_OK,
         "documents": 0,
         "chunks": 0,
+        # Nothing is ingested in this test, so every sample policy file is listed.
+        "files_not_loaded": sorted(path.name for path in SAMPLE_POLICIES_DIR.glob("*.md")),
         "version": __version__,
     }
 
@@ -48,6 +52,7 @@ def test_health_is_503_when_database_is_unreachable() -> None:
         "llm": FAKE_LLM_OK,
         "documents": None,
         "chunks": None,
+        "files_not_loaded": None,
         "version": __version__,
     }
 
@@ -119,3 +124,30 @@ def test_openapi_documents_health_responses(client: TestClient) -> None:
     health = client.get("/openapi.json").json()["paths"]["/health"]["get"]
 
     assert {"200", "503"} <= set(health["responses"])
+
+
+def test_health_lists_a_policy_file_that_failed_to_load(
+    migrated_database_url: str, engine: Engine, tmp_path: Path
+) -> None:
+    uploads = tmp_path / "uploads"
+    uploads.mkdir()
+    (uploads / "broken-policy.md").write_bytes(b"# Broken\n\n## 1. Scope\n\nAll\x00 staff.")
+    ingest_all(engine, FakeEmbedder(), uploads)
+
+    with TestClient(build_test_app(migrated_database_url, upload_dir=uploads)) as client:
+        response = client.get("/health")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["files_not_loaded"] == ["broken-policy.md"]
+    # A skipped file doesn't change the status: "degraded" means the LLM isn't ready.
+    assert body["status"] == "ok"
+
+
+def test_health_lists_nothing_when_every_file_is_loaded(
+    migrated_database_url: str, engine: Engine, tmp_path: Path
+) -> None:
+    ingest_all(engine, FakeEmbedder(), tmp_path / "uploads")
+
+    with TestClient(build_test_app(migrated_database_url, upload_dir=tmp_path / "uploads")) as c:
+        assert c.get("/health").json()["files_not_loaded"] == []

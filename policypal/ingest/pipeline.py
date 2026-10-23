@@ -4,7 +4,9 @@ Ingestion is idempotent, so it is safe to run on every start:
 - a file whose bytes and pipeline version haven't changed is skipped (nothing re-embedded);
 - a new or changed file replaces all of its document's chunks in one transaction;
 - a document whose file has disappeared from its folder is removed;
-- "sample wins": an uploaded file never replaces a sample policy with the same slug.
+- "sample wins": an uploaded file never replaces a sample policy with the same slug;
+- a file that can't be ingested is logged and skipped (its last good version is kept), so
+  one bad file never stops the app from starting.
 """
 
 import hashlib
@@ -15,6 +17,7 @@ from pathlib import Path
 from typing import Literal
 
 from sqlalchemy import Engine, delete, func, select
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from policypal.embeddings import Embedder, check_dimension
@@ -26,7 +29,7 @@ logger = logging.getLogger("policypal.ingest")
 
 SAMPLE_POLICIES_DIR = Path(__file__).resolve().parents[2] / "data" / "policies"
 
-IngestStatus = Literal["created", "updated", "unchanged", "removed", "skipped"]
+IngestStatus = Literal["created", "updated", "unchanged", "removed", "skipped", "failed"]
 
 # What an incoming file means for the stored document with the same slug:
 #   new               no document has this slug yet
@@ -60,9 +63,33 @@ def ingest_folder(
 ) -> list[IngestResult]:
     """Ingest every .md/.pdf file directly inside `folder` (not sub-folders), then remove
     documents of the same origin whose file is no longer there."""
-    files = sorted(path for path in folder.iterdir() if path.suffix.lower() in SUPPORTED_SUFFIXES)
-    results = [ingest_file(engine, embedder, path, origin) for path in files]
+    check_dimension(embedder)  # a wrong model is a setup error, not a bad file: stop here
+    results = [_ingest_or_skip(engine, embedder, path, origin) for path in _policy_files(folder)]
+    # A failed file's slug is kept too, so its last good version stays searchable.
     return results + _remove_missing(engine, origin, keep={result.slug for result in results})
+
+
+def files_not_loaded(engine: Engine, embedder: Embedder, upload_dir: Path) -> list[str]:
+    """Policy files whose current content isn't what is stored, e.g. a file that failed to
+    ingest. An upload whose name belongs to a sample policy is skipped on purpose, so it
+    isn't listed."""
+    version = pipeline_version(embedder)
+    folders: tuple[tuple[Path, Origin], ...] = (
+        (SAMPLE_POLICIES_DIR, "sample"),
+        (upload_dir, "upload"),
+    )
+    not_loaded = []
+    with Session(engine) as session:
+        documents = {document.slug: document for document in session.scalars(select(Document))}
+        for folder, origin in folders:
+            if not folder.is_dir():  # e.g. no upload has been made yet
+                continue
+            for path in _policy_files(folder):
+                content_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+                change = classify(documents.get(slug_for(path)), origin, content_sha256, version)
+                if change not in ("same", "sample_owns_slug"):
+                    not_loaded.append(path.name)
+    return not_loaded
 
 
 def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
@@ -70,6 +97,35 @@ def ingest_file(engine: Engine, embedder: Embedder, path: Path, origin: Origin) 
     result = _ingest_file(engine, embedder, path, origin)
     _log(result)
     return result
+
+
+def _policy_files(folder: Path) -> list[Path]:
+    """The .md/.pdf files directly inside `folder`, by name. A missing folder is an error:
+    treating it as empty would remove every document that came from it."""
+    return sorted(path for path in folder.iterdir() if path.suffix.lower() in SUPPORTED_SUFFIXES)
+
+
+def _ingest_or_skip(engine: Engine, embedder: Embedder, path: Path, origin: Origin) -> IngestResult:
+    """Ingest one file; if that file can't be ingested, log why and report it as failed."""
+    try:
+        return ingest_file(engine, embedder, path, origin)
+    except OperationalError:
+        raise  # the database can't be reached: nothing can be ingested, so stop
+    except Exception as error:  # anything else is a problem with this one file
+        result = IngestResult(slug_for(path), "failed", 0)
+        # The parser's messages are written for users; other errors could quote the
+        # document's text (e.g. a database error repeats the SQL), so only their type is logged.
+        reason = str(error) if isinstance(error, ValueError) else type(error).__name__
+        logger.error(
+            "ingest.failed",
+            extra={
+                "slug": result.slug,
+                "file": path.name,
+                "error": type(error).__name__,
+                "reason": reason,
+            },
+        )
+        return result
 
 
 def classify(

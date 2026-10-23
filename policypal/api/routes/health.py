@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Response, status
 
 from policypal import __version__
-from policypal.api.deps import EngineDep, LLMDep
+from policypal.api.deps import EmbedderDep, EngineDep, LLMDep, SettingsDep
 from policypal.api.schemas import HEALTH_UNAVAILABLE_EXAMPLE, HealthResponse, LLMHealth
 from policypal.db import check_database
+from policypal.ingest.pipeline import files_not_loaded
 from policypal.llm import describe_llm
 
 router = APIRouter(tags=["health"])
@@ -23,13 +24,24 @@ router = APIRouter(tags=["health"])
         }
     },
 )
-def health(engine: EngineDep, llm: LLMDep, response: Response) -> HealthResponse:
+def health(
+    settings: SettingsDep,
+    engine: EngineDep,
+    embedder: EmbedderDep,
+    llm: LLMDep,
+    response: Response,
+) -> HealthResponse:
     check = check_database(engine)
     report = HealthResponse(
         database=check.status,
         llm=LLMHealth.model_validate(describe_llm(llm), from_attributes=True),
         documents=check.documents,
         chunks=check.chunks,
+        files_not_loaded=(
+            files_not_loaded(engine, embedder, settings.upload_dir)
+            if check.status == "ok"
+            else None
+        ),
         version=__version__,
     )
     if report.status == "unavailable":

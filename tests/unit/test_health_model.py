@@ -21,6 +21,7 @@ def test_status_is_derived_from_the_checks(
         llm=LLMHealth(provider="ollama", model="llama3.2:3b", status=llm_status),
         documents=None,
         chunks=None,
+        files_not_loaded=None,
         version="0.1.0",
     )
 

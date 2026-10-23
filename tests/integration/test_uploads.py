@@ -432,3 +432,18 @@ def test_sample_wins_when_an_uploaded_file_has_a_sample_slug(
         ).one()
     assert origin == "sample"
     assert sha == hashlib.sha256(SAMPLE_LEAVE.read_bytes()).hexdigest()
+
+
+def test_reingest_reports_a_file_that_fails_instead_of_a_500(
+    client: TestClient, engine: Engine, upload_dir: Path
+) -> None:
+    """A bad file copied into the folder by hand is skipped; the others are still loaded."""
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    (upload_dir / "broken.md").write_bytes(b"# Broken\n\n## 1. Scope\n\nAll\x00 staff.")
+
+    response = client.post("/documents/reingest", headers=ADMIN)
+
+    assert response.status_code == 200
+    results = statuses(response.json()["results"])
+    assert results["broken"] == "failed"
+    assert list(results.values()).count("created") == 8

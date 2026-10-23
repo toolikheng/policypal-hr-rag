@@ -36,6 +36,7 @@ HEALTH_UNAVAILABLE_EXAMPLE = {
     "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "ok"},
     "documents": None,
     "chunks": None,
+    "files_not_loaded": None,
     "version": "0.1.0",
 }
 
@@ -45,6 +46,11 @@ class HealthResponse(BaseModel):
     llm: LLMHealth
     documents: int | None  # null when the database can't be checked
     chunks: int | None
+    files_not_loaded: list[str] | None = Field(
+        description="Policy files whose current content isn't searchable, e.g. a file that "
+        "failed to load at start-up (see the api log). Null when the database can't be "
+        "checked. It doesn't change `status`."
+    )
     version: str
 
     @computed_field
@@ -67,6 +73,7 @@ class HealthResponse(BaseModel):
                     "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "ok"},
                     "documents": 8,
                     "chunks": 119,
+                    "files_not_loaded": [],
                     "version": "0.1.0",
                 },
                 {
@@ -75,6 +82,7 @@ class HealthResponse(BaseModel):
                     "llm": {"provider": "ollama", "model": "llama3.2:3b", "status": "unavailable"},
                     "documents": 8,
                     "chunks": 119,
+                    "files_not_loaded": [],
                     "version": "0.1.0",
                 },
             ]
