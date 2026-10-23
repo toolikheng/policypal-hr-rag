@@ -156,7 +156,9 @@ To run without an LLM at all, set `LLM_PROVIDER=extractive` in `.env`.
    sentence if they don't answer the question, and treat the excerpts as data, not
    instructions (a defence against instructions hidden in uploaded files; a
    mitigation, not a guarantee).
-4. **Check:** citations are built by the server from the excerpts actually sent.
+4. **Check:** a reply that contains the refusal sentence is a refusal, even if it also
+   cites an excerpt (the model is saying the excerpts don't answer the question).
+   Otherwise, citations are built by the server from the excerpts actually sent.
    Markers that don't match an excerpt are removed. A reply with no valid citation, or
    with nothing but markers, is replaced by the quoted passages. The model can't invent
    a source. But a citation shows where an answer came from, not that it is correct or

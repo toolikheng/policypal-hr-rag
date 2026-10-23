@@ -159,12 +159,30 @@ def test_llm_refusal_sentence_is_a_refusal(llm_reply: str) -> None:
     assert reply.fallback_reason is None
 
 
-def test_a_cited_answer_that_also_mentions_the_refusal_is_still_an_answer() -> None:
-    llm = FakeLLM("You get 16 days [1]. I couldn't find this in the policies for interns.")
+# The first two are real llama3.2:3b replies from the Phase 5 evaluation (golden g01, g22):
+# the model said the excerpt didn't answer the question but still cited it.
+@pytest.mark.parametrize(
+    "llm_reply",
+    [
+        "According to policy excerpt [1] 9.3, if a public holiday falls on a rest day, the next"
+        " working day is a paid holiday. However, this does not directly answer the question."
+        " I couldn't find this in the policies.",
+        "According to policy excerpt [1] 5.1.3, where meals are provided free, the allowance is"
+        " reduced by one third for each main meal provided. However, this excerpt does not"
+        " directly address the lodging allowance. I couldn’t find this in the policies.",
+        "You get 16 days [1]. I couldn't find this in the policies for interns.",
+    ],
+)
+def test_a_reply_with_the_refusal_sentence_is_a_refusal_even_with_a_citation(
+    llm_reply: str,
+) -> None:
+    reply = build_reply("Q?", [LEAVE], FakeLLM(llm_reply, model="llama3.2:3b"), THRESHOLD)
 
-    reply = build_reply("Q?", [LEAVE], llm, THRESHOLD)
-
-    assert reply.mode == "llm"
+    assert reply.mode == "refused"
+    assert reply.text == REFUSAL_SENTENCE
+    assert reply.citations == ()
+    assert reply.model == "llama3.2:3b"
+    assert reply.fallback_reason is None
 
 
 # Replies like these came from llama3.2:1b in the Phase 2 latency measurement.

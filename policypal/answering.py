@@ -6,9 +6,11 @@ The rules, in order:
 2. Without an LLM (LLM_PROVIDER=extractive), quote the top passages.
 3. Otherwise ask the LLM, giving it the chunks that passed the threshold as excerpts [1]..[n].
    - If the LLM fails (down, timeout, ...), quote the passages and say why.
+   - If the reply contains the refusal sentence, it is a refusal, even if it also cites
+     an excerpt: the model is saying the excerpts don't answer the question.
    - Citation markers that don't match an excerpt are removed.
    - An answer needs a valid marker and some words besides the markers.
-   - Otherwise: a refusal if the LLM refused, else quote the passages and say why.
+   - Otherwise quote the passages and say why.
 Every answer states its mode, so a fallback is never silent.
 """
 
@@ -131,17 +133,14 @@ def build_reply(
         return _extractive(excerpts, error.reason, _ms_since(started))
     generation_ms = _ms_since(started)
 
+    if _REFUSAL.search(text.replace("’", "'")):
+        return Reply(REFUSAL_SENTENCE, "refused", model=llm.model, generation_ms=generation_ms)
     text = _remove_invalid_markers(text, len(excerpts)).strip()
     numbers = _cited_numbers(text)
-    plain = text.replace("’", "'")
-    refused = _REFUSAL.search(plain) is not None
-    # Words left once the markers and any refusal sentence are taken out.
-    has_words = re.search(r"[A-Za-z]", _REFUSAL.sub("", _MARKER.sub("", plain))) is not None
+    has_words = re.search(r"[A-Za-z]", _MARKER.sub("", text)) is not None
     if numbers and has_words:
         citations = tuple(Citation(n, excerpts[n - 1]) for n in numbers)
         return Reply(text, "llm", citations, llm.model, generation_ms=generation_ms)
-    if refused:
-        return Reply(REFUSAL_SENTENCE, "refused", model=llm.model, generation_ms=generation_ms)
     reason: FallbackReason = "llm_empty_answer" if numbers else "llm_no_valid_citation"
     logger.warning("llm.fallback", extra={"reason": reason})
     return _extractive(excerpts, reason, generation_ms)
