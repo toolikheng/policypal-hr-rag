@@ -183,8 +183,10 @@ stack was running. That is why `OLLAMA_TIMEOUT_SECONDS` defaults to 120: after t
 API stops waiting and quotes the policy text instead. On a slower machine, raise it in
 `.env`. Refusals take well under a second because the LLM isn't called.
 
-The evaluation later measured `llama3.2:3b` on 31 golden-set answers: a median of 14.2 s
-per answer (maximum 30.7 s) with the model already loaded; see [Evaluation](#evaluation).
+The evaluation later measured `llama3.2:3b` on the golden set with the model already
+loaded: a median of 14.2 s per answer in one run and 4.9 s in another, with the same
+answers, so the speed depends on what else the machine is doing; see
+[Evaluation](#evaluation).
 
 ## Managing policies (admin)
 
@@ -277,14 +279,16 @@ in `evaluation/`. The questions are about the fictional sample policies.
 
 | Set | Questions | Used for |
 |---|---|---|
-| `dev_set.yaml` | 20 (12 answerable, 8 should be refused) | Choosing settings: the refusal threshold and the query instruction |
+| `dev_set.yaml` | 40 (24 answerable, 16 should be refused): 20 from the start, 20 conversational ones added for v2 | Choosing settings: the refusal threshold and the query instruction |
 | `golden_set.yaml` | 52 (40 answerable, 12 should be refused) | Reporting results only; nothing is tuned on it |
+| `held_out_set.yaml` | 10 (8 answerable, 2 should be refused) | The "unseen document" test on a ninth policy |
 
 Each question names the policy section(s) that answer it, and has a type: plain,
 look-alike (a similar section elsewhere could be picked instead), table, amendment
 (the value was changed and the old value is still in the text), two-section, or one of
 two kinds that should be refused (a topic no policy covers, or a missing detail of a
-covered topic). Both sets were committed before any evaluation run.
+covered topic). The golden set and the first 20 dev questions were committed before any
+evaluation run; the other 20 dev questions were added later (see v2 below).
 
 Every run builds its own database, `policypal_eval`, next to the app's and loads exactly
 the 8 sample policies into it, so your documents, uploads and question history are never
@@ -296,11 +300,12 @@ make eval             # golden set: search (Markdown and PDF, instruction on and
 make eval-llm         # golden set: answers from the local LLM (Ollama must be healthy; slow on a CPU)
 ```
 
-Reports are written to `evaluation/results/<version>/` as Markdown and JSON. Each one starts with
+Reports are written to `evaluation/results/<version>/` as Markdown and JSON: `v1/` holds
+the first, official results and `v2/` the rerun described below. Each report starts with
 the settings and machine it ran on, and the golden reports explain every mistake.
 There is also `make eval-held-out`, the "unseen document" test described below.
 
-### Results (measured 2026-10-23)
+### Results v1 (the official results, measured 2026-10-23)
 
 Run on an Intel Core i5-10300H laptop (4 cores / 8 threads, CPU only), Docker Desktop
 4.86.0 on WSL2 with 11.6 GiB visible to Docker, commit `7f3b687` (golden) and `9dc7dbb`
@@ -357,6 +362,55 @@ off); 7 of 8 answerable questions answered, each citing the expected section (5 
 answers, 2 fallbacks to quoting); one conversational question was refused by the
 threshold (0.656); neither of the 2 should-refuse questions was refused (see below).
 
+### Results v2: a rerun after seeing v1's errors
+
+v2 was made **after looking at v1's mistakes**, so it is not an independent test like
+v1. Two things changed:
+
+- **The dev set grew from 20 to 40 questions.** v1 refused 8 answerable golden questions
+  that were worded conversationally, so 20 new dev questions were written the way
+  employees talk (not copied from, or paraphrasing, golden questions) and committed
+  before any run. The threshold was then calibrated again with the same rule.
+- **A rule bug was fixed.** In v1, a reply that contained the refusal sentence but also
+  cited an excerpt counted as an answer. Now it is a refusal. This decides what a reply
+  means; it does not tune any number.
+
+Then the golden set was run again (commit `85f97f7`; reports in `evaluation/results/v2/`):
+
+| Golden set, Markdown, instruction on | v1 | v2 |
+|---|---|---|
+| Dev questions used to choose the threshold | 20 | 40 |
+| Threshold | 0.69 | 0.69 (chosen again) |
+| Search: section hit@1 / hit@5 | 35/40 / 40/40 | 35/40 / 40/40 (identical results) |
+| Search: answerable answered / should-refuse refused | 32/40 / 11/12 | 32/40 / 11/12 |
+| LLM: answerable questions answered | 32/40 | 30/40 |
+| LLM: should-refuse questions refused | 11/12 | 11/12 |
+| LLM: refused by the LLM | 0 | 2 |
+| LLM: answers with a valid citation (of 33 asked) | 31 | 29 |
+| LLM: of those, citing an expected section | 28/31 | 28/29 |
+| LLM: answer time, median (max) | 14.2 s (30.7 s) | 4.9 s (24.3 s) |
+
+- **The larger dev set chose 0.69 again** (balanced accuracy 88.5%; 0.65 would score
+  81.2%). Most new conversational questions scored 0.71–0.80, but new should-refuse
+  questions also scored high (0.663 for donating leave to a colleague, 0.742 for a
+  missing detail about unused sick leave). So v1's
+  false refusals are not just a small-sample accident: with this embedding model,
+  conversational answerable questions and near-topic should-refuse questions overlap.
+  Search returned exactly the same chunks and scores as in v1.
+- **The rule fix changed two answers.** One was a hedge that cited the wrong section
+  ("…this does not directly answer the question. I couldn't find this in the policies.")
+  and is now a refusal, as intended. The other was partly right ("If your probation is
+  extended a second time, it is not allowed [1].") followed by the refusal sentence; it
+  is now a refusal too, so that partial answer is lost. That is the trade-off of the
+  stricter rule.
+- **The LLM varied between runs:** 28 of 33 answers were word-for-word the same; one
+  hedge in v1 became a correct cited answer in v2.
+- **Answer time depends on the machine's state.** The same answers took 3–4 times longer
+  in v1, which started right after a Docker image rebuild. Expect roughly 5–15 s per
+  answer on this laptop, not a single number.
+- The held-out test was not rerun; its results above use v1's answer rule (the
+  threshold is the same in both versions).
+
 ### What the results show
 
 - **Search works well; the threshold is the weak point.** Every answerable golden
@@ -369,13 +423,18 @@ threshold (0.656); neither of the 2 should-refuse questions was refused (see bel
 - **Look-alike sections are the hardest search case** (6/9 at hit@1): for example the
   Medical Claims "Medical Certificates" section outranked the Leave Policy's sick-leave
   rules for an MC question.
-- **A citation shows where an answer came from, not that it is true.** For the 2
-  held-out questions about details the policy doesn't cover (redundancy during a training
-  bond; who pays for a safety card), the threshold let them through, and the model
-  invented an answer and cited the policy. In the golden set, one cited answer used the
-  wrong section (workplace parking instead of a parking fine), and two replies that
-  hedged ("…this does not directly answer the question. I couldn't find this in the
-  policies.") still counted as answers because they also cited an excerpt.
+- **A citation shows where an answer came from, not that it is true.** The 2 held-out
+  questions about details the Training policy doesn't cover got past the threshold, and
+  the model invented an answer and cited the policy. Asked "What happens to my training
+  bond if my position is made redundant?", it replied: "According to policy [1], if an
+  employee is made redundant, the bond period is terminated, and the employee is no
+  longer required to repay the sponsorship." The policy says nothing about redundancy
+  (only resignation and dismissal for misconduct). The citation check passed, because
+  the cited excerpt is real; checking that each sentence is supported by its excerpt is
+  future work. In the golden set, one cited answer also used the wrong section (it
+  answered about parking at your own workplace when asked about a parking fine).
+- **Hedged replies (fixed in v2):** in v1, two replies that said the excerpts didn't
+  answer the question still counted as answers because they also cited an excerpt.
 - **PDF and Markdown search the same** here, but these PDFs are rendered from the same
   Markdown by `scripts/build_pdfs.py`, which is the easy case for a PDF parser.
 
@@ -388,7 +447,19 @@ threshold (0.656); neither of the 2 should-refuse questions was refused (see bel
   golden search results had been seen (in the golden set's style and type mix).
 - Whether an answer's text is correct is **not** measured automatically; the error
   analysis in each report shows the answers that went wrong so they can be read.
-- One run each; temperature 0 makes the LLM mostly repeatable, but not guaranteed.
+- Each version is a single run. Temperature 0 makes the LLM mostly repeatable, but not
+  fully: 5 of 33 answers changed between v1 and v2.
+
+### Future work (evaluation)
+
+- **LLM-as-judge / faithfulness check:** check that every sentence of an answer is
+  supported by the excerpt it cites (with a second model or an entailment model), to
+  catch invented details like the redundancy example above.
+- A bigger set of questions written by people who didn't build the system, and repeated
+  LLM runs to measure how much the answers vary.
+- Ways to refuse fewer conversational questions without letting near-topic ones through,
+  for example re-ranking the search results, or a threshold rule that counts a false
+  refusal and a false answer differently. Any of these needs a fresh evaluation.
 
 ## Sample data
 
