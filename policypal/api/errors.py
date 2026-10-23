@@ -58,6 +58,11 @@ DATABASE_UNAVAILABLE = ApiError(
 DOCUMENT_NOT_FOUND = ApiError(
     status.HTTP_404_NOT_FOUND, "Document not found.", "No document has this id."
 )
+MESSAGE_NOT_FOUND = ApiError(
+    status.HTTP_404_NOT_FOUND,
+    "Message not found.",
+    "No answer has this message_id (it comes from POST /ask).",
+)
 ADMIN_DISABLED = ApiError(
     status.HTTP_503_SERVICE_UNAVAILABLE,
     "Admin features are disabled: set ADMIN_TOKEN.",

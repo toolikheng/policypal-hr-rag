@@ -1,4 +1,4 @@
-"""The question history: every answered (or refused) question, its sources and votes.
+"""The question history: every answered (or refused) question, its sources and its vote.
 
 Users are anonymous: a conversation is only a random UUID, so no names, emails or IP
 addresses are stored. Question text is stored here (HR needs it for analytics) but is
@@ -8,12 +8,20 @@ never written to the logs.
 import uuid
 from dataclasses import dataclass
 
-from sqlalchemy import Engine, select
+from sqlalchemy import Engine, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from policypal.answering import Answer
-from policypal.models import Channel, Conversation, DocumentChunk, Message, MessageSource
+from policypal.models import (
+    Channel,
+    Conversation,
+    DocumentChunk,
+    Feedback,
+    Message,
+    MessageSource,
+    Rating,
+)
 
 
 @dataclass(frozen=True)
@@ -80,3 +88,27 @@ def save_answer(
             for source in answer.sources
         )
     return SavedAnswer(message_id=message_id, conversation_id=conversation_id)
+
+
+def record_feedback(
+    engine: Engine, message_id: uuid.UUID, rating: Rating, comment: str | None
+) -> bool:
+    """Store the vote on an answer; voting again replaces the rating and comment.
+
+    Returns False if no answer has this message ID.
+    """
+    upsert = insert(Feedback).values(message_id=message_id, rating=rating, comment=comment or None)
+    # One statement, so two clicks at the same moment can't create two votes.
+    upsert = upsert.on_conflict_do_update(
+        index_elements=[Feedback.message_id],
+        set_={
+            "rating": upsert.excluded.rating,
+            "comment": upsert.excluded.comment,
+            "updated_at": func.now(),
+        },
+    )
+    with Session(engine) as session, session.begin():
+        if session.get(Message, message_id) is None:
+            return False
+        session.execute(upsert)
+    return True

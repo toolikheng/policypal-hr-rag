@@ -98,7 +98,7 @@ def test_ask_waits_longer_than_the_api_waits_for_the_llm() -> None:
 def test_feedback_sends_the_vote() -> None:
     requests: list[httpx.Request] = []
 
-    recording(202, {"status": "accepted"}, requests).feedback("m-1", "down", comment="Wrong")
+    recording(200, {"status": "recorded"}, requests).feedback("m-1", "down", comment="Wrong")
 
     assert (requests[0].method, requests[0].url.path) == ("POST", "/feedback")
     assert json.loads(requests[0].content) == {

@@ -19,7 +19,9 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
   (document and section), refuses when the policies don't cover a question, and quotes
   the policy text when no LLM is available. Admins can upload new policies.
 - **Streamlit UI:** a chat page with sources and 👍/👎 feedback, and an admin page for
-  uploads and re-ingesting. Feedback is logged for now; storing it comes next.
+  uploads and re-ingesting.
+- **Question history:** every question, answer, source and vote is stored in PostgreSQL
+  (users are anonymous: a conversation is only a random ID).
 
 ## Using the UI
 
@@ -193,8 +195,9 @@ Other errors: `401`/`403` (missing or wrong token), `413` (larger than `MAX_UPLO
 Uploaded files are kept in the `uploads` volume and loaded again on every start.
 
 `POST /feedback` takes `{"message_id": ..., "rating": "up" | "down", "comment": ...}` (the
-`message_id` comes from `/ask`). It returns `202 accepted` and logs the vote, but never the
-comment text. Votes aren't stored in the database yet.
+`message_id` comes from `/ask`). It stores one vote per answer and returns
+`200 {"status": "recorded"}`; voting again replaces the rating and comment. An unknown
+`message_id` gets `404`. The log line has the rating but never the comment text.
 
 ## Sample data
 

@@ -11,7 +11,7 @@ from policypal.db import DatabaseStatus
 from policypal.ingest.parsing import FileType
 from policypal.ingest.pipeline import IngestStatus
 from policypal.llm.base import LLMStatus
-from policypal.models import Channel, Origin
+from policypal.models import Channel, Origin, Rating
 
 
 class LLMHealth(BaseModel):
@@ -229,7 +229,7 @@ Comment = Annotated[str, StringConstraints(strip_whitespace=True, max_length=500
 
 class FeedbackRequest(BaseModel):
     message_id: UUID = Field(description="The message_id returned by POST /ask.")
-    rating: Literal["up", "down"]
+    rating: Rating
     comment: Comment | None = None
 
     model_config = ConfigDict(
@@ -246,9 +246,9 @@ class FeedbackRequest(BaseModel):
 
 
 class FeedbackResponse(BaseModel):
-    status: Literal["accepted"]
+    status: Literal["recorded"]
 
-    model_config = ConfigDict(json_schema_extra={"examples": [{"status": "accepted"}]})
+    model_config = ConfigDict(json_schema_extra={"examples": [{"status": "recorded"}]})
 
 
 # --- /documents -------------------------------------------------------------------------

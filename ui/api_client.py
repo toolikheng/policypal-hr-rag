@@ -113,7 +113,7 @@ class PolicyPalClient:
 
     def feedback(self, message_id: str, rating: str, comment: str | None = None) -> None:
         body = {"message_id": message_id, "rating": rating, "comment": comment}
-        self._send("POST", "/feedback", ok=(202,), json=body)
+        self._send("POST", "/feedback", json=body)
 
     def list_documents(self) -> list[Document]:
         return self._send("GET", "/documents")
