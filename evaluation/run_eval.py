@@ -28,7 +28,14 @@ from alembic.config import Config
 from sqlalchemy import Engine, create_engine, func, select, text
 from sqlalchemy.engine import make_url
 
-from evaluation.datasets import DEV_SET, EVALUATION_DIR, GOLDEN_SET, QuestionSet, load_question_set
+from evaluation.datasets import (
+    DEV_SET,
+    EVALUATION_DIR,
+    GOLDEN_SET,
+    HELD_OUT_SET,
+    QuestionSet,
+    load_question_set,
+)
 from evaluation.metrics import (
     AnswerOutcome,
     Match,
@@ -69,6 +76,12 @@ EVAL_DATABASE = "policypal_eval"
 RESULTS_DIR = EVALUATION_DIR / "results"
 ALEMBIC_INI = EVALUATION_DIR.parent / "alembic.ini"
 POLICY_FOLDERS: dict[Source, Path] = {"md": SAMPLE_POLICIES_DIR, "pdf": SAMPLE_POLICIES_DIR / "pdf"}
+# The held-out "unseen document": added as an upload, in the same format as the run.
+# Not in the Docker image; the Makefile mounts data/upload-demo for the held-out runs.
+_HELD_OUT_POLICY = SAMPLE_POLICIES_DIR.parent / "upload-demo" / "training-and-development-policy"
+HELD_OUT_POLICIES: dict[Source, Sequence[Path]] = {
+    source: [_HELD_OUT_POLICY.with_suffix(f".{source}")] for source in ("md", "pdf")
+}
 # The model card's instruction: what "instruction on" means, whatever the app is set to.
 QUERY_INSTRUCTION: str = Settings.model_fields["embedding_query_instruction"].default
 # Asked once before an LLM run so loading the model isn't counted. It is in no question set.
@@ -279,13 +292,16 @@ def evaluate_retrieval(
     thresholds: Mapping[str, float],
     base: Mapping[str, str],
     results_dir: Path,
+    extra_files: Mapping[Source, Sequence[Path]] | None = None,
 ) -> list[RetrievalRun]:
     """Search for every question with the policies loaded from Markdown, then from PDF,
-    each with the query instruction on and off. Writes `<set>-retrieval.md/.json`."""
+    each with the query instruction on and off. Writes `<set>-retrieval.md/.json`.
+    `extra_files` adds uploads per format (the held-out policy)."""
     runs: list[RetrievalRun] = []
     policies = []
     for source in ("md", "pdf"):
-        engine = load_policies(database_url, embedders["on"], source)
+        extra = (extra_files or {}).get(source, ())
+        engine = load_policies(database_url, embedders["on"], source, extra)
         try:
             for setting in ("on", "off"):
                 outcomes = run_retrieval(engine, embedders[setting], questions, top_k)
@@ -380,9 +396,15 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--results-dir", type=Path, default=RESULTS_DIR)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("calibrate", help="choose the refusal threshold on the dev set")
-    commands.add_parser("retrieval", help="search quality on the golden set (md/pdf, on/off)")
-    end_to_end = commands.add_parser("end-to-end", help="full answers on the golden set")
+    retrieval = commands.add_parser("retrieval", help="search quality (md/pdf, on/off)")
+    end_to_end = commands.add_parser("end-to-end", help="full answers through the pipeline")
     end_to_end.add_argument("--provider", choices=("ollama", "extractive"), required=True)
+    for command_parser in (retrieval, end_to_end):
+        command_parser.add_argument(
+            "--held-out",
+            action="store_true",
+            help="the unseen-document test: held-out questions, with the Training policy added",
+        )
     args = parser.parse_args(argv)
 
     settings = Settings()
@@ -392,6 +414,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     top_k = settings.retrieval_top_k
     calibration_file = args.results_dir / "dev-calibration.json"
     logger.info("eval.started", extra={"command": args.command})
+    held_out = getattr(args, "held_out", False)
+    questions = load_question_set(HELD_OUT_SET if held_out else GOLDEN_SET)
+    extra_files = HELD_OUT_POLICIES if held_out else {}
 
     if args.command == "end-to-end":
         instruction = bool(settings.embedding_query_instruction)
@@ -400,12 +425,13 @@ def main(argv: Sequence[str] | None = None) -> None:
             database_url,
             build_embedder(settings),
             build_llm(settings.model_copy(update={"llm_provider": args.provider})),
-            load_question_set(GOLDEN_SET),
+            questions,
             instruction=instruction,
             top_k=top_k,
             threshold=thresholds["on" if instruction else "off"],
             base=base,
             results_dir=args.results_dir,
+            extra_files=extra_files.get("md", ()),
         )
         return
 
@@ -427,11 +453,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         evaluate_retrieval(
             database_url,
             embedders,
-            load_question_set(GOLDEN_SET),
+            questions,
             top_k=top_k,
             thresholds=load_thresholds(calibration_file),
             base=base,
             results_dir=args.results_dir,
+            extra_files=extra_files,
         )
 
 

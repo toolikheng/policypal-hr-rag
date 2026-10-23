@@ -1,0 +1,80 @@
+# Held-out set: the "unseen document" test. The questions are about the fictional
+# Training and Development Policy (data/upload-demo/), which is NOT one of the 8 sample
+# policies: it was never used to write the golden or dev sets or to choose the threshold.
+# (Fictional sample data, not a real company's policy.)
+#
+# Written on 2026-10-23, after the golden set, the dev set (commit 3fa9c3e) and the
+# threshold (commit 7f3b687) were frozen, and committed before any held-out run. The
+# golden-set search results had already been seen, so the questions follow the golden
+# set's mix of types and wording (including conversational questions without the
+# policy's keywords) instead of being written to score well. The policy has no
+# amendments, so there are no amendment questions. Format: see golden_set.yaml.
+
+name: held-out
+questions:
+  - id: h01
+    question: How many days of training am I expected to do each year?
+    type: plain
+    expected:
+      - {document: training-and-development-policy, section: "3. Training Days"}
+    note: Clause 3.1 (at least five days, 40 hours).
+
+  - id: h02
+    question: What is the yearly limit for an external course the company sponsors for an E2?
+    type: table
+    expected:
+      - {document: training-and-development-policy, section: "5. External Course Sponsorship"}
+    note: Table row "E1 to E3" (RM3,000).
+
+  - id: h03
+    question: If the company asks me to attend training on my rest day, do I get anything for it?
+    type: look-alike
+    expected:
+      - {document: training-and-development-policy, section: "3. Training Days"}
+    note: Clause 3.3; Overtime 5 (rest-day rate) and Overtime 8 (time off in lieu) look similar.
+
+  - id: h04
+    question: The company paid for my course and now I want to resign. Do I have to pay anything back?
+    type: plain
+    expected:
+      - {document: training-and-development-policy, section: "7. Training Bond"}
+    note: Conversational; the word "bond" is not in the question.
+
+  - id: h05
+    question: Do I get time off to sit a professional exam?
+    type: look-alike
+    expected:
+      - {document: training-and-development-policy, section: "6. Professional Certifications"}
+    note: Exam leave (6.2) competes with the Leave Policy's leave types.
+
+  - id: h06
+    question: The company is sponsoring a RM12,000 course for me in Penang. Do I have to sign a training bond, and how is my travel to the course handled?
+    type: two-section
+    expected:
+      - {document: training-and-development-policy, section: "7. Training Bond"}
+      - {document: training-and-development-policy, section: "5. External Course Sponsorship"}
+    note: Needs 7 (over RM5,000, so a bond) and 5.4 (travel follows the Travel Policy).
+
+  - id: h07
+    question: How long is the bond period if my course costs RM8,000?
+    type: plain
+    expected:
+      - {document: training-and-development-policy, section: "7. Training Bond"}
+    note: Needs the rule in 7.2 (12 months per RM5,000 or part of it), so 24 months.
+
+  - id: h08
+    question: How often do site workers have to redo their safety training?
+    type: look-alike
+    expected:
+      - {document: training-and-development-policy, section: "8. Mandatory Safety Training for Site Employees"}
+    note: The Code of Conduct's "6. Safety at Project Sites" looks similar.
+
+  - id: h09
+    question: What happens to my training bond if my position is made redundant?
+    type: missing-detail
+    note: Clause 7.3 covers resignation and dismissal for misconduct only; redundancy is not covered.
+
+  - id: h10
+    question: Who pays for the construction safety induction card?
+    type: missing-detail
+    note: Clause 8.1 requires the card but does not say who pays for it.

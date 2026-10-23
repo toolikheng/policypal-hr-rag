@@ -13,6 +13,7 @@ from evaluation.metrics import Section
 from evaluation.report import REQUIRED_CONFIG_FIELDS
 from evaluation.run_eval import (
     BASE_CONFIG_FIELDS,
+    HELD_OUT_POLICIES,
     base_config,
     calibrate,
     create_database_if_missing,
@@ -24,6 +25,7 @@ from evaluation.run_eval import (
     run_end_to_end,
     run_retrieval,
 )
+from policypal.db import make_engine
 from policypal.models import Document, DocumentChunk
 from tests.fakes import FakeEmbedder, FakeLLM
 from tests.helpers import make_settings
@@ -276,3 +278,30 @@ def test_chunk_rows_keep_their_section_names(migrated_database_url: str) -> None
         sections = set(conn.execute(select(DocumentChunk.section)).scalars())
 
     assert CARRY.section in sections
+
+
+def test_evaluate_retrieval_adds_the_held_out_policy_in_the_same_format(
+    migrated_database_url: str, tmp_path: Path, base: dict[str, str]
+) -> None:
+    embedders = {"on": FakeEmbedder(), "off": FakeEmbedder()}
+
+    evaluate_retrieval(
+        migrated_database_url,
+        embedders,
+        QUESTIONS,
+        top_k=5,
+        thresholds={"on": 0.3, "off": 0.3},
+        base=base,
+        results_dir=tmp_path,
+        extra_files=HELD_OUT_POLICIES,
+    )
+
+    data = json.loads((tmp_path / "sample-retrieval.json").read_text(encoding="utf-8"))
+    policies = data["config"]["Policies"]
+    assert "from Markdown + upload training-and-development-policy" in policies
+    assert "from PDF + upload training-and-development-policy" in policies
+    engine = make_engine(migrated_database_url)  # the database still holds the PDF run
+    try:
+        assert ("training-and-development-policy", "pdf", "upload") in documents(engine)
+    finally:
+        engine.dispose()

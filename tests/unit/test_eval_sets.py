@@ -6,11 +6,18 @@ from pathlib import Path
 
 import pytest
 
-from evaluation.datasets import DEV_SET, GOLDEN_SET, QuestionSet, load_question_set
+from evaluation.datasets import DEV_SET, GOLDEN_SET, HELD_OUT_SET, QuestionSet, load_question_set
 from evaluation.metrics import ANSWERABLE_TYPES, Section
 from policypal.ingest.chunking import chunk_document
 from policypal.ingest.parsing import file_type_of, parse_document
-from tests.sample_data import CORE_POLICY_SLUGS, HELD_OUT_TOPIC, POLICY_DIR, UNCOVERED_TOPICS
+from tests.sample_data import (
+    CORE_POLICY_SLUGS,
+    HELD_OUT_TOPIC,
+    POLICY_DIR,
+    UNCOVERED_TOPICS,
+    UPLOAD_DEMO_DIR,
+    UPLOAD_DEMO_SLUG,
+)
 
 # The 16 hand-picked questions that set the provisional threshold in Phase 2. The
 # evaluation sets must not reuse them, or the calibration would be tested on its own data.
@@ -192,3 +199,39 @@ def test_each_reserved_uncovered_topic_has_one_golden_refusal_question(
     assert [item.type for item in golden_matches] == ["uncovered-topic"]
     # The dev set uses different topics, so calibration never sees these.
     assert [item.id for item in dev.questions if pattern.search(item.question)] == []
+
+
+# --- The held-out set (the unseen Training policy) ------------------------------------
+
+
+@pytest.fixture(scope="module")
+def held_out() -> QuestionSet:
+    return load_question_set(HELD_OUT_SET)
+
+
+def test_held_out_set_has_8_answerable_and_2_unanswerable_questions(held_out: QuestionSet) -> None:
+    assert sum(item.answerable for item in held_out.questions) == 8
+    assert [item.type for item in held_out.questions if not item.answerable] == [
+        "missing-detail",
+        "missing-detail",
+    ]
+
+
+@pytest.mark.parametrize("suffix", [".md", ".pdf"])
+def test_held_out_questions_expect_sections_of_the_training_policy(
+    held_out: QuestionSet, suffix: str
+) -> None:
+    existing = sections_in([(UPLOAD_DEMO_DIR / UPLOAD_DEMO_SLUG).with_suffix(suffix)])
+
+    expected = {section for item in held_out.questions for section in item.expected}
+    assert {section.document for section in expected} == {UPLOAD_DEMO_SLUG}
+    assert expected - existing == set()
+
+
+def test_held_out_questions_are_new(
+    held_out: QuestionSet, golden: QuestionSet, dev: QuestionSet
+) -> None:
+    earlier = {normalised(item.question) for item in golden.questions + dev.questions}
+    earlier |= {normalised(question) for question in THRESHOLD_PROBE_QUESTIONS}
+
+    assert [item.id for item in held_out.questions if normalised(item.question) in earlier] == []

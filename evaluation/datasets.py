@@ -20,6 +20,9 @@ from evaluation.metrics import ANSWERABLE_TYPES, UNANSWERABLE_TYPES, Section
 EVALUATION_DIR = Path(__file__).resolve().parent
 GOLDEN_SET = EVALUATION_DIR / "golden_set.yaml"
 DEV_SET = EVALUATION_DIR / "dev_set.yaml"
+# Questions about the held-out Training policy, written after the sets above and the
+# threshold were frozen. Reported separately, as the "unseen document" test.
+HELD_OUT_SET = EVALUATION_DIR / "held_out_set.yaml"
 
 
 @dataclass(frozen=True)

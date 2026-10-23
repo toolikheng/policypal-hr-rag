@@ -3,16 +3,19 @@ VENV := .venv
 BIN := $(VENV)/bin
 
 .PHONY: help setup up down logs db-up test lint format lint-workflows migrate ingest pdfs \
-	eval-calibrate eval eval-llm
+	eval-calibrate eval eval-llm eval-held-out
 
 # The evaluation runs in a one-off container from the api image (it has the embedding
 # model), on its own database (policypal_eval). Reports are written to evaluation/results/
 # on your machine. The commit and the Docker version are only known here, so they are
 # passed in ("-dirty" means tracked files had uncommitted changes, results excluded).
-EVAL = docker compose run --rm --build \
+EVAL_RUN = docker compose run --rm --build \
 	-v "$(CURDIR)/evaluation/results:/app/evaluation/results" \
 	-e EVAL_GIT_COMMIT="$$(git rev-parse --short HEAD)$$(git diff --quiet HEAD -- . ':!evaluation/results' || echo -dirty)" \
-	-e EVAL_DOCKER_VERSION="$$(docker version --format '{{.Server.Platform.Name}}, engine {{.Server.Version}}')" \
+	-e EVAL_DOCKER_VERSION="$$(docker version --format '{{.Server.Platform.Name}}, engine {{.Server.Version}}')"
+EVAL = $(EVAL_RUN) api python -m evaluation.run_eval
+# The held-out Training policy isn't in the image, so it is mounted (read-only).
+EVAL_HELD_OUT = $(EVAL_RUN) -v "$(CURDIR)/data/upload-demo:/app/data/upload-demo:ro" \
 	api python -m evaluation.run_eval
 
 help: ## List available commands
@@ -71,3 +74,8 @@ eval: ## Evaluate on the golden set: search (Markdown/PDF, instruction on/off) a
 eval-llm: ## Evaluate answers from the local LLM on the golden set (Ollama must be healthy; slow on a CPU)
 	mkdir -p evaluation/results
 	$(EVAL) end-to-end --provider ollama
+
+eval-held-out: ## The unseen-document test: questions on the held-out Training policy (search, then the LLM)
+	mkdir -p evaluation/results
+	$(EVAL_HELD_OUT) retrieval --held-out
+	$(EVAL_HELD_OUT) end-to-end --provider ollama --held-out
