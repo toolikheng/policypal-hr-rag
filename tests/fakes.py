@@ -74,3 +74,61 @@ class FakeLLM:
 
     def status(self) -> LLMStatus:
         return self._status
+
+
+class FakeApiClient:
+    """Stand-in for ui.api_client.PolicyPalClient in Streamlit page tests.
+
+    Replies are scripted; every call is recorded in `calls`.
+    """
+
+    def __init__(
+        self,
+        *,
+        health: dict | None = None,
+        answers: list[dict] | None = None,
+        documents: dict[int, dict] | None = None,
+        uploads: list[dict | Exception] | None = None,
+    ) -> None:
+        self._health = health or {"status": "ok", "database": "ok", "version": "0.1.0"}
+        self.answers = list(answers or [])
+        self.documents = documents or {}
+        self.uploads = list(uploads or [])
+        self.calls: list[tuple] = []
+
+    def _next(self, replies: list) -> object:
+        reply = replies.pop(0)
+        if isinstance(reply, Exception):
+            raise reply
+        return reply
+
+    def health(self) -> dict:
+        if isinstance(self._health, Exception):
+            raise self._health
+        return self._health
+
+    def ask(self, question: str, conversation_id: str | None = None) -> dict:
+        self.calls.append(("ask", question, conversation_id))
+        return self._next(self.answers)  # type: ignore[return-value]
+
+    def feedback(self, message_id: str, rating: str, comment: str | None = None) -> None:
+        self.calls.append(("feedback", message_id, rating, comment))
+
+    def list_documents(self) -> list[dict]:
+        self.calls.append(("list_documents",))
+        return [
+            {key: value for key, value in doc.items() if key != "sections"}
+            for doc in self.documents.values()
+        ]
+
+    def get_document(self, document_id: int) -> dict:
+        self.calls.append(("get_document", document_id))
+        return self.documents[document_id]
+
+    def upload(self, filename: str, data: bytes, *, token: str, replace: bool = False) -> dict:
+        self.calls.append(("upload", filename, data, token, replace))
+        return self._next(self.uploads)  # type: ignore[return-value]
+
+    def reingest(self, *, token: str) -> list[dict]:
+        self.calls.append(("reingest", token))
+        return [{"slug": "leave-policy", "status": "unchanged", "chunks": 20}]
