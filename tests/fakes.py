@@ -85,7 +85,7 @@ class FakeApiClient:
     def __init__(
         self,
         *,
-        health: dict | None = None,
+        health: dict | Exception | None = None,  # an exception is raised by health()
         answers: list[dict] | None = None,
         documents: dict[int, dict] | None = None,
         uploads: list[dict | Exception] | None = None,

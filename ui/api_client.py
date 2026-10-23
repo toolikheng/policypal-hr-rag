@@ -63,6 +63,21 @@ class Document(TypedDict):
     updated_at: str
 
 
+class ChunkText(TypedDict):
+    id: int
+    text: str
+
+
+class Section(TypedDict):
+    section: str
+    section_path: str
+    chunks: list[ChunkText]
+
+
+class DocumentDetail(Document):
+    sections: list[Section]
+
+
 class UploadResult(TypedDict):
     status: Literal["created", "updated", "unchanged"]
     document: Document
@@ -103,8 +118,7 @@ class PolicyPalClient:
     def list_documents(self) -> list[Document]:
         return self._send("GET", "/documents")
 
-    def get_document(self, document_id: int) -> dict[str, Any]:
-        """A document with `sections`, each with its `chunks` ({id, text})."""
+    def get_document(self, document_id: int) -> DocumentDetail:
         return self._send("GET", f"/documents/{document_id}")
 
     def upload(
