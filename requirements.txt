@@ -22,3 +22,5 @@ pypdf==6.19.0
 sentence-transformers==6.1.0
 # Pinned explicitly because sentence-transformers relies heavily on it.
 transformers==5.18.0
+# Reads the evaluation question sets (evaluation/*.yaml).
+PyYAML==6.0.3

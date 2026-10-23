@@ -10,29 +10,13 @@ from tests.sample_data import (
     CORE_POLICIES,
     CORE_POLICY_SLUGS,
     FICTIONAL_LABEL,
+    HELD_OUT_TOPIC,
     POLICY_DIR,
+    UNCOVERED_TOPICS,
     UPLOAD_DEMO_DIR,
     UPLOAD_DEMO_POLICY,
     UPLOAD_DEMO_SLUG,
 )
-
-# Topics that no policy covers, so questions about them must be refused later.
-UNCOVERED_TOPICS = {
-    "bonus": r"\bbonus",
-    "salary increments or pay reviews": r"increment|salary review|pay review|pay rise",
-    "company car or car allowance": r"company car|car allowance|pool car",
-    "gym or fitness membership": r"\bgym\b|fitness",
-    "share or stock options": r"share option|stock option|share scheme|\bESOS\b",
-    "childcare support": r"child ?care|nursery|creche",
-    "long-service awards": r"long[- ]service",
-    "relocation allowance": r"relocat",
-    "sabbatical leave": r"sabbatical",
-    "retirement": r"retire",
-}
-
-# The upload-demo policy's subject. The core set must not cover it, so the held-out
-# document adds genuinely new information when it is uploaded.
-HELD_OUT_TOPIC = r"\btraining\b|\bcourses?\b|training bond"
 
 NUMBERED_HEADING = re.compile(r"^#{2,3} \d+(\.\d+)*\.? \S")
 

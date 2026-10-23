@@ -1,0 +1,385 @@
+# Golden set: the questions the evaluation REPORTS on. Nothing is tuned on them.
+#
+# The questions are about the fictional Binaan Maju Sdn Bhd sample policies (fictional
+# sample data, not a real company's policies).
+#
+# Rules:
+# - Frozen once committed. After the first run, an item may change only to fix a labelling
+#   mistake, and the change is listed in the report.
+# - Questions are not reused from the dev set or from the 16 hand-picked questions that
+#   set the provisional threshold in Phase 2, and none is about the held-out Training policy.
+# - expected: the sections that answer the question. Any one of them counts as found,
+#   except for type two-section, which needs both. Unanswerable questions have none.
+# - Types: plain, look-alike (a similar section elsewhere could be picked instead),
+#   table (the answer is a table cell), amendment (the value was changed and the old value
+#   is still in the text), two-section (needs two sections); uncovered-topic and
+#   missing-detail (should be refused).
+
+name: golden
+questions:
+  # --- Leave Policy -----------------------------------------------------------------
+  - id: g01
+    question: If a public holiday falls in the middle of my week of annual leave, is that day taken from my leave balance?
+    type: plain
+    expected:
+      - {document: leave-policy, section: "4.1 Annual Leave Entitlement"}
+    note: The answer is the last paragraph of 4.1, below the entitlement table.
+
+  - id: g02
+    question: I'm sick today and the doctor gave me an MC. By when must I tell my superior, and when do I upload the MC?
+    type: look-alike
+    expected:
+      - {document: leave-policy, section: "5.1 Sick Leave (Outpatient)"}
+    note: Medical Claims 3.4 "Medical Certificates" and Leave 5.3 also talk about MCs.
+
+  - id: g03
+    question: How many days of paternity leave can a father take now?
+    type: amendment
+    expected:
+      - {document: leave-policy, section: "6.2 Paternity Leave"}
+      - {document: leave-policy, section: "10. Amendment History"}
+    note: Raised from 3 to 7 days in version 3.1; the old value is still in the text.
+
+  - id: g04
+    question: How many days of compassionate leave do I get when my grandmother passes away?
+    type: table
+    expected:
+      - {document: leave-policy, section: "6.3 Compassionate Leave"}
+    note: Table row "Sibling or grandparent" (1 day).
+
+  - id: g05
+    question: I'm an E2 going into hospital for surgery next month. How many days of paid leave can I get for it, and how much per day will the insurance pay for my room?
+    type: two-section
+    expected:
+      - {document: leave-policy, section: "5.2 Hospitalisation Leave"}
+      - {document: medical-claims-policy, section: "4.2 Group Hospitalisation and Surgical Insurance"}
+    note: Needs Leave 5.2 (60 days) and Medical Claims 4.2 (RM200 a day for E grades).
+
+  # --- Medical Claims and Benefits Policy ------------------------------------------
+  - id: g06
+    question: What is the annual outpatient limit for an E2 employee?
+    type: amendment
+    expected:
+      - {document: medical-claims-policy, section: "3.2 Annual Outpatient Limits"}
+      - {document: medical-claims-policy, section: "9. Amendment History"}
+    note: A table cell raised from RM1,000 to RM1,200 in version 2.2; both values appear.
+
+  - id: g07
+    question: Will the company reimburse me if I see a doctor at a clinic that is not on the panel?
+    type: look-alike
+    expected:
+      - {document: medical-claims-policy, section: "3.3 Non-Panel Clinics and Reimbursement"}
+    note: Leave 5.3 "Medical Certificates from Non-Panel Clinics" is about MCs, not costs.
+
+  - id: g08
+    question: Are braces for my teeth covered by the dental benefit?
+    type: plain
+    expected:
+      - {document: medical-claims-policy, section: "5. Dental Benefits"}
+    note: The answer is an exclusion inside section 5 (cosmetic treatment).
+
+  - id: g09
+    question: What room and board rate per day does the hospital insurance cover for an M1 manager?
+    type: table
+    expected:
+      - {document: medical-claims-policy, section: "4.2 Group Hospitalisation and Surgical Insurance"}
+    note: Table row "M1 and M2" (RM300).
+
+  - id: g10
+    question: Can I claim physiotherapy, and is there a yearly cap?
+    type: plain
+    expected:
+      - {document: medical-claims-policy, section: "7. Exclusions"}
+    note: Hidden in the exclusions list, item (d) (RM500 with a doctor's referral).
+
+  # --- Overtime Policy --------------------------------------------------------------
+  - id: g11
+    question: I'm a site technician and I worked on a Sunday to finish a job. At what rate is that paid?
+    type: two-section
+    expected:
+      - {document: overtime-policy, section: "3. Normal Working Hours"}
+      - {document: overtime-policy, section: "5. Overtime Rates"}
+    note: Needs section 3 (Sunday is the rest day) and section 5 (rest day 2.0 times the hourly rate).
+
+  - id: g12
+    question: How much meal allowance do I get when I work overtime?
+    type: look-alike
+    expected:
+      - {document: overtime-policy, section: "7. Meal and Transport Allowances for Overtime"}
+    note: Travel 5.1 (outstation meal allowance) and Expense Claims 4.2 (working meals) look similar.
+
+  - id: g13
+    question: Do executives get paid for working overtime?
+    type: plain
+    expected:
+      - {document: overtime-policy, section: "2. Eligibility"}
+      - {document: overtime-policy, section: "8. Time Off in Lieu for Executives"}
+    note: Either section 2 (not paid) or section 8 (time off in lieu instead) answers it.
+
+  - id: g14
+    question: How long do I have to use my time off in lieu before it lapses?
+    type: amendment
+    expected:
+      - {document: overtime-policy, section: "8. Time Off in Lieu for Executives"}
+      - {document: overtime-policy, section: "10. Amendment History"}
+    note: Extended from 30 to 60 days in version 2.0; the old value is only in the amendment history.
+
+  - id: g15
+    question: What are the normal working hours on a Saturday for site-based staff?
+    type: table
+    expected:
+      - {document: overtime-policy, section: "3. Normal Working Hours"}
+    note: Table cell for site-based employees (8:00 a.m. to 1:00 p.m.).
+
+  # --- Expense Claims Policy --------------------------------------------------------
+  - id: g16
+    question: What was the car mileage rate for the first 500 km before the 2025 change?
+    type: amendment
+    expected:
+      - {document: expense-claims-policy, section: "3.1 Mileage for Using Your Own Vehicle"}
+      - {document: expense-claims-policy, section: "10. Amendment History"}
+    note: Asks for the old value (RM0.60) from the amendment note.
+
+  - id: g17
+    question: What is the client entertainment limit per occasion for an M2 manager?
+    type: table
+    expected:
+      - {document: expense-claims-policy, section: "4.1 Client Entertainment"}
+    note: Table row "M1 and M2" (RM300).
+
+  - id: g18
+    question: Can I claim my home internet bill?
+    type: look-alike
+    expected:
+      - {document: expense-claims-policy, section: "5. Mobile Phone and Internet"}
+      - {document: work-from-home-policy, section: "5.2 Internet and Utilities Allowance"}
+    note: Expense Claims 5 says no and points to the WFH allowance (WFH 5.2); either answers.
+
+  - id: g19
+    question: Who has to approve my expense claim of RM1,500?
+    type: table
+    expected:
+      - {document: expense-claims-policy, section: "9. Approval Limits"}
+    note: Table row "RM500.01 to RM2,000" (Head of Department).
+
+  - id: g20
+    question: Can I claim a parking fine I got while visiting a client's office?
+    type: look-alike
+    expected:
+      - {document: expense-claims-policy, section: "7. Items That Cannot Be Claimed"}
+    note: Section 3.2 "Tolls and Parking" sounds right, but fines are excluded in section 7.
+
+  # --- Travel Policy ----------------------------------------------------------------
+  - id: g21
+    question: What is the hotel limit per night for an E2 staying in Kota Kinabalu?
+    type: table
+    expected:
+      - {document: travel-policy, section: "4. Accommodation"}
+    note: Table column "Sabah and Sarawak" (RM280); the reader must know Kota Kinabalu is in Sabah.
+
+  - id: g22
+    question: How much allowance do I get if I stay with relatives instead of a hotel on an outstation trip?
+    type: amendment
+    expected:
+      - {document: travel-policy, section: "4. Accommodation"}
+      - {document: travel-policy, section: "8. Amendment History"}
+    note: Raised from RM50 to RM60 in version 3.0; the old value is only in the amendment history.
+
+  - id: g23
+    question: I'm driving my own car to a project site 400 km away. Is there any limit on what I can claim for mileage?
+    type: look-alike
+    expected:
+      - {document: travel-policy, section: "3.2 Using Your Own Vehicle for Outstation Travel"}
+    note: Expense Claims 3.1 has the mileage rates, but the cap for trips over 350 km is in Travel 3.2.
+
+  - id: g24
+    question: I'm flying to Tokyo for a client meeting. What daily allowance do I get, and is the trip covered by travel insurance?
+    type: two-section
+    expected:
+      - {document: travel-policy, section: "6.1 Overseas Daily Allowance"}
+      - {document: travel-policy, section: "6.2 Travel Insurance"}
+    note: Needs 6.1 (other countries in Asia, USD80) and 6.2 (group travel insurance).
+
+  - id: g25
+    question: Can I get money in advance before an overseas business trip?
+    type: plain
+    expected:
+      - {document: travel-policy, section: "6.3 Cash Advance"}
+    note: A paraphrase of "cash advance" (up to 70% of the estimated cost).
+
+  # --- Code of Conduct --------------------------------------------------------------
+  - id: g26
+    question: When was the ban on facilitation payments added to the Code of Conduct?
+    type: amendment
+    expected:
+      - {document: code-of-conduct, section: "10. Amendment History"}
+    note: Only the amendment history gives the version and date (2.1, 1 September 2024).
+
+  - id: g27
+    question: Can I give a client a gift worth RM500?
+    type: look-alike
+    expected:
+      - {document: code-of-conduct, section: "4.2 Giving Gifts and Hospitality"}
+    note: Code 4.1 "Receiving Gifts" (RM100) and Expense Claims 4.1 (client entertainment) look similar.
+
+  - id: g28
+    question: A colleague keeps making sexual jokes about me. Who can I report it to?
+    type: plain
+    expected:
+      - {document: code-of-conduct, section: "5.2 Anti-Harassment"}
+    note: A long section split into two chunks.
+
+  - id: g29
+    question: Am I allowed to post photos of our project site on Instagram?
+    type: plain
+    expected:
+      - {document: code-of-conduct, section: "7.2 Social Media"}
+    note: The words "social media" are not in the question.
+
+  - id: g30
+    question: What happens if I'm late three times in a month, and can I appeal against a warning?
+    type: two-section
+    expected:
+      - {document: code-of-conduct, section: "5.3 Attendance and Punctuality"}
+      - {document: code-of-conduct, section: "9. Disciplinary Action"}
+    note: Needs 5.3 (a verbal warning) and 9 (appeal in writing within seven days).
+
+  # --- Probation and Confirmation Policy --------------------------------------------
+  - id: g31
+    question: What is the notice period after confirmation for an M1?
+    type: table
+    expected:
+      - {document: probation-and-confirmation-policy, section: "7.2 Notice After Confirmation"}
+    note: Table row "M1, M2 and SM" (3 months); 7.1 has a look-alike table for probation.
+
+  - id: g32
+    question: How much notice must an executive give to resign while still on probation?
+    type: amendment
+    expected:
+      - {document: probation-and-confirmation-policy, section: "7.1 Notice During Probation"}
+      - {document: probation-and-confirmation-policy, section: "9. Amendment History"}
+    note: Changed from 2 weeks to 1 month in version 1.3; both values appear.
+
+  - id: g33
+    question: Can my probation be extended, and for how long?
+    type: plain
+    expected:
+      - {document: probation-and-confirmation-policy, section: "4. Extension of Probation"}
+    note: A straight paraphrase of section 4 (once, by up to three months).
+
+  - id: g34
+    question: Do I get dental and optical benefits while I'm on probation?
+    type: look-alike
+    expected:
+      - {document: probation-and-confirmation-policy, section: "6.2 Medical Benefits During Probation"}
+      - {document: medical-claims-policy, section: "5. Dental Benefits"}
+      - {document: medical-claims-policy, section: "6. Optical Benefits"}
+    note: The same rule (confirmed employees only) is in three places; any of them answers.
+
+  - id: g35
+    question: My probation was already extended once. If I still don't meet the standard, what happens, and will I get the reasons in writing?
+    type: two-section
+    expected:
+      - {document: probation-and-confirmation-policy, section: "4. Extension of Probation"}
+      - {document: probation-and-confirmation-policy, section: "8. Ending Employment During Probation"}
+    note: Needs 4 (no second extension) and 8 (employment ended, reasons in writing).
+
+  # --- Work From Home Policy --------------------------------------------------------
+  - id: g36
+    question: How much is the monthly allowance for working from home?
+    type: amendment
+    expected:
+      - {document: work-from-home-policy, section: "5.2 Internet and Utilities Allowance"}
+      - {document: work-from-home-policy, section: "10. Amendment History"}
+    note: Raised from RM30 to RM50 in version 1.1; both values appear.
+
+  - id: g37
+    question: Who is eligible to work from home?
+    type: look-alike
+    expected:
+      - {document: work-from-home-policy, section: "2. Eligibility"}
+    note: '"Eligibility" is also a heading in the Overtime and Medical Claims policies.'
+
+  - id: g38
+    question: Can I use the free Wi-Fi at a coffee shop when I'm working from home?
+    type: plain
+    expected:
+      - {document: work-from-home-policy, section: "8. Information Security"}
+    note: The answer is "only through the VPN" (8.1).
+
+  - id: g39
+    question: Will the company give me a monitor for my home office?
+    type: plain
+    expected:
+      - {document: work-from-home-policy, section: "5.1 Company Equipment"}
+    note: The answer is a "not provided" sentence.
+
+  - id: g40
+    question: I'm a non-executive working from home. Do I need approval before working overtime, and who gives it?
+    type: two-section
+    expected:
+      - {document: work-from-home-policy, section: "6. Working Hours and Overtime"}
+      - {document: overtime-policy, section: "4. Pre-Approval of Overtime"}
+    note: Needs WFH 6 (prior approval is required) and Overtime 4 (the HOD or Project Manager, in MyHR).
+
+  # --- Should be refused: topics no policy covers (the 10 reserved topics) ----------
+  - id: g41
+    question: How many months of bonus will we get at the end of the year?
+    type: uncovered-topic
+    note: Reserved topic, bonus.
+
+  - id: g42
+    question: When is the yearly salary review, and how big is the usual increment?
+    type: uncovered-topic
+    note: Reserved topic, salary increments.
+
+  - id: g43
+    question: Do managers get a monthly car allowance?
+    type: uncovered-topic
+    note: Reserved topic, car allowance. Expense Claims 3.1 (mileage) looks similar.
+
+  - id: g44
+    question: Does the company pay for gym membership?
+    type: uncovered-topic
+    note: Reserved topic, gym. Close to the medical benefits.
+
+  - id: g45
+    question: Can employees buy company shares through a share option scheme?
+    type: uncovered-topic
+    note: Reserved topic, share options.
+
+  - id: g46
+    question: Is there a childcare subsidy for working parents?
+    type: uncovered-topic
+    note: Reserved topic, childcare. Close to family leave and children's medical cover.
+
+  - id: g47
+    question: Is there a long-service award for staff who reach 10 years?
+    type: uncovered-topic
+    note: Reserved topic, long-service awards. Close to the "5 years and above" leave tier.
+
+  - id: g48
+    question: If I'm transferred from Kuala Lumpur to the Kuching office, will the company pay my relocation costs?
+    type: uncovered-topic
+    note: Reserved topic, relocation. Close to Probation 2.2 (transfers) and the Travel Policy.
+
+  - id: g49
+    question: Can I take a paid sabbatical after several years with the company?
+    type: uncovered-topic
+    note: Reserved topic, sabbatical. Close to Leave 8 (unpaid leave).
+
+  - id: g50
+    question: What is the company's retirement age?
+    type: uncovered-topic
+    note: Reserved topic, retirement.
+
+  # --- Should be refused: a covered topic, but this detail is not in the policies ---
+  - id: g51
+    question: What is the hotel limit per night for a business trip to Singapore?
+    type: missing-detail
+    note: Travel 4 gives hotel limits for Malaysian locations only; there is no overseas hotel limit.
+
+  - id: g52
+    question: Do site workers on a night shift get a shift allowance?
+    type: missing-detail
+    note: Working hours and overtime are covered; shift allowances are not.

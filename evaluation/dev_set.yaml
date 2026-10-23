@@ -1,0 +1,138 @@
+# Dev set: the questions used to CHOOSE settings (the refusal threshold, and whether
+# questions get the query instruction). Its results are never reported as the system's
+# quality; the golden set is.
+#
+# The questions are about the fictional Binaan Maju Sdn Bhd sample policies (fictional
+# sample data, not a real company's policies).
+#
+# Rules: frozen once committed; no question from the golden set or from the 16 Phase 2
+# threshold questions; different uncovered topics from the golden set; nothing about the
+# held-out Training policy. The format and types are explained in golden_set.yaml.
+
+name: dev
+questions:
+  - id: d01
+    question: Is emergency leave extra leave, or does it come out of my annual leave?
+    type: plain
+    expected:
+      - {document: leave-policy, section: "7. Emergency Leave"}
+    note: The answer is clause 7.2 (deducted from annual leave).
+
+  - id: d02
+    question: How many paid sick days a year do I get after three years of service?
+    type: table
+    expected:
+      - {document: leave-policy, section: "5.1 Sick Leave (Outpatient)"}
+    note: Table row "2 years to less than 5 years" (18 days).
+
+  - id: d03
+    question: Do I need a medical certificate to claim the cost of my clinic visit?
+    type: look-alike
+    expected:
+      - {document: medical-claims-policy, section: "3.4 Medical Certificates"}
+    note: Leave 5.1 and 5.3 are about MCs for absence from work.
+
+  - id: d04
+    question: What is the most overtime I can work in one month?
+    type: plain
+    expected:
+      - {document: overtime-policy, section: "6. Limits on Overtime"}
+    note: 104 hours (6.1).
+
+  - id: d05
+    question: What was the overtime meal allowance for a normal working day before March 2024?
+    type: amendment
+    expected:
+      - {document: overtime-policy, section: "10. Amendment History"}
+    note: The old value (RM10) is only in the amendment history.
+
+  - id: d06
+    question: Can I claim for lunch when my team has to work through lunch to meet a deadline?
+    type: look-alike
+    expected:
+      - {document: expense-claims-policy, section: "4.2 Working Meals"}
+    note: Overtime 7.1 and Travel 5.1 meal allowances look similar.
+
+  - id: d07
+    question: Will the company pay my yearly fee for a professional engineering institution?
+    type: plain
+    expected:
+      - {document: expense-claims-policy, section: "6. Professional Memberships"}
+    note: A paraphrase of "professional memberships".
+
+  - id: d08
+    question: What is the full-day outstation meal allowance for an M2?
+    type: table
+    expected:
+      - {document: travel-policy, section: "5.1 Outstation Meal Allowance"}
+    note: Table row "M1 and M2" (RM90).
+
+  - id: d09
+    question: I'm a senior manager flying to London. Can I fly business class, and what is my daily allowance?
+    type: two-section
+    expected:
+      - {document: travel-policy, section: "3.1 Air Travel"}
+      - {document: travel-policy, section: "6.1 Overseas Daily Allowance"}
+    note: Needs 3.1 (Senior Management on flights over six hours) and 6.1 (Europe, USD110).
+
+  - id: d10
+    question: Who must I report a near miss to at a project site?
+    type: look-alike
+    expected:
+      - {document: code-of-conduct, section: "6. Safety at Project Sites"}
+    note: WFH 7.2 (injuries at home are reported to HR) looks similar.
+
+  - id: d11
+    question: When did non-executive office staff become eligible for work from home?
+    type: amendment
+    expected:
+      - {document: work-from-home-policy, section: "10. Amendment History"}
+    note: Only the amendment history gives the version and date (1.1, 1 October 2024).
+
+  - id: d12
+    question: What notice does an NE3 need to give during probation, and can salary be paid instead of notice?
+    type: two-section
+    expected:
+      - {document: probation-and-confirmation-policy, section: "7.1 Notice During Probation"}
+      - {document: probation-and-confirmation-policy, section: "7.3 Payment Instead of Notice"}
+    note: Needs 7.1 (2 weeks) and 7.3 (payment instead of notice).
+
+  - id: d13
+    question: Is there an employee assistance programme for free counselling?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d14
+    question: Can I get a salary advance before Hari Raya?
+    type: uncovered-topic
+    note: Not covered. Travel 6.3 (a cash advance for overseas trips) looks similar.
+
+  - id: d15
+    question: Where am I allowed to smoke during breaks at the office?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d16
+    question: Does the company give a cash gift when an employee gets married?
+    type: uncovered-topic
+    note: Not covered. Close to Leave 6.4 (marriage leave) and Code 4.1 (gifts).
+
+  - id: d17
+    question: Does the company pay for a yearly health screening?
+    type: uncovered-topic
+    note: Not covered. Close to the medical benefits.
+
+  - id: d18
+    question: Do employees get a day off on their birthday?
+    type: uncovered-topic
+    note: Not covered. Close to the leave types.
+
+  - id: d19
+    question: How do I nominate a colleague for the employee of the month award?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d20
+    question: How do I claim for lost luggage under the company's travel insurance?
+    type: missing-detail
+    note: Travel 6.2 covers the insurance but not how to claim; 3.1.3 is about excess baggage.
