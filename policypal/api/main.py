@@ -16,7 +16,7 @@ from sqlalchemy.exc import OperationalError
 
 from policypal import __version__
 from policypal.api.errors import database_unavailable, upload_rejected
-from policypal.api.routes import ask, documents, feedback, health
+from policypal.api.routes import analytics, ask, documents, feedback, health
 from policypal.config import Settings
 from policypal.db import make_engine
 from policypal.embeddings import Embedder, build_embedder, check_dimension
@@ -77,6 +77,7 @@ def create_app(
     app.include_router(ask.router)
     app.include_router(documents.router)
     app.include_router(feedback.router)
+    app.include_router(analytics.router)
     return app
 
 

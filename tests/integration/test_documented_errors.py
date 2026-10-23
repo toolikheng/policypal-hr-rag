@@ -61,11 +61,19 @@ def test_ask_validation_error(client: TestClient) -> None:
     assert_documented(client, "post", "/ask", client.post("/ask", json={"question": "hi"}))
 
 
-@pytest.mark.parametrize("path", ["/documents", "/documents/reingest"])
-def test_admin_token_errors(client: TestClient, path: str) -> None:
+@pytest.mark.parametrize(
+    ("method", "path"),
+    [("post", "/documents"), ("post", "/documents/reingest"), ("get", "/analytics")],
+)
+def test_admin_token_errors(client: TestClient, method: str, path: str) -> None:
     for headers in ({}, {"X-Admin-Token": "guess"}):
-        response = client.post(path, headers=headers)
-        assert_documented(client, "post", path, response)
+        response = client.request(method, path, headers=headers)
+        assert_documented(client, method, path, response)
+
+
+def test_analytics_validation_error(client: TestClient) -> None:
+    response = client.get("/analytics", params={"days": 0}, headers=ADMIN)
+    assert_documented(client, "get", "/analytics", response)
 
 
 def test_admin_disabled_error(migrated_database_url: str, engine: Engine) -> None:

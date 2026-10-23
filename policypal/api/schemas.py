@@ -375,3 +375,91 @@ class ReingestResponse(BaseModel):
             ]
         }
     )
+
+
+# --- GET /analytics -------------------------------------------------------------------
+
+
+class FeedbackStatsResponse(BaseModel):
+    count: int = Field(description="Votes on messages in the period.")
+    up: int
+    down: int
+    feedback_rate: float | None = Field(
+        description="Messages with a vote / all messages; null when there are no messages."
+    )
+    helpful_rate: float | None = Field(description="Up votes / all votes; null with no votes.")
+
+
+class LatencyStatsResponse(BaseModel):
+    overall: int | None
+    llm: int | None
+    extractive: int | None
+
+
+class QuestionCountResponse(BaseModel):
+    question: str = Field(description="Lower-cased and trimmed, so repeats are grouped.")
+    count: int
+    last_asked: datetime
+
+
+class FallbackCountResponse(BaseModel):
+    reason: FallbackReason
+    count: int
+
+
+class AnalyticsResponse(BaseModel):
+    period_days: int
+    total_questions: int
+    answered: int = Field(description="Answered by the LLM or by quoting the policy.")
+    refused: int
+    refusal_rate: float | None = Field(description="Refused / all; null with no messages.")
+    feedback: FeedbackStatsResponse
+    avg_latency_ms: LatencyStatsResponse = Field(
+        description="Average total time to answer, by mode; null when there are none."
+    )
+    top_questions: list[QuestionCountResponse]
+    unanswered_questions: list[QuestionCountResponse] = Field(
+        description="Questions the policies didn't cover (refused)."
+    )
+    fallbacks: list[FallbackCountResponse] = Field(
+        description="Answers that fell back to quoting the policy, by reason. Extractive "
+        "answers when no LLM is configured are not fallbacks."
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            # Illustrative numbers, not measurements.
+            "examples": [
+                {
+                    "period_days": 30,
+                    "total_questions": 42,
+                    "answered": 35,
+                    "refused": 7,
+                    "refusal_rate": 0.1667,
+                    "feedback": {
+                        "count": 12,
+                        "up": 9,
+                        "down": 3,
+                        "feedback_rate": 0.2857,
+                        "helpful_rate": 0.75,
+                    },
+                    "avg_latency_ms": {"overall": 18450, "llm": 24300, "extractive": 850},
+                    "top_questions": [
+                        {
+                            "question": "how many days of annual leave do i get?",
+                            "count": 5,
+                            "last_asked": "2026-10-23T08:15:00Z",
+                        }
+                    ],
+                    "unanswered_questions": [
+                        {
+                            "question": "is there a bonus this year?",
+                            "count": 3,
+                            "last_asked": "2026-10-22T16:40:00Z",
+                        }
+                    ],
+                    "fallbacks": [{"reason": "llm_timeout", "count": 2}],
+                }
+            ]
+        }
+    )
