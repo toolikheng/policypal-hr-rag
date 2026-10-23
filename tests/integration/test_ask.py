@@ -206,3 +206,103 @@ def test_database_down_is_a_503() -> None:
 
     assert response.status_code == 503
     assert response.json() == {"detail": "Database unavailable."}
+
+
+def stored_message(engine: Engine, message_id: str):
+    with engine.connect() as conn:
+        message = conn.execute(
+            text(
+                "SELECT m.*, c.channel FROM messages m"
+                " JOIN conversations c ON c.id = m.conversation_id WHERE m.id = :id"
+            ),
+            {"id": message_id},
+        ).one()
+        sources = conn.execute(
+            text("SELECT * FROM message_sources WHERE message_id = :id ORDER BY rank"),
+            {"id": message_id},
+        ).all()
+    return message, sources
+
+
+def test_an_answered_question_is_stored_with_its_sources(
+    client: TestClient, engine: Engine
+) -> None:
+    body = ask(client, f"  {IN_SCOPE}  ", channel="ui").json()
+
+    message, sources = stored_message(engine, body["message_id"])
+    assert str(message.conversation_id) == body["conversation_id"]
+    assert message.channel == "ui"
+    assert (message.question, message.answer, message.mode) == (IN_SCOPE, body["answer"], "llm")
+    assert message.llm_model == "tiny:1b"
+    latency = body["latency_ms"]
+    assert (message.retrieval_ms, message.generation_ms, message.total_ms) == (
+        latency["retrieval"],
+        latency["generation"],
+        latency["total"],
+    )
+    # Every retrieved chunk is kept; the one shown as [1] is marked as cited.
+    assert len(sources) == 5  # RETRIEVAL_TOP_K default
+    [cited] = [source for source in sources if source.cited]
+    [citation] = body["citations"]
+    assert (cited.document_title, cited.section) == (
+        citation["document_title"],
+        citation["section"],
+    )
+
+
+def test_a_refused_question_is_stored(client: TestClient, engine: Engine) -> None:
+    body = ask(client, OUT_OF_SCOPE).json()
+
+    message, sources = stored_message(engine, body["message_id"])
+    assert (message.question, message.answer, message.mode) == (
+        OUT_OF_SCOPE,
+        REFUSAL_SENTENCE,
+        "refused",
+    )
+    assert message.channel == "api"
+    assert not any(source.cited for source in sources)
+
+
+def test_a_fallback_is_stored_with_its_reason(
+    migrated_database_url: str, leave_policy: None, engine: Engine
+) -> None:
+    llm = FakeLLM(error=LLMError("llm_timeout", "Ollama did not answer within 60 s."))
+
+    with ask_client(migrated_database_url, llm=llm) as client:
+        body = ask(client).json()
+
+    message, _ = stored_message(engine, body["message_id"])
+    assert (message.mode, message.fallback_reason) == ("extractive", "llm_timeout")
+
+
+def test_questions_in_one_conversation_are_grouped(client: TestClient, engine: Engine) -> None:
+    first = ask(client).json()
+    second = ask(client, conversation_id=first["conversation_id"]).json()
+
+    assert second["conversation_id"] == first["conversation_id"]
+    with engine.connect() as conn:
+        counts = conn.execute(
+            text("SELECT (SELECT count(*) FROM conversations), (SELECT count(*) FROM messages)")
+        ).one()
+    assert tuple(counts) == (1, 2)
+
+
+def test_history_survives_reingesting_the_policy(client: TestClient, engine: Engine) -> None:
+    body = ask(client).json()
+    with engine.begin() as conn:
+        conn.execute(text("DELETE FROM documents"))
+
+    _, sources = stored_message(engine, body["message_id"])
+    assert sources and all(source.chunk_id is None for source in sources)
+    assert {source.document_title for source in sources} == {"Leave Policy"}
+
+
+def test_the_log_line_links_to_the_stored_message(
+    client: TestClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level("INFO")
+
+    body = ask(client).json()
+
+    [record] = [r for r in caplog.records if r.getMessage() == "ask.answered"]
+    assert record.message_id == body["message_id"]

@@ -11,7 +11,7 @@ from policypal.db import DatabaseStatus
 from policypal.ingest.parsing import FileType
 from policypal.ingest.pipeline import IngestStatus
 from policypal.llm.base import LLMStatus
-from policypal.models import Origin
+from policypal.models import Channel, Origin
 
 
 class LLMHealth(BaseModel):
@@ -81,9 +81,12 @@ Question = Annotated[str, StringConstraints(strip_whitespace=True, min_length=3,
 
 class AskRequest(BaseModel):
     question: Question
-    # Groups questions from one chat for logging; a new one is made if not given.
-    conversation_id: UUID | None = None
-    channel: Literal["ui", "widget", "api"] = "api"
+    conversation_id: UUID | None = Field(
+        default=None,
+        description="Groups the questions of one chat. Leave it null to start a new one; "
+        "an ID the server doesn't know yet is accepted as a new conversation.",
+    )
+    channel: Channel = "api"
 
     model_config = ConfigDict(
         json_schema_extra={
