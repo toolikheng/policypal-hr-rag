@@ -9,7 +9,7 @@ from typing import get_args, get_type_hints
 from policypal.api.schemas import AnalyticsResponse
 from policypal.vocabulary import FallbackReason, LLMErrorReason, Mode
 from ui import api_client
-from ui.formatting import _FALLBACK_REASONS
+from ui.formatting import fallback_label
 
 
 def values(literal: object) -> set[str]:
@@ -25,7 +25,9 @@ def test_fallback_reasons_include_every_llm_error() -> None:
 
 
 def test_the_ui_has_plain_words_for_every_fallback_reason() -> None:
-    assert set(_FALLBACK_REASONS) == values(FallbackReason)
+    # An unknown reason is shown as its bare code, so plain words mean the UI knows it.
+    for reason in values(FallbackReason):
+        assert fallback_label(reason) != reason, reason
 
 
 def test_the_ui_client_knows_every_mode() -> None:
