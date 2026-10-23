@@ -148,9 +148,10 @@ To run without an LLM at all, set `LLM_PROVIDER=extractive` in `.env`.
    the 5 most similar chunks by cosine similarity.
 2. **Refuse early:** if the best similarity is below `MIN_SIMILARITY` (0.69), the API
    refuses without calling the LLM. The value is a similarity score, not a probability.
-   0.69 was chosen on a separate dev set of 20 questions, as the threshold with the best
-   balanced accuracy (see [Evaluation](#evaluation)). It is a thin line: on the dev set the
-   nearest question that should be refused scored 0.689.
+   0.69 is the threshold with the best balanced accuracy on a separate dev set: first on 20
+   questions (v1), then again on 40 (v2), which chose the same value (see
+   [Evaluation](#evaluation)). It is a thin line: on the v1 dev set the nearest question that
+   should be refused scored 0.689.
 3. **Generate:** the excerpts that passed go to the LLM, numbered `[1]`…`[n]`. The
    prompt tells it to use only the excerpts, cite them, reply with the refusal
    sentence if they don't answer the question, and treat the excerpts as data, not

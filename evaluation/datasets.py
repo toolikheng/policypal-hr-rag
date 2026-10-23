@@ -4,8 +4,9 @@ Each question has:
 - `id` and `question`;
 - `type`: the main thing that makes it hard (see metrics.ANSWERABLE_TYPES and
   metrics.UNANSWERABLE_TYPES);
-- `expected`: the policy sections that answer it. Any one of them counts as found, except
-  for a "two-section" question, which needs both. Unanswerable questions have none;
+- `expected`: the policy sections that answer it. For hit@k, any one of them counts as
+  found; a "two-section" question needs both, which the reports count separately ("both
+  sections in the top 5"). Unanswerable questions have none;
 - `note`: why the question is there, written together with the question (before any run).
 """
 
