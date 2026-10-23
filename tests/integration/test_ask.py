@@ -181,6 +181,19 @@ def test_invalid_input_is_a_422(client: TestClient, payload: dict[str, Any]) -> 
     assert response.json()["detail"]
 
 
+def test_a_question_postgresql_cannot_store_is_a_422_before_any_work(
+    client: TestClient, llm: FakeLLM, engine: Engine
+) -> None:
+    """PostgreSQL text can't hold the NUL character; it must be rejected, not a 500."""
+    response = ask(client, "How many days of annual leave\u0000 do I get?")
+
+    assert response.status_code == 422
+    assert "NUL" in response.json()["detail"][0]["msg"]
+    assert llm.calls == []
+    with engine.connect() as conn:
+        assert conn.execute(text("SELECT count(*) FROM messages")).scalar_one() == 0
+
+
 def test_question_is_trimmed_before_its_length_is_checked(client: TestClient, llm: FakeLLM) -> None:
     ask(client, f"   {IN_SCOPE}   ")
 

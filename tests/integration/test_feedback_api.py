@@ -112,8 +112,14 @@ def test_a_vote_is_logged_without_the_comment_text(
             "rating": "up",
             "comment": "x" * 501,
         },
+        # PostgreSQL text can't hold the NUL character, so it's rejected, not a 500.
+        {
+            "message_id": "6f1c2a9e-3b1d-4c55-9a51-2f0f7d1e8b3a",
+            "rating": "up",
+            "comment": "a\u0000b",
+        },
     ],
-    ids=["empty", "no-rating", "bad-rating", "bad-id", "comment-too-long"],
+    ids=["empty", "no-rating", "bad-rating", "bad-id", "comment-too-long", "comment-with-nul"],
 )
 def test_invalid_feedback_is_a_422(client: TestClient, payload: dict[str, Any]) -> None:
     assert client.post("/feedback", json=payload).status_code == 422

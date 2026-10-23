@@ -4,7 +4,14 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, computed_field
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    computed_field,
+)
 
 from policypal.answering import Answer
 from policypal.db import DatabaseStatus
@@ -75,9 +82,24 @@ class HealthResponse(BaseModel):
     )
 
 
+# --- Text that is stored in PostgreSQL --------------------------------------------------
+
+
+def _storable(text: str) -> str:
+    """PostgreSQL text can't hold the NUL character, so it is rejected here (422) rather
+    than failing later when the text is saved (500)."""
+    if "\x00" in text:
+        raise ValueError("must not contain the NUL character")
+    return text
+
+
 # --- POST /ask ------------------------------------------------------------------------
 
-Question = Annotated[str, StringConstraints(strip_whitespace=True, min_length=3, max_length=1000)]
+Question = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=3, max_length=1000),
+    AfterValidator(_storable),
+]
 
 
 class AskRequest(BaseModel):
@@ -225,7 +247,9 @@ ASK_EXAMPLES = {
 
 # --- POST /feedback -------------------------------------------------------------------
 
-Comment = Annotated[str, StringConstraints(strip_whitespace=True, max_length=500)]
+Comment = Annotated[
+    str, StringConstraints(strip_whitespace=True, max_length=500), AfterValidator(_storable)
+]
 
 
 class FeedbackRequest(BaseModel):
