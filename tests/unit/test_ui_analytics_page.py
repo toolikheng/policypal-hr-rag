@@ -86,6 +86,7 @@ def test_the_figures_for_the_last_30_days_are_shown(monkeypatch: pytest.MonkeyPa
     top, unanswered, fallbacks = page.dataframe
     assert list(top.value["Question"]) == ["how much annual leave?", "is there a bonus?"]
     assert list(top.value["Times asked"]) == [3, 2]
+    assert list(top.value["Last asked"]) == ["2026-10-23 08:15 UTC", "2026-10-22 16:40 UTC"]
     assert list(unanswered.value["Question"]) == ["is there a bonus?"]
     assert list(fallbacks.value["Reason"]) == [
         "the AI model took too long (llm_timeout)",

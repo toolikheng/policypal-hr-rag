@@ -6,6 +6,7 @@ from ui.formatting import (
     safe_markdown,
     seconds,
     section_text,
+    short_time,
     source_label,
     upload_summary,
 )
@@ -135,3 +136,8 @@ def test_seconds_shows_a_dash_when_there_is_no_average() -> None:
 def test_fallback_label_uses_plain_words_and_keeps_the_code() -> None:
     assert fallback_label("llm_timeout") == "the AI model took too long (llm_timeout)"
     assert fallback_label("something_new") == "something_new"
+
+
+def test_short_time_shows_the_utc_minute() -> None:
+    assert short_time("2026-10-23T10:36:28.391104Z") == "2026-10-23 10:36 UTC"
+    assert short_time("2026-10-23T18:36:28+08:00") == "2026-10-23 10:36 UTC"

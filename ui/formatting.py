@@ -1,5 +1,6 @@
 """Small pure helpers that turn API replies into text for the pages (tested without Streamlit)."""
 
+from datetime import UTC, datetime
 from typing import Any
 
 # Why the API quoted the policies instead of giving an AI answer, in plain words.
@@ -92,3 +93,8 @@ def percent(rate: float | None) -> str:
 def seconds(ms: int | None) -> str:
     """'18.5 s', or '—' when there is no average."""
     return "—" if ms is None else f"{ms / 1000:.1f} s"
+
+
+def short_time(iso: str) -> str:
+    """'2026-10-23T10:36:28.391104Z' -> '2026-10-23 10:36 UTC'."""
+    return datetime.fromisoformat(iso).astimezone(UTC).strftime("%Y-%m-%d %H:%M UTC")

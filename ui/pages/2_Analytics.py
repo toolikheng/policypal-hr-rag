@@ -7,7 +7,7 @@ import streamlit as st
 
 from ui import api_client
 from ui.api_client import ApiError, QuestionCount
-from ui.formatting import fallback_label, percent, seconds
+from ui.formatting import fallback_label, percent, seconds, short_time
 
 st.set_page_config(page_title="PolicyPal analytics", page_icon="📘")
 st.title("Analytics")
@@ -38,7 +38,7 @@ def question_table(rows: list[QuestionCount], empty: str) -> None:
             {
                 "Question": row["question"],
                 "Times asked": row["count"],
-                "Last asked": row["last_asked"],
+                "Last asked": short_time(row["last_asked"]),
             }
             for row in rows
         ],
