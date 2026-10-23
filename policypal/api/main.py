@@ -15,11 +15,12 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
 from policypal import __version__
-from policypal.api.errors import DATABASE_UNAVAILABLE
+from policypal.api.errors import database_unavailable, upload_rejected
 from policypal.api.routes import ask, documents, feedback, health
 from policypal.config import Settings
 from policypal.db import make_engine
 from policypal.embeddings import Embedder, build_embedder, check_dimension
+from policypal.ingest.uploads import UploadRejected
 from policypal.llm import build_llm
 from policypal.llm.base import LLMProvider
 from policypal.logging_setup import configure_logging, request_id_var
@@ -71,21 +72,12 @@ def create_app(
     )
     app.middleware("http")(request_context)
     app.exception_handler(OperationalError)(database_unavailable)
+    app.exception_handler(UploadRejected)(upload_rejected)
     app.include_router(health.router)
     app.include_router(ask.router)
     app.include_router(documents.router)
     app.include_router(feedback.router)
     return app
-
-
-async def database_unavailable(request: Request, exc: Exception) -> JSONResponse:
-    """The database couldn't be reached (OperationalError): 503 instead of a 500."""
-    # The error type only: the full message can contain the connection string.
-    logger.warning("database.unreachable", extra={"error": type(exc).__name__})
-    return JSONResponse(
-        status_code=DATABASE_UNAVAILABLE.status_code,
-        content={"detail": DATABASE_UNAVAILABLE.detail},
-    )
 
 
 async def request_context(

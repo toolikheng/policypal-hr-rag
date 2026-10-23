@@ -1,17 +1,22 @@
-"""Every error the API returns, defined once.
+"""Every error the API returns, defined once, and how errors become responses.
 
 Code raises these (`raise DOCUMENT_NOT_FOUND.exception()`), and routes list them in
 Swagger (`responses=documented(DOCUMENT_NOT_FOUND)`), so the docs show exactly what the
 API sends. tests/integration/test_documented_errors.py checks that they match.
+The exception handlers at the end are registered by create_app().
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Any
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from policypal.ingest import uploads
+
+logger = logging.getLogger("policypal.api")
 
 
 class ErrorResponse(BaseModel):
@@ -131,3 +136,29 @@ def validation_error(
         "description": "The request is invalid.",
         "content": {"application/json": {"example": {"detail": [problem]}}},
     }
+
+
+# The status code for each kind of rejected upload (their examples are in UPLOAD_ERRORS).
+_UPLOAD_STATUS: dict[type[uploads.UploadRejected], int] = {
+    uploads.FileTooLarge: status.HTTP_413_CONTENT_TOO_LARGE,
+    uploads.UnsupportedFileType: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    uploads.InvalidUpload: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    uploads.UploadConflict: status.HTTP_409_CONFLICT,
+}
+
+
+async def upload_rejected(request: Request, exc: uploads.UploadRejected) -> JSONResponse:
+    """An UploadRejected error from the upload rules: its message, plus `conflict` for a 409."""
+    body = {"detail": str(exc)}
+    if isinstance(exc, uploads.UploadConflict):
+        body["conflict"] = exc.conflict
+    return JSONResponse(status_code=_UPLOAD_STATUS[type(exc)], content=body)
+
+
+async def database_unavailable(request: Request, exc: Exception) -> JSONResponse:
+    """The database couldn't be reached (OperationalError): 503 instead of a 500."""
+    # The error type only: the full message can contain the connection string.
+    logger.warning("database.unreachable", extra={"error": type(exc).__name__})
+    return JSONResponse(
+        status_code=DATABASE_UNAVAILABLE.status_code, content=DATABASE_UNAVAILABLE.body
+    )

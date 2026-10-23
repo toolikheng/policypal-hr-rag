@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, File, Query, Response, UploadFile, status
 
 from policypal import catalogue
 from policypal.api.deps import EmbedderDep, EngineDep, SettingsDep, require_admin
@@ -10,7 +9,6 @@ from policypal.api.errors import (
     DATABASE_UNAVAILABLE,
     DOCUMENT_NOT_FOUND,
     UPLOAD_ERRORS,
-    ConflictResponse,
     documented,
     validation_error,
 )
@@ -23,14 +21,7 @@ from policypal.api.schemas import (
     ReingestResponse,
     UploadResponse,
 )
-from policypal.ingest.uploads import (
-    FileTooLarge,
-    InvalidUpload,
-    UnsupportedFileType,
-    UploadConflict,
-    add_upload,
-    rescan,
-)
+from policypal.ingest.uploads import add_upload, rescan
 
 router = APIRouter(tags=["documents"])
 
@@ -104,27 +95,17 @@ def upload_document(
         bool,
         Query(description="Replace an uploaded policy with the same name (never a sample)."),
     ] = False,
-) -> UploadResponse | JSONResponse:
-    try:
-        result = add_upload(
-            engine,
-            embedder,
-            settings.upload_dir,
-            file.filename or "",
-            file.file,
-            replace=replace,
-            max_mb=settings.max_upload_mb,
-        )
-    except FileTooLarge as exc:
-        raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, str(exc)) from exc
-    except UnsupportedFileType as exc:
-        raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, str(exc)) from exc
-    except InvalidUpload as exc:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
-    except UploadConflict as exc:
-        body = ConflictResponse(detail=str(exc), conflict=exc.conflict)
-        return JSONResponse(status_code=status.HTTP_409_CONFLICT, content=body.model_dump())
-
+) -> UploadResponse:
+    # A rejected upload raises UploadRejected; errors.upload_rejected turns it into a 4xx.
+    result = add_upload(
+        engine,
+        embedder,
+        settings.upload_dir,
+        file.filename or "",
+        file.file,
+        replace=replace,
+        max_mb=settings.max_upload_mb,
+    )
     if result.status != "created":
         response.status_code = status.HTTP_200_OK
     return UploadResponse.model_validate(result, from_attributes=True)
