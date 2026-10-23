@@ -36,9 +36,8 @@ MAX_PASSAGES = 3
 # A citation marker: [1], or a list such as [1, 3]. The spaces before it are captured so
 # a removed marker doesn't leave a gap before the full stop.
 _MARKER = re.compile(r"(\s*)\[(\d+(?:\s*,\s*\d+)*)\]")
-# A sentence containing the refusal ("could not" also counts). Apostrophes are made
-# straight before matching.
-_REFUSAL = re.compile(r"[^.!?\n]*could(?:n't| not) find this in the policies[^.!?\n]*[.!?]?", re.I)
+# The refusal sentence ("could not" also counts). Apostrophes are made straight first.
+_REFUSAL = re.compile(r"could(?:n't| not) find this in the policies", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
