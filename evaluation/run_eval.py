@@ -73,9 +73,11 @@ from policypal.retrieval import RetrievedChunk, retrieve
 logger = logging.getLogger("policypal.evaluation")
 
 EVAL_DATABASE = "policypal_eval"
-# Each version of the results has its own folder. v1: the first official results (dev
-# set of 20 questions). Commands write to, and read the thresholds from, the current one.
-RESULTS_VERSION = "v1"
+# Each version of the results has its own folder. Commands write to, and read the
+# thresholds from, the current one. v1: the first official results (dev set of 20
+# questions). v2: after seeing v1's errors, with 20 conversational dev questions added
+# and the refusal-sentence rule fixed.
+RESULTS_VERSION = "v2"
 RESULTS_DIR = EVALUATION_DIR / "results" / RESULTS_VERSION
 ALEMBIC_INI = EVALUATION_DIR.parent / "alembic.ini"
 POLICY_FOLDERS: dict[Source, Path] = {"md": SAMPLE_POLICIES_DIR, "pdf": SAMPLE_POLICIES_DIR / "pdf"}

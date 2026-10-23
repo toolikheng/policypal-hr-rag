@@ -1,0 +1,4439 @@
+{
+  "config": {
+    "Date (UTC)": "2026-10-23 15:50",
+    "Commit": "e84baca",
+    "Embedding model": "BAAI/bge-small-en-v1.5",
+    "Top k": "5",
+    "CPU": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz (8 logical CPUs)",
+    "RAM": "11.6 GiB visible",
+    "Operating system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "Python": "3.12.14",
+    "Docker": "Docker Desktop 4.86.0 (236216), engine 29.7.2",
+    "Question set": "dev (40 questions: 24 answerable, 16 should be refused)",
+    "Policies": "8 sample policies from Markdown (119 chunks)",
+    "Query instruction": "on and off (both measured)",
+    "Threshold": "chosen here, one for each instruction setting",
+    "LLM": "none (search only)"
+  },
+  "thresholds": {
+    "on": 0.69,
+    "off": 0.71
+  },
+  "verdict": "keep-on",
+  "runs": {
+    "on": {
+      "label": "Markdown, instruction on",
+      "source": "md",
+      "instruction": true,
+      "threshold": 0.69,
+      "outcomes": [
+        {
+          "question_id": "d01",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "leave-policy",
+              "section": "7. Emergency Leave"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "7. Emergency Leave"
+              },
+              "similarity": 0.8165600056481392
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.7471139653657072
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.5 Joining or Leaving Part-Way Through the Year"
+              },
+              "similarity": 0.7276228883154064
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.6921127644810907
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.6912029959676048
+            }
+          ],
+          "retrieval_ms": 34
+        },
+        {
+          "question_id": "d02",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "leave-policy",
+              "section": "5.1 Sick Leave (Outpatient)"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.1 Sick Leave (Outpatient)"
+              },
+              "similarity": 0.7242332696914673
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.705518901348114
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.6532470401231049
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6528137740118819
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "8. Unpaid Leave"
+              },
+              "similarity": 0.6512459724398879
+            }
+          ],
+          "retrieval_ms": 27
+        },
+        {
+          "question_id": "d03",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "medical-claims-policy",
+              "section": "3.4 Medical Certificates"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.4 Medical Certificates"
+              },
+              "similarity": 0.807691883582362
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.3 Medical Certificates from Non-Panel Clinics"
+              },
+              "similarity": 0.7315020125209099
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.687067985534668
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.1 Specialist Consultation"
+              },
+              "similarity": 0.658588171005249
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.6568736433982849
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d04",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "overtime-policy",
+              "section": "6. Limits on Overtime"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "6. Limits on Overtime"
+              },
+              "similarity": 0.6967265371410206
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6381446554488355
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "9. Submitting Overtime Claims"
+              },
+              "similarity": 0.6360125758640435
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.6191114641295118
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "5. Overtime Rates"
+              },
+              "similarity": 0.6159728398339259
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d05",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "overtime-policy",
+              "section": "10. Amendment History"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.7849841842064762
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7534603623473441
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6843571662902832
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6838374922372418
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "5. Overtime Rates"
+              },
+              "similarity": 0.6683981418609619
+            }
+          ],
+          "retrieval_ms": 29
+        },
+        {
+          "question_id": "d06",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "4.2 Working Meals"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.7391386032104492
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6770472122998719
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6399235343978694
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "9. Submitting Overtime Claims"
+              },
+              "similarity": 0.6373215913772583
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.6351770162582397
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "d07",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.7366756200790405
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6237056255340576
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.4 Passports and Visas"
+              },
+              "similarity": 0.6125664710998535
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.3 Rail and Bus"
+              },
+              "similarity": 0.5935370568312979
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.5874064564704895
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d08",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.8100232368721522
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7144825032661866
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.7134169340133667
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6715798377990723
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.66358882188797
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "d09",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "3.1 Air Travel"
+            },
+            {
+              "document": "travel-policy",
+              "section": "6.1 Overseas Daily Allowance"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.1 Air Travel"
+              },
+              "similarity": 0.7075150609016418
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.66973898826474
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.6445366740226746
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6442951175990642
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.6423273682594299
+            }
+          ],
+          "retrieval_ms": 30
+        },
+        {
+          "question_id": "d10",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "code-of-conduct",
+              "section": "6. Safety at Project Sites"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.6494927615229641
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.2 Anti-Harassment"
+              },
+              "similarity": 0.5920500402420745
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "8. Whistleblowing"
+              },
+              "similarity": 0.5801098596984242
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.3 Attendance and Punctuality"
+              },
+              "similarity": 0.5782124996185303
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "4. Pre-Approval of Overtime"
+              },
+              "similarity": 0.5756650223931667
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d11",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "work-from-home-policy",
+              "section": "10. Amendment History"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.6990025818942451
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6884335465172812
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.6663087805325532
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6533139554671087
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6445949077606201
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d12",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.3 Payment Instead of Notice"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "7.3 Payment Instead of Notice"
+              },
+              "similarity": 0.752852693030079
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "6.3 Overtime, Claims and Work From Home"
+              },
+              "similarity": 0.7311834853182159
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "7.1 Notice During Probation"
+              },
+              "similarity": 0.725127908572213
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "8. Ending Employment During Probation"
+              },
+              "similarity": 0.6734341979026794
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "2. Probation Period"
+              },
+              "similarity": 0.6594329476356506
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d13",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.5748400002908747
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.5654953640108907
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.540487658337868
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.2 Anti-Harassment"
+              },
+              "similarity": 0.5341164110690821
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.2 Anti-Harassment"
+              },
+              "similarity": 0.533549380283119
+            }
+          ],
+          "retrieval_ms": 31
+        },
+        {
+          "question_id": "d14",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.3 Cash Advance"
+              },
+              "similarity": 0.6254384144879344
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5723313006959795
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.5715294650442375
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.5608892964256649
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.5603895616415296
+            }
+          ],
+          "retrieval_ms": 27
+        },
+        {
+          "question_id": "d15",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.5814594529319461
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "2. Scope"
+              },
+              "similarity": 0.5765524758963312
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.5735962899212491
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.5663604657220285
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5642894429815479
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "d16",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.6446816364499992
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.6232074127669696
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.621676169533959
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.6171204675960273
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "6.4 Marriage Leave"
+              },
+              "similarity": 0.6171187986660731
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d17",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.648994049489854
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "6. Optical Benefits"
+              },
+              "similarity": 0.6465424335225057
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "7. Exclusions"
+              },
+              "similarity": 0.632503829449188
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6289419003232907
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.6203625798225447
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "d18",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "9. Public Holidays"
+              },
+              "similarity": 0.6737247303888374
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6601059043344328
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "6. Working Hours and Overtime"
+              },
+              "similarity": 0.634618325875005
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6345010835527082
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6247867420697089
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "d19",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5853680270471541
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "3. Conflicts of Interest"
+              },
+              "similarity": 0.578955854239712
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "4. Applying for WFH"
+              },
+              "similarity": 0.570919002835811
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.1 Dress Code"
+              },
+              "similarity": 0.5569999648034606
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.2 Anti-Harassment"
+              },
+              "similarity": 0.5475946012026547
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d20",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "7. Claims After Travel"
+              },
+              "similarity": 0.6889900154477361
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.2 Travel Insurance"
+              },
+              "similarity": 0.6716372566439368
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6575848664292785
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.3 Cash Advance"
+              },
+              "similarity": 0.6455711933630005
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "2. General Principles"
+              },
+              "similarity": 0.6352918365423788
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d21",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "leave-policy",
+              "section": "4.4 Encashment of Unused Annual Leave"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.7123922917959781
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.6996036142465298
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "6.4 Marriage Leave"
+              },
+              "similarity": 0.697471460624679
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "8. Unpaid Leave"
+              },
+              "similarity": 0.6970689088979717
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.6969733445934461
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "d22",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.7338011423467922
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6452660175999404
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.2 Internet and Utilities Allowance"
+              },
+              "similarity": 0.6445980879903991
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6431829162618021
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.1 Mileage for Using Your Own Vehicle"
+              },
+              "similarity": 0.6364187056269587
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "d23",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.7982007981419101
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "7. Claims After Travel"
+              },
+              "similarity": 0.6651842197666049
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6444245404691051
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "2. Travel Approval"
+              },
+              "similarity": 0.6360278942568377
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "4. Pre-Approval of Overtime"
+              },
+              "similarity": 0.6325826486846627
+            }
+          ],
+          "retrieval_ms": 33
+        },
+        {
+          "question_id": "d24",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "medical-claims-policy",
+              "section": "2. Eligibility and Covered Family Members"
+            },
+            {
+              "document": "medical-claims-policy",
+              "section": "4.2 Group Hospitalisation and Surgical Insurance"
+            },
+            {
+              "document": "medical-claims-policy",
+              "section": "9. Amendment History"
+            },
+            {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.2 Medical Benefits During Probation"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.3 Hospital Admission Procedure"
+              },
+              "similarity": 0.7242310540262973
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.2 Group Hospitalisation and Surgical Insurance"
+              },
+              "similarity": 0.6957299294632727
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "2. Eligibility and Covered Family Members"
+              },
+              "similarity": 0.673531372932711
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.667075355823318
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "7. Exclusions"
+              },
+              "similarity": 0.6578881348438195
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d25",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "8. Amendment History"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.7744011417388249
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "8. Amendment History"
+              },
+              "similarity": 0.7097700238227844
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5743680767526652
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5706602931022644
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5652704834938049
+            }
+          ],
+          "retrieval_ms": 32
+        },
+        {
+          "question_id": "d26",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "work-from-home-policy",
+              "section": "2. Eligibility"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.6555425730024246
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "6. Working Hours and Overtime"
+              },
+              "similarity": 0.6365490176350476
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6152617564641394
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6008877754211426
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "9. Ending or Suspending a WFH Arrangement"
+              },
+              "similarity": 0.5957329273223877
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d27",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "work-from-home-policy",
+              "section": "7. Health and Safety at Home"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.5965346338430276
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.1 Company Equipment"
+              },
+              "similarity": 0.5707363742151047
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "8. Information Security"
+              },
+              "similarity": 0.5696212649345398
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5592604279518127
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.5377450585365295
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "d28",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.71254169940949
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7107816683314242
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.6774028731940477
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.1 Air Travel"
+              },
+              "similarity": 0.6704231101022309
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.6653791269434031
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d29",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            },
+            {
+              "document": "travel-policy",
+              "section": "7. Claims After Travel"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.751769349084459
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.734704315662384
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7286933226172149
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.6774131655693054
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.6772672130306249
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d30",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "code-of-conduct",
+              "section": "3. Conflicts of Interest"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.6011084497305291
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5955908120992561
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.5859469596759415
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.5824178034787718
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.5823416536348589
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "d31",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "1. Purpose and Scope"
+            },
+            {
+              "document": "expense-claims-policy",
+              "section": "3.2 Tolls and Parking"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+              },
+              "similarity": 0.719459593296051
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.1 Mileage for Using Your Own Vehicle"
+              },
+              "similarity": 0.7106911884914462
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.694672167301178
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.692664623260498
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.6690363883972168
+            }
+          ],
+          "retrieval_ms": 27
+        },
+        {
+          "question_id": "d32",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "medical-claims-policy",
+              "section": "4.3 Hospital Admission Procedure"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.3 Hospital Admission Procedure"
+              },
+              "similarity": 0.74106151078665
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "2. Travel Approval"
+              },
+              "similarity": 0.6441294379080058
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.2 Group Hospitalisation and Surgical Insurance"
+              },
+              "similarity": 0.6169323185763023
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "4. Pre-Approval of Overtime"
+              },
+              "similarity": 0.6165664285600622
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6125064820035739
+            }
+          ],
+          "retrieval_ms": 36
+        },
+        {
+          "question_id": "d33",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.5654405951499939
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.5493383407592773
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5476347208023071
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "2. Travel Approval"
+              },
+              "similarity": 0.5410912036895752
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.5394915020768949
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d34",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "4. Accommodation"
+              },
+              "similarity": 0.5577881003744553
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5495235756181627
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.542620626531803
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "2. Scope"
+              },
+              "similarity": 0.5416510974376749
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5382083333606531
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d35",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.6625785827636719
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.6505168496946322
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6450469493865967
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6408259700744233
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "6.1 Maternity Leave"
+              },
+              "similarity": 0.6387160635759804
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "d36",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.1 Company Equipment"
+              },
+              "similarity": 0.5291589936864697
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.3 Attendance and Punctuality"
+              },
+              "similarity": 0.478209748214774
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "2. Travel Approval"
+              },
+              "similarity": 0.47704698076984253
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "4. Applying for WFH"
+              },
+              "similarity": 0.4701856514866847
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "7. Claims After Travel"
+              },
+              "similarity": 0.4665478905006617
+            }
+          ],
+          "retrieval_ms": 34
+        },
+        {
+          "question_id": "d37",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.3 Rail and Bus"
+              },
+              "similarity": 0.5545737412825987
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5267480611801147
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.525297999382019
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.5154352188110352
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.5084843039512634
+            }
+          ],
+          "retrieval_ms": 37
+        },
+        {
+          "question_id": "d38",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.2 Internet and Utilities Allowance"
+              },
+              "similarity": 0.6267341820318526
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "2. General Principles"
+              },
+              "similarity": 0.5966107134091047
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "6. Optical Benefits"
+              },
+              "similarity": 0.5839561023816818
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.5744568616799322
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.5637804193758504
+            }
+          ],
+          "retrieval_ms": 36
+        },
+        {
+          "question_id": "d39",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6045722365379333
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6031000018119812
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.6002324461798413
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.5910932421684265
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.590695858001709
+            }
+          ],
+          "retrieval_ms": 32
+        },
+        {
+          "question_id": "d40",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.7423950433731079
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.1 Sick Leave (Outpatient)"
+              },
+              "similarity": 0.7020941972732544
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "8. Unpaid Leave"
+              },
+              "similarity": 0.695962625982606
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.691907525062561
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6843023676511851
+            }
+          ],
+          "retrieval_ms": 29
+        }
+      ]
+    },
+    "off": {
+      "label": "Markdown, instruction off",
+      "source": "md",
+      "instruction": false,
+      "threshold": 0.71,
+      "outcomes": [
+        {
+          "question_id": "d01",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "leave-policy",
+              "section": "7. Emergency Leave"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "7. Emergency Leave"
+              },
+              "similarity": 0.8208819734524518
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.76752769947052
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.5 Joining or Leaving Part-Way Through the Year"
+              },
+              "similarity": 0.7519851922988892
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.7315110288249271
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.7264733910560608
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d02",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "leave-policy",
+              "section": "5.1 Sick Leave (Outpatient)"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.1 Sick Leave (Outpatient)"
+              },
+              "similarity": 0.741082326109272
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.7266133590571083
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.2 Annual Outpatient Limits"
+              },
+              "similarity": 0.6787981177809098
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.6727327097536261
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6680163142651961
+            }
+          ],
+          "retrieval_ms": 17
+        },
+        {
+          "question_id": "d03",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "medical-claims-policy",
+              "section": "3.4 Medical Certificates"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.4 Medical Certificates"
+              },
+              "similarity": 0.7986844898054322
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.3 Medical Certificates from Non-Panel Clinics"
+              },
+              "similarity": 0.7291739148393933
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.708219051361084
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "7. Exclusions"
+              },
+              "similarity": 0.6733988523483276
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.6725783348083496
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d04",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "overtime-policy",
+              "section": "6. Limits on Overtime"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "6. Limits on Overtime"
+              },
+              "similarity": 0.7196489906729471
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6656645934981592
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "9. Submitting Overtime Claims"
+              },
+              "similarity": 0.651373943604593
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "5. Overtime Rates"
+              },
+              "similarity": 0.643759450688396
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.642777306702458
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d05",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "overtime-policy",
+              "section": "10. Amendment History"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.8073095198089185
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7807357441940473
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.7145212888717651
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.703620451472972
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "5. Overtime Rates"
+              },
+              "similarity": 0.6946601867675781
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d06",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "4.2 Working Meals"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.7482549548149109
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6931581084037967
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6609829270253833
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.6567255854606628
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.6514063477516174
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d07",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.7610896825790405
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6499366760253906
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.4 Passports and Visas"
+              },
+              "similarity": 0.6406230926513672
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.3 Rail and Bus"
+              },
+              "similarity": 0.6268301232558426
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.6163824200630188
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d08",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.8229668034891384
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7505441456708835
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.7313563823699951
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.7149251699447632
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.6790406299209232
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d09",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "3.1 Air Travel"
+            },
+            {
+              "document": "travel-policy",
+              "section": "6.1 Overseas Daily Allowance"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.1 Air Travel"
+              },
+              "similarity": 0.7226594686508179
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.6917238647773197
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6657446226033805
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.6643885374069214
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.6625908613204956
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "d10",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "code-of-conduct",
+              "section": "6. Safety at Project Sites"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.6755685403604197
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.3 Attendance and Punctuality"
+              },
+              "similarity": 0.6143675446510315
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.2 Anti-Harassment"
+              },
+              "similarity": 0.6082977886022466
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "4. Pre-Approval of Overtime"
+              },
+              "similarity": 0.6041257021352241
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "8. Whistleblowing"
+              },
+              "similarity": 0.5988759637548956
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d11",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "work-from-home-policy",
+              "section": "10. Amendment History"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.7232656047781955
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.7098108106964356
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.6938354555466512
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6786161256661353
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "4. Applying for WFH"
+              },
+              "similarity": 0.6626891493797302
+            }
+          ],
+          "retrieval_ms": 17
+        },
+        {
+          "question_id": "d12",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.3 Payment Instead of Notice"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "6.3 Overtime, Claims and Work From Home"
+              },
+              "similarity": 0.7598635697446139
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "7.3 Payment Instead of Notice"
+              },
+              "similarity": 0.7539851216086686
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "7.1 Notice During Probation"
+              },
+              "similarity": 0.7349273282376189
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "8. Ending Employment During Probation"
+              },
+              "similarity": 0.6929464936256409
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "2. Probation Period"
+              },
+              "similarity": 0.6863391399383545
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "d13",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.6096938848495483
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.5876304507255554
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.2 Annual Outpatient Limits"
+              },
+              "similarity": 0.5753531113056485
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "7. Exclusions"
+              },
+              "similarity": 0.5742912292480469
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.5725148916244507
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d14",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.3 Cash Advance"
+              },
+              "similarity": 0.6613235271765916
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.6237793789041512
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.607425129856178
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5997756123542828
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.5973285436630291
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "d15",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.590480853261846
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.5889450801676416
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5738793523455438
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.5726892861498253
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.5715263400642466
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "d16",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.6789490963281326
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.6467477083206177
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "6.4 Marriage Leave"
+              },
+              "similarity": 0.6349191069602966
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6337176561355591
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.627318799495697
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d17",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "6. Optical Benefits"
+              },
+              "similarity": 0.693132100123285
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.6782254778809991
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "7. Exclusions"
+              },
+              "similarity": 0.667602022516788
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6525502813562571
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "5. Dental Benefits"
+              },
+              "similarity": 0.6402002000629794
+            }
+          ],
+          "retrieval_ms": 17
+        },
+        {
+          "question_id": "d18",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "9. Public Holidays"
+              },
+              "similarity": 0.6879919767379761
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6830716133117676
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6484202952134445
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "6. Working Hours and Overtime"
+              },
+              "similarity": 0.6390952683034391
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6362703280126702
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d19",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5903308528070127
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "4. Applying for WFH"
+              },
+              "similarity": 0.5853734510691861
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.1 Dress Code"
+              },
+              "similarity": 0.5782545287977644
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "3. Conflicts of Interest"
+              },
+              "similarity": 0.5764370469526038
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.5725648316663745
+            }
+          ],
+          "retrieval_ms": 17
+        },
+        {
+          "question_id": "d20",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "7. Claims After Travel"
+              },
+              "similarity": 0.7056152820587158
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6726419925689697
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.2 Travel Insurance"
+              },
+              "similarity": 0.6709218621253967
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.3 Cash Advance"
+              },
+              "similarity": 0.663219153881073
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "2. General Principles"
+              },
+              "similarity": 0.6509068012237549
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "d21",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "leave-policy",
+              "section": "4.4 Encashment of Unused Annual Leave"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.7255765363230399
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.722414066359867
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "6.4 Marriage Leave"
+              },
+              "similarity": 0.7149881890423198
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "8. Unpaid Leave"
+              },
+              "similarity": 0.7095576274922338
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.7030887184686245
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d22",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.7398472428321838
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6571044325828552
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.2 Internet and Utilities Allowance"
+              },
+              "similarity": 0.6556779146194458
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6533960906627135
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.1 Mileage for Using Your Own Vehicle"
+              },
+              "similarity": 0.6461602871226968
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d23",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.7951975586892643
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "7. Claims After Travel"
+              },
+              "similarity": 0.6723310546677688
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.6417186687328018
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.3 Rail and Bus"
+              },
+              "similarity": 0.6406860779898074
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "2. Travel Approval"
+              },
+              "similarity": 0.6356714585023261
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "d24",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "medical-claims-policy",
+              "section": "2. Eligibility and Covered Family Members"
+            },
+            {
+              "document": "medical-claims-policy",
+              "section": "4.2 Group Hospitalisation and Surgical Insurance"
+            },
+            {
+              "document": "medical-claims-policy",
+              "section": "9. Amendment History"
+            },
+            {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.2 Medical Benefits During Probation"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.3 Hospital Admission Procedure"
+              },
+              "similarity": 0.7481554600914503
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.2 Group Hospitalisation and Surgical Insurance"
+              },
+              "similarity": 0.7191633749506859
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "2. Eligibility and Covered Family Members"
+              },
+              "similarity": 0.6965710701602071
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.6940751854136488
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "7. Exclusions"
+              },
+              "similarity": 0.6874426789615954
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "d25",
+          "question_type": "amendment",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "8. Amendment History"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.7929752119809137
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "8. Amendment History"
+              },
+              "similarity": 0.731014088927861
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "4. Accommodation"
+              },
+              "similarity": 0.600283229334163
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "10. Amendment History"
+              },
+              "similarity": 0.598893749845773
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5918837609325742
+            }
+          ],
+          "retrieval_ms": 27
+        },
+        {
+          "question_id": "d26",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "work-from-home-policy",
+              "section": "2. Eligibility"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.654727360324422
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "6. Working Hours and Overtime"
+              },
+              "similarity": 0.6368406631445501
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "8. Information Security"
+              },
+              "similarity": 0.6099169254302979
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6085477108628933
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6062049865722656
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "d27",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "work-from-home-policy",
+              "section": "7. Health and Safety at Home"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.6182914007728468
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.1 Company Equipment"
+              },
+              "similarity": 0.6003794908297376
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "8. Information Security"
+              },
+              "similarity": 0.5990670919418335
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5746722221374512
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.5608058571815491
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d28",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.7361655674079411
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7306229632721578
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.6954531669616699
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.6752727627754211
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.1 Air Travel"
+              },
+              "similarity": 0.671779215335846
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "d29",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            },
+            {
+              "document": "travel-policy",
+              "section": "7. Claims After Travel"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.1 Outstation Meal Allowance"
+              },
+              "similarity": 0.7534526586532646
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.7485793382776191
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.7426445194906569
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.6920053730004582
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "6.1 Overseas Daily Allowance"
+              },
+              "similarity": 0.6783356858291826
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "d30",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "code-of-conduct",
+              "section": "3. Conflicts of Interest"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.6326736807823181
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.618901215857196
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6112079620361328
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6086317534070173
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "3. WFH Arrangements"
+              },
+              "similarity": 0.6076888675875157
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "d31",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "expense-claims-policy",
+              "section": "1. Purpose and Scope"
+            },
+            {
+              "document": "expense-claims-policy",
+              "section": "3.2 Tolls and Parking"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+              },
+              "similarity": 0.7320161025514554
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.7241851255783377
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.1 Mileage for Using Your Own Vehicle"
+              },
+              "similarity": 0.7230800289368591
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.7224105761998562
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.6903709953802243
+            }
+          ],
+          "retrieval_ms": 30
+        },
+        {
+          "question_id": "d32",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "medical-claims-policy",
+              "section": "4.3 Hospital Admission Procedure"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.3 Hospital Admission Procedure"
+              },
+              "similarity": 0.758086426600262
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "2. Travel Approval"
+              },
+              "similarity": 0.6494676679690093
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.2 Group Hospitalisation and Surgical Insurance"
+              },
+              "similarity": 0.6288638336143604
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "4. Pre-Approval of Overtime"
+              },
+              "similarity": 0.6261452882116689
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.6176619161568941
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "d33",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.5931130536659934
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.584575941017162
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.5771537927205851
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.5766557616014917
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.5758116064520821
+            }
+          ],
+          "retrieval_ms": 25
+        },
+        {
+          "question_id": "d34",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "4. Accommodation"
+              },
+              "similarity": 0.5841732520850638
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5620011780857049
+            },
+            {
+              "section": {
+                "document": "probation-and-confirmation-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.558229916306748
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.556366496519272
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "8. Amendment History"
+              },
+              "similarity": 0.5544812614344086
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d35",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.6950413584709167
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.1 Annual Leave Entitlement"
+              },
+              "similarity": 0.6802328610142684
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.1 Sick Leave (Outpatient)"
+              },
+              "similarity": 0.6703330278396606
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6662161350250244
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "6.1 Maternity Leave"
+              },
+              "similarity": 0.6627328000823987
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "d36",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.1 Company Equipment"
+              },
+              "similarity": 0.5262942878849163
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.3 Attendance and Punctuality"
+              },
+              "similarity": 0.4841283271236233
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "7. Claims After Travel"
+              },
+              "similarity": 0.4652726074890736
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "4. Applying for WFH"
+              },
+              "similarity": 0.4598774039818412
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "4.3 Hospital Admission Procedure"
+              },
+              "similarity": 0.45733360218997043
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d37",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "3.3 Rail and Bus"
+              },
+              "similarity": 0.5989860774295238
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5685338635126443
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.5593299532336035
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.53594564963035
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.5319202821302256
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d38",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "5.2 Internet and Utilities Allowance"
+              },
+              "similarity": 0.6676570177078247
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "2. General Principles"
+              },
+              "similarity": 0.6334456205368042
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "6. Optical Benefits"
+              },
+              "similarity": 0.6218289587701652
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.6192520260810852
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6143887042999268
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "d39",
+          "question_type": "uncovered-topic",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.2 Working Meals"
+              },
+              "similarity": 0.6331616044044495
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6269160509109497
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "4.1 Client Entertainment"
+              },
+              "similarity": 0.6179525483874959
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "5. Mobile Phone and Internet"
+              },
+              "similarity": 0.6172672510147095
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.1 Panel Clinics"
+              },
+              "similarity": 0.6107208728790283
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "d40",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.7433712039368641
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.1 Sick Leave (Outpatient)"
+              },
+              "similarity": 0.719555275466725
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "8. Unpaid Leave"
+              },
+              "similarity": 0.7050228470536652
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.3 Carry Forward of Annual Leave"
+              },
+              "similarity": 0.7032737312749797
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "5.2 Hospitalisation Leave"
+              },
+              "similarity": 0.7027155338099293
+            }
+          ],
+          "retrieval_ms": 21
+        }
+      ]
+    }
+  },
+  "sweeps": {
+    "on": [
+      {
+        "threshold": 0.5,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 0,
+          "false_answers": 16
+        }
+      },
+      {
+        "threshold": 0.51,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 0,
+          "false_answers": 16
+        }
+      },
+      {
+        "threshold": 0.52,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 0,
+          "false_answers": 16
+        }
+      },
+      {
+        "threshold": 0.53,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.54,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.55,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.56,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 3,
+          "false_answers": 13
+        }
+      },
+      {
+        "threshold": 0.57,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 4,
+          "false_answers": 12
+        }
+      },
+      {
+        "threshold": 0.58,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 5,
+          "false_answers": 11
+        }
+      },
+      {
+        "threshold": 0.59,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 7,
+          "false_answers": 9
+        }
+      },
+      {
+        "threshold": 0.6,
+        "counts": {
+          "answered": 23,
+          "false_refusals": 1,
+          "refused": 7,
+          "false_answers": 9
+        }
+      },
+      {
+        "threshold": 0.61,
+        "counts": {
+          "answered": 22,
+          "false_refusals": 2,
+          "refused": 8,
+          "false_answers": 8
+        }
+      },
+      {
+        "threshold": 0.62,
+        "counts": {
+          "answered": 22,
+          "false_refusals": 2,
+          "refused": 8,
+          "false_answers": 8
+        }
+      },
+      {
+        "threshold": 0.63,
+        "counts": {
+          "answered": 22,
+          "false_refusals": 2,
+          "refused": 10,
+          "false_answers": 6
+        }
+      },
+      {
+        "threshold": 0.64,
+        "counts": {
+          "answered": 22,
+          "false_refusals": 2,
+          "refused": 10,
+          "false_answers": 6
+        }
+      },
+      {
+        "threshold": 0.65,
+        "counts": {
+          "answered": 21,
+          "false_refusals": 3,
+          "refused": 12,
+          "false_answers": 4
+        }
+      },
+      {
+        "threshold": 0.66,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 12,
+          "false_answers": 4
+        }
+      },
+      {
+        "threshold": 0.67,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 13,
+          "false_answers": 3
+        }
+      },
+      {
+        "threshold": 0.68,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 14,
+          "false_answers": 2
+        }
+      },
+      {
+        "threshold": 0.69,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.7,
+        "counts": {
+          "answered": 18,
+          "false_refusals": 6,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.71,
+        "counts": {
+          "answered": 17,
+          "false_refusals": 7,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.72,
+        "counts": {
+          "answered": 14,
+          "false_refusals": 10,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.73,
+        "counts": {
+          "answered": 12,
+          "false_refusals": 12,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.74,
+        "counts": {
+          "answered": 9,
+          "false_refusals": 15,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.75,
+        "counts": {
+          "answered": 8,
+          "false_refusals": 16,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.76,
+        "counts": {
+          "answered": 6,
+          "false_refusals": 18,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.77,
+        "counts": {
+          "answered": 6,
+          "false_refusals": 18,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.78,
+        "counts": {
+          "answered": 5,
+          "false_refusals": 19,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.79,
+        "counts": {
+          "answered": 4,
+          "false_refusals": 20,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.8,
+        "counts": {
+          "answered": 3,
+          "false_refusals": 21,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.81,
+        "counts": {
+          "answered": 2,
+          "false_refusals": 22,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.82,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.83,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.84,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.85,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      }
+    ],
+    "off": [
+      {
+        "threshold": 0.5,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 0,
+          "false_answers": 16
+        }
+      },
+      {
+        "threshold": 0.51,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 0,
+          "false_answers": 16
+        }
+      },
+      {
+        "threshold": 0.52,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 0,
+          "false_answers": 16
+        }
+      },
+      {
+        "threshold": 0.53,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.54,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.55,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.56,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.57,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.58,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 1,
+          "false_answers": 15
+        }
+      },
+      {
+        "threshold": 0.59,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 2,
+          "false_answers": 14
+        }
+      },
+      {
+        "threshold": 0.6,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 6,
+          "false_answers": 10
+        }
+      },
+      {
+        "threshold": 0.61,
+        "counts": {
+          "answered": 24,
+          "false_refusals": 0,
+          "refused": 7,
+          "false_answers": 9
+        }
+      },
+      {
+        "threshold": 0.62,
+        "counts": {
+          "answered": 23,
+          "false_refusals": 1,
+          "refused": 7,
+          "false_answers": 9
+        }
+      },
+      {
+        "threshold": 0.63,
+        "counts": {
+          "answered": 23,
+          "false_refusals": 1,
+          "refused": 7,
+          "false_answers": 9
+        }
+      },
+      {
+        "threshold": 0.64,
+        "counts": {
+          "answered": 22,
+          "false_refusals": 2,
+          "refused": 8,
+          "false_answers": 8
+        }
+      },
+      {
+        "threshold": 0.65,
+        "counts": {
+          "answered": 22,
+          "false_refusals": 2,
+          "refused": 8,
+          "false_answers": 8
+        }
+      },
+      {
+        "threshold": 0.66,
+        "counts": {
+          "answered": 21,
+          "false_refusals": 3,
+          "refused": 8,
+          "false_answers": 8
+        }
+      },
+      {
+        "threshold": 0.67,
+        "counts": {
+          "answered": 21,
+          "false_refusals": 3,
+          "refused": 10,
+          "false_answers": 6
+        }
+      },
+      {
+        "threshold": 0.68,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 11,
+          "false_answers": 5
+        }
+      },
+      {
+        "threshold": 0.69,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 12,
+          "false_answers": 4
+        }
+      },
+      {
+        "threshold": 0.7,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 14,
+          "false_answers": 2
+        }
+      },
+      {
+        "threshold": 0.71,
+        "counts": {
+          "answered": 20,
+          "false_refusals": 4,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.72,
+        "counts": {
+          "answered": 19,
+          "false_refusals": 5,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.73,
+        "counts": {
+          "answered": 16,
+          "false_refusals": 8,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.74,
+        "counts": {
+          "answered": 13,
+          "false_refusals": 11,
+          "refused": 15,
+          "false_answers": 1
+        }
+      },
+      {
+        "threshold": 0.75,
+        "counts": {
+          "answered": 10,
+          "false_refusals": 14,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.76,
+        "counts": {
+          "answered": 7,
+          "false_refusals": 17,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.77,
+        "counts": {
+          "answered": 6,
+          "false_refusals": 18,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.78,
+        "counts": {
+          "answered": 6,
+          "false_refusals": 18,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.79,
+        "counts": {
+          "answered": 6,
+          "false_refusals": 18,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.8,
+        "counts": {
+          "answered": 3,
+          "false_refusals": 21,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.81,
+        "counts": {
+          "answered": 2,
+          "false_refusals": 22,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.82,
+        "counts": {
+          "answered": 2,
+          "false_refusals": 22,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.83,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.84,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      },
+      {
+        "threshold": 0.85,
+        "counts": {
+          "answered": 0,
+          "false_refusals": 24,
+          "refused": 16,
+          "false_answers": 0
+        }
+      }
+    ]
+  }
+}
