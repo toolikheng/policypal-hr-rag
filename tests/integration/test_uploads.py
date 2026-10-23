@@ -149,6 +149,12 @@ BAD_FILES = {
         "The Markdown file has no title line ('# Title').",
     ),
     "no-name": ("!!!.md", DEMO_BYTES, 422, "The file name must contain letters or digits."),
+    "nul-character": (
+        "nul.md",
+        b"# Policy\n\n## 1. Scope\n\nAll\x00 staff.",
+        422,
+        "The document contains a NUL character, which can't be stored.",
+    ),
 }
 
 

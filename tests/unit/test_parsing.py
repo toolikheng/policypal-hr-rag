@@ -220,3 +220,9 @@ def test_parse_document_dispatches_on_file_type() -> None:
 def test_markdown_that_is_not_utf8_is_rejected_with_a_clear_error() -> None:
     with pytest.raises(ValueError, match="UTF-8"):
         parse_document("# Café policy\n\nText.".encode("latin-1"), "md")
+
+
+def test_text_with_a_nul_character_is_rejected() -> None:
+    """PostgreSQL text can't hold the NUL character, so such a file can never be stored."""
+    with pytest.raises(ValueError, match="NUL character"):
+        parse_document(b"# Policy\n\n## 1. Scope\n\nAll\x00 staff.", "md")

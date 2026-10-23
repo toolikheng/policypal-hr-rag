@@ -58,12 +58,18 @@ def file_type_of(filename: str) -> FileType:
 
 def parse_document(data: bytes, file_type: FileType) -> ParsedDocument:
     if file_type == "pdf":
-        return parse_pdf(data)
-    try:
-        text = data.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise ValueError("The Markdown file is not valid UTF-8 text.") from exc
-    return parse_markdown(text)
+        parsed = parse_pdf(data)
+    else:
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError("The Markdown file is not valid UTF-8 text.") from exc
+        parsed = parse_markdown(text)
+    # PostgreSQL text can't hold the NUL character, so such a document could never be saved.
+    stored = [parsed.title, *(part for s in parsed.sections for part in (*s.path, s.text))]
+    if any("\x00" in part for part in stored):
+        raise ValueError("The document contains a NUL character, which can't be stored.")
+    return parsed
 
 
 def assemble(title: str, lines: Iterable[Line]) -> ParsedDocument:

@@ -197,7 +197,9 @@ never silently replace anything:
 | The name of a built-in sample policy | Always `409` with `"conflict": "sample_policy"`: samples can't be replaced by upload |
 
 Other errors: `401`/`403` (missing or wrong token), `413` (larger than `MAX_UPLOAD_MB`),
-`415` (not `.md` or `.pdf`), `422` (unreadable file, e.g. a scanned PDF with no text).
+`415` (not `.md` or `.pdf`), `422` (unreadable file, e.g. a scanned PDF with no text, or
+text containing a NUL character, which PostgreSQL can't store). A rejected file is never
+saved.
 Uploaded files are kept in the `uploads` volume and loaded again on every start.
 
 ## Question history and analytics
