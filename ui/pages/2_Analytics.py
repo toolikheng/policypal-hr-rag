@@ -13,21 +13,6 @@ st.set_page_config(page_title="PolicyPal analytics", page_icon="📘")
 st.title("Analytics")
 st.caption("Policies here are **fictional sample data** for Binaan Maju Sdn Bhd.")
 
-client = api_client.make_client()
-token = st.text_input("Admin token", type="password", key="analytics_token")
-days = st.selectbox(
-    "Period", [7, 30, 90, 365], index=1, key="period", format_func=lambda d: f"Last {d} days"
-)
-if not token:
-    st.info("Enter the admin token to see analytics.")
-    st.stop()
-
-try:
-    report = client.analytics(days, token=token)
-except ApiError as exc:
-    st.error(str(exc))
-    st.stop()
-
 
 def question_table(rows: list[QuestionCount], empty: str) -> None:
     if not rows:
@@ -45,6 +30,21 @@ def question_table(rows: list[QuestionCount], empty: str) -> None:
         hide_index=True,
     )
 
+
+client = api_client.make_client()
+token = st.text_input("Admin token", type="password", key="analytics_token")
+days = st.selectbox(
+    "Period", [7, 30, 90, 365], index=1, key="period", format_func=lambda d: f"Last {d} days"
+)
+if not token:
+    st.info("Enter the admin token to see analytics.")
+    st.stop()
+
+try:
+    report = client.analytics(days, token=token)
+except ApiError as exc:
+    st.error(str(exc))
+    st.stop()
 
 feedback, latency = report["feedback"], report["avg_latency_ms"]
 questions, refused, voted, helpful = st.columns(4)

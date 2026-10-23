@@ -100,14 +100,28 @@ class FallbackCount(TypedDict):
     count: int
 
 
+class FeedbackStats(TypedDict):
+    count: int
+    up: int
+    down: int
+    feedback_rate: float | None
+    helpful_rate: float | None
+
+
+class LatencyStats(TypedDict):
+    overall: int | None
+    llm: int | None
+    extractive: int | None
+
+
 class Analytics(TypedDict):
     period_days: int
     total_questions: int
     answered: int
     refused: int
     refusal_rate: float | None
-    feedback: dict[str, Any]  # count, up, down, feedback_rate, helpful_rate
-    avg_latency_ms: dict[str, int | None]  # overall, llm, extractive
+    feedback: FeedbackStats
+    avg_latency_ms: LatencyStats
     top_questions: list[QuestionCount]
     unanswered_questions: list[QuestionCount]
     fallbacks: list[FallbackCount]
