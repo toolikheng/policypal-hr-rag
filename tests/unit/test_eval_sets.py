@@ -142,12 +142,14 @@ def test_golden_set_asks_five_questions_about_each_policy(golden: QuestionSet) -
     assert policies == Counter({slug: 5 for slug in CORE_POLICY_SLUGS})
 
 
-def test_dev_set_has_12_answerable_and_8_unanswerable_questions(dev: QuestionSet) -> None:
+def test_dev_set_has_24_answerable_and_16_unanswerable_questions(dev: QuestionSet) -> None:
+    # 20 from the start (v1) plus 20 conversational ones added for v2.
     answerable = [item for item in dev.questions if item.answerable]
 
-    assert len(answerable) == 12
-    assert len(dev.questions) - len(answerable) == 8
+    assert len(answerable) == 24
+    assert len(dev.questions) - len(answerable) == 16
     assert {item.type for item in answerable} == set(ANSWERABLE_TYPES)
+    assert [item.id for item in dev.questions] == [f"d{n:02}" for n in range(1, 41)]
 
 
 @pytest.mark.parametrize("folder", [POLICY_DIR, POLICY_DIR / "pdf"], ids=["md", "pdf"])
@@ -168,7 +170,7 @@ def test_no_question_appears_twice_within_or_across_the_sets(
     questions = Counter(normalised(item.question) for item in golden.questions + dev.questions)
 
     assert [question for question, count in questions.items() if count > 1] == []
-    assert len({item.id for item in golden.questions + dev.questions}) == 72
+    assert len({item.id for item in golden.questions + dev.questions}) == 92
 
 
 def test_no_threshold_probe_question_is_reused(golden: QuestionSet, dev: QuestionSet) -> None:

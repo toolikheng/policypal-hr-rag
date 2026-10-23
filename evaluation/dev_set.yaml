@@ -136,3 +136,142 @@ questions:
     question: How do I claim for lost luggage under the company's travel insurance?
     type: missing-detail
     note: Travel 6.2 covers the insurance but not how to claim; 3.1.3 is about excess baggage.
+
+  # --- Added 2026-10-23 for v2 (owner decision) ------------------------------------
+  # The v1 golden run showed that conversational questions score lower than the dev
+  # set's first 20, so the v1 threshold refused 8 of 40 answerable golden questions.
+  # These 20 questions are written the way employees talk: first person, with context,
+  # often without the policy's own words. They were written after seeing v1's errors;
+  # they are not copied from, or paraphrases of, golden-set questions (they ask about
+  # other facts), and they were committed before any run. The threshold is then
+  # calibrated again on all 40 dev questions (results v2).
+
+  - id: d21
+    question: I'm resigning next month and still have 6 days of annual leave left. Will I get paid for those days?
+    type: plain
+    expected:
+      - {document: leave-policy, section: "4.4 Encashment of Unused Annual Leave"}
+    note: Paid out or offset against notice, at the Company's discretion.
+
+  - id: d22
+    question: My boss wants me reachable after hours now that I'm an M1. How much of my phone bill can I claim each month?
+    type: table
+    expected:
+      - {document: expense-claims-policy, section: "5. Mobile Phone and Internet"}
+    note: Table row "M1 and M2" (RM150).
+
+  - id: d23
+    question: My approved OT on site ended around midnight and I had no way home, so I took an e-hailing car. Can I claim the fare?
+    type: look-alike
+    expected:
+      - {document: overtime-policy, section: "7. Meal and Transport Allowances for Overtime"}
+      - {document: expense-claims-policy, section: "3.3 Taxi and E-hailing"}
+    note: Overtime 7.2 and Expense Claims 3.3 both say yes; either answers.
+
+  - id: d24
+    question: I remember new staff had to wait before the hospital insurance covered them. Is that still the case?
+    type: amendment
+    expected:
+      - {document: medical-claims-policy, section: "2. Eligibility and Covered Family Members"}
+      - {document: medical-claims-policy, section: "4.2 Group Hospitalisation and Surgical Insurance"}
+      - {document: medical-claims-policy, section: "9. Amendment History"}
+      - {document: probation-and-confirmation-policy, section: "6.2 Medical Benefits During Probation"}
+    note: Changed in version 2.1 (covered from the first day); the same rule is in four places.
+
+  - id: d25
+    question: Was the extra allowance for remote sites in the Sabah interior always there, or is it new? When did it start?
+    type: amendment
+    expected:
+      - {document: travel-policy, section: "8. Amendment History"}
+    note: Only the amendment history gives the date (version 2.1, 1 January 2023).
+
+  - id: d26
+    question: A plumber is coming to fix a leak at my place on Thursday. Can I just work from home that day?
+    type: plain
+    expected:
+      - {document: work-from-home-policy, section: "2. Eligibility"}
+    note: Ad hoc WFH (2.4), approved by the immediate superior, up to two days a month.
+
+  - id: d27
+    question: I tripped over my laptop cable at home during working hours and hurt my ankle. Who do I need to tell?
+    type: look-alike
+    expected:
+      - {document: work-from-home-policy, section: "7. Health and Safety at Home"}
+    note: Code 6 (site accidents go to the site safety officer) looks similar.
+
+  - id: d28
+    question: I'm an E1 flying back from Kuching and I land at 11 in the morning. What meal allowance do I get for that day?
+    type: table
+    expected:
+      - {document: travel-policy, section: "5.1 Outstation Meal Allowance"}
+    note: Half-day rate (back before 1 p.m.) for E1 to E3, RM35.
+
+  - id: d29
+    question: My team is going outstation to Ipoh and the client is buying us lunch every day. Do we still get the full meal allowance, and when do I have to submit the claim?
+    type: two-section
+    expected:
+      - {document: travel-policy, section: "5.1 Outstation Meal Allowance"}
+      - {document: travel-policy, section: "7. Claims After Travel"}
+    note: Needs 5.1.3 (a third less per meal provided) and 7.1 (claim within 14 days).
+
+  - id: d30
+    question: I want to start a small catering business on weekends. Do I need anyone's permission?
+    type: plain
+    expected:
+      - {document: code-of-conduct, section: "3. Conflicts of Interest"}
+    note: Clause 3.4 (approval from the HOD and HR) and 3.2 (declare it).
+
+  - id: d31
+    question: I'm driving my own car from KL to Seremban for a meeting, about 70 km away. Which policy covers the trip, and can I claim the tolls?
+    type: two-section
+    expected:
+      - {document: expense-claims-policy, section: "1. Purpose and Scope"}
+      - {document: expense-claims-policy, section: "3.2 Tolls and Parking"}
+    note: Needs 1 (local trips up to 100 km) and 3.2 (tolls at cost).
+
+  - id: d32
+    question: I'm booked for a planned operation at a private hospital next week. What do I need to sort out with HR before I'm admitted?
+    type: look-alike
+    expected:
+      - {document: medical-claims-policy, section: "4.3 Hospital Admission Procedure"}
+    note: A guarantee letter three working days before; Leave 5.2 (hospitalisation leave) looks similar.
+
+  - id: d33
+    question: Can I bring my mum along to the company's annual dinner?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d34
+    question: Is there a prayer room I can use at the Penang office?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d35
+    question: A colleague is going through chemo. Can I give her some of my annual leave days?
+    type: uncovered-topic
+    note: Not covered. Leave 4.4 (encashment) and Expense 7 (donations) look similar.
+
+  - id: d36
+    question: My laptop has become really slow. How do I ask IT for a new one?
+    type: uncovered-topic
+    note: Not covered. Code 7.1 and WFH 5.1 mention laptops but not how to replace one.
+
+  - id: d37
+    question: Is there a staff shuttle bus from the LRT station to the head office?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d38
+    question: How much does the company put into my EPF every month?
+    type: uncovered-topic
+    note: Not covered by any policy.
+
+  - id: d39
+    question: Can I get a company credit card so I don't have to pay for client lunches myself?
+    type: uncovered-topic
+    note: Not covered. Expense Claims 4.1 (client entertainment) looks similar.
+
+  - id: d40
+    question: I didn't use most of my sick leave this year. Can I get paid for the unused days?
+    type: missing-detail
+    note: Leave 4.4 covers cashing out annual leave only; unused sick leave is not mentioned.
