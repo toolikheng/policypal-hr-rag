@@ -139,14 +139,16 @@ class PolicyPalClient:
             raise ApiError(f"Cannot reach the PolicyPal API at {self._http.base_url}.") from exc
         try:
             body = response.json()
-        except ValueError as exc:
-            raise ApiError("The PolicyPal API reply was not valid JSON.") from exc
+        except ValueError:
+            body = None  # e.g. a proxy's HTML error page
         if response.status_code not in ok:
             raise ApiError(
                 _message(body, response.status_code),
                 status_code=response.status_code,
                 conflict=body.get("conflict") if isinstance(body, dict) else None,
             )
+        if body is None:
+            raise ApiError("The PolicyPal API reply was not valid JSON.")
         return body
 
 

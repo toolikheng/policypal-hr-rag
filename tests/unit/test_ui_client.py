@@ -177,3 +177,13 @@ def test_a_server_error_shows_the_request_id_to_report() -> None:
 
     with pytest.raises(ApiError, match=r"HTTP 500, reference abc123"):
         client_returning(500, body).ask("Q?")
+
+
+def test_an_error_page_that_is_not_json_still_reports_its_status() -> None:
+    # For example a proxy's HTML page when the API container is down.
+    proxy_page = client_with(lambda request: httpx.Response(502, text="<html>Bad gateway</html>"))
+
+    with pytest.raises(ApiError, match=r"HTTP 502") as caught:
+        proxy_page.ask("Q?")
+
+    assert caught.value.status_code == 502
