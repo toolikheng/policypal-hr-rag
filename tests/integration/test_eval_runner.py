@@ -13,7 +13,6 @@ from evaluation.metrics import Section
 from evaluation.report import REQUIRED_CONFIG_FIELDS
 from evaluation.run_eval import (
     BASE_CONFIG_FIELDS,
-    HELD_OUT_POLICIES,
     base_config,
     calibrate,
     create_database_if_missing,
@@ -123,15 +122,18 @@ def test_load_policies_empties_the_question_history(migrated_database_url: str) 
             assert conn.execute(text("SELECT count(*) FROM conversations")).scalar_one() == 0
 
 
-def test_load_policies_adds_extra_files_as_uploads(
-    migrated_database_url: str, tmp_path: Path
+@pytest.mark.parametrize("source", ["md", "pdf"])
+def test_the_held_out_policy_is_added_as_an_upload_in_the_runs_format(
+    migrated_database_url: str, source: str
 ) -> None:
-    extra = tmp_path / "canteen-policy.md"
-    extra.write_text("# Canteen Policy\n\n## 1. Opening Hours\n\nOpen 8 to 5.\n", encoding="utf-8")
-
-    with loaded(migrated_database_url, extra_files=[extra]) as engine:
-        assert ("canteen-policy", "md", "upload") in documents(engine)
+    with loaded(migrated_database_url, source, held_out=True) as engine:
+        assert ("training-and-development-policy", source, "upload") in documents(engine)
         assert len(documents(engine)) == 9
+
+
+def test_without_held_out_the_training_policy_is_not_loaded(migrated_database_url: str) -> None:
+    with loaded(migrated_database_url) as engine:
+        assert "training-and-development-policy" not in [slug for slug, _, _ in documents(engine)]
 
 
 # --- Running the questions ------------------------------------------------------------
@@ -293,7 +295,7 @@ def test_evaluate_retrieval_adds_the_held_out_policy_in_the_same_format(
         thresholds={"on": 0.3, "off": 0.3},
         base=base,
         results_dir=tmp_path,
-        extra_files=HELD_OUT_POLICIES,
+        held_out=True,
     )
 
     data = json.loads((tmp_path / "sample-retrieval.json").read_text(encoding="utf-8"))
