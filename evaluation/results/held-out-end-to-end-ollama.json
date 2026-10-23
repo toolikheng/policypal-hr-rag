@@ -1,0 +1,605 @@
+{
+  "config": {
+    "Date (UTC)": "2026-10-23 15:37",
+    "Commit": "9dc7dbb",
+    "Embedding model": "BAAI/bge-small-en-v1.5",
+    "Top k": "5",
+    "CPU": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz (8 logical CPUs)",
+    "RAM": "11.6 GiB visible",
+    "Operating system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "Python": "3.12.14",
+    "Docker": "Docker Desktop 4.86.0 (236216), engine 29.7.2",
+    "Question set": "held-out (10 questions: 8 answerable, 2 should be refused)",
+    "Policies": "8 sample policies from Markdown + upload training-and-development-policy (130 chunks)",
+    "Query instruction": "on",
+    "Threshold": "0.69 (from the dev set)",
+    "LLM": "llama3.2:3b (ollama)"
+  },
+  "run": {
+    "provider": "ollama",
+    "model": "llama3.2:3b",
+    "threshold": 0.69,
+    "outcomes": [
+      {
+        "question_id": "h01",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "3. Training Days"
+          }
+        ],
+        "mode": "llm",
+        "answer": "Every employee should complete at least five days (40 hours) of training each calendar year. [1]",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "3. Training Days"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            },
+            "similarity": 0.7672449766555484
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "4. Training Needs Analysis"
+            },
+            "similarity": 0.7108633094511456
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            },
+            "similarity": 0.6970986488939942
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "9. Sharing What You Learn"
+            },
+            "similarity": 0.6832558105435497
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            "similarity": 0.6825785230053364
+          }
+        ],
+        "retrieval_ms": 30,
+        "generation_ms": 10759,
+        "total_ms": 10790
+      },
+      {
+        "question_id": "h02",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "5. External Course Sponsorship"
+          }
+        ],
+        "mode": "llm",
+        "answer": "The yearly limit for an external course the company sponsors for an E2 is RM3,000 [1].",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "5. External Course Sponsorship"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            },
+            "similarity": 0.8056648009223041
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            "similarity": 0.6498426198959351
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.6387902498245239
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "9. Sharing What You Learn"
+            },
+            "similarity": 0.6376535892486572
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            },
+            "similarity": 0.6104592084884644
+          }
+        ],
+        "retrieval_ms": 55,
+        "generation_ms": 8559,
+        "total_ms": 8614
+      },
+      {
+        "question_id": "h03",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "3. Training Days"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Training and Development Policy — 3. Training Days\n> 3.1 Every employee should complete at least five days (40 hours) of training each calendar year. Training hours are recorded in MyHR under \"Learning Record\".\n>\n> 3.2 Approved training attended during working hours counts as working time.\n>\n> 3.3 Training held on a rest day at the Company's request is compensated: NE employees under the Overtime Policy, and executives with time off in lieu.",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "3. Training Days"
+          }
+        ],
+        "fallback_reason": "llm_no_valid_citation",
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            },
+            "similarity": 0.7261834038168079
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            },
+            "similarity": 0.6771619897195131
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.6642531356660655
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            },
+            "similarity": 0.6478857221739623
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.6446252081021554
+          }
+        ],
+        "retrieval_ms": 32,
+        "generation_ms": 4517,
+        "total_ms": 4550
+      },
+      {
+        "question_id": "h04",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "7. Training Bond"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            "similarity": 0.6560065746307373
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            },
+            "similarity": 0.6461050932282144
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.4 Encashment of Unused Annual Leave"
+            },
+            "similarity": 0.6341561675071716
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.3 Bribery and Facilitation Payments"
+            },
+            "similarity": 0.6119695901870728
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "9. Disciplinary Action"
+            },
+            "similarity": 0.6081630821130833
+          }
+        ],
+        "retrieval_ms": 36,
+        "generation_ms": null,
+        "total_ms": 36
+      },
+      {
+        "question_id": "h05",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "6. Professional Certifications"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Training and Development Policy — 6. Professional Certifications\n> 6.1 Examination fees for professional certifications approved by the HOD are reimbursed once the employee passes the examination. Fees for failed attempts are not reimbursed.\n>\n> 6.2 Employees receive one day of paid examination leave for each paper they sit, on the day of the examination, up to five days per calendar year.",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "6. Professional Certifications"
+          }
+        ],
+        "fallback_reason": "llm_no_valid_citation",
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "6. Professional Certifications"
+            },
+            "similarity": 0.7079813406500816
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.645513696013253
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "3. Normal Working Hours"
+            },
+            "similarity": 0.613030800873495
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.5992454410948571
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "6. Working Hours and Overtime"
+            },
+            "similarity": 0.5847340968726711
+          }
+        ],
+        "retrieval_ms": 21,
+        "generation_ms": 6134,
+        "total_ms": 6155
+      },
+      {
+        "question_id": "h06",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "7. Training Bond"
+          },
+          {
+            "document": "training-and-development-policy",
+            "section": "5. External Course Sponsorship"
+          }
+        ],
+        "mode": "llm",
+        "answer": "You must sign a training bond for the RM12,000 course, as the sponsorship exceeds the RM5,000 limit for your grade [1]. Your travel to the course will be handled according to the Travel Policy, which is separate from the Training and Development Policy.",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "7. Training Bond"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            "similarity": 0.7982113599244169
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            },
+            "similarity": 0.7320043386217134
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.6543600364220158
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.6501289799847898
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "Document information"
+            },
+            "similarity": 0.6441714571663328
+          }
+        ],
+        "retrieval_ms": 47,
+        "generation_ms": 18914,
+        "total_ms": 18962
+      },
+      {
+        "question_id": "h07",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "7. Training Bond"
+          }
+        ],
+        "mode": "llm",
+        "answer": "According to policy excerpt [1] 7.2, the bond period is 12 months of service for every RM5,000 of sponsorship, up to a maximum of 36 months. Since your course costs RM8,000, which is 1.6 times RM5,000, the bond period would be 12 months x 1.6 = 19.2 months.",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "7. Training Bond"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            "similarity": 0.747248113155365
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            },
+            "similarity": 0.626879676952405
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.2 Remote Site Allowance"
+            },
+            "similarity": 0.5947053077992625
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.3 Non-Panel Clinics and Reimbursement"
+            },
+            "similarity": 0.588188648223877
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "Document information"
+            },
+            "similarity": 0.5783686293143862
+          }
+        ],
+        "retrieval_ms": 28,
+        "generation_ms": 9301,
+        "total_ms": 9329
+      },
+      {
+        "question_id": "h08",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "training-and-development-policy",
+            "section": "8. Mandatory Safety Training for Site Employees"
+          }
+        ],
+        "mode": "llm",
+        "answer": "Site workers must complete a one-day safety refresher every two years [1].",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "8. Mandatory Safety Training for Site Employees"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            },
+            "similarity": 0.8289498788744298
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "6. Safety at Project Sites"
+            },
+            "similarity": 0.7003792106879241
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            },
+            "similarity": 0.6823609253929991
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "4. Training Needs Analysis"
+            },
+            "similarity": 0.656679630279541
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "7. Health and Safety at Home"
+            },
+            "similarity": 0.6418184851516208
+          }
+        ],
+        "retrieval_ms": 21,
+        "generation_ms": 9223,
+        "total_ms": 9245
+      },
+      {
+        "question_id": "h09",
+        "question_type": "missing-detail",
+        "expected": [],
+        "mode": "llm",
+        "answer": "According to policy [1], if an employee is made redundant, the bond period is terminated, and the employee is no longer required to repay the sponsorship.",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "7. Training Bond"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            "similarity": 0.7415685653686523
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            },
+            "similarity": 0.6462582771470262
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            },
+            "similarity": 0.640198311793906
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.6333402395248413
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "3. Leave Year and Applications"
+            },
+            "similarity": 0.6210959409361
+          }
+        ],
+        "retrieval_ms": 46,
+        "generation_ms": 4328,
+        "total_ms": 4374
+      },
+      {
+        "question_id": "h10",
+        "question_type": "missing-detail",
+        "expected": [],
+        "mode": "llm",
+        "answer": "The construction safety induction card is issued free of charge to site-based employees who have completed the Company's two-day site safety induction. [1]",
+        "cited": [
+          {
+            "document": "training-and-development-policy",
+            "section": "8. Mandatory Safety Training for Site Employees"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            },
+            "similarity": 0.7166800836706062
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            },
+            "similarity": 0.6301999753356036
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            },
+            "similarity": 0.6140547028747388
+          },
+          {
+            "section": {
+              "document": "training-and-development-policy",
+              "section": "6. Professional Certifications"
+            },
+            "similarity": 0.5990520001587868
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            },
+            "similarity": 0.5886111504667322
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": 3791,
+        "total_ms": 3815
+      }
+    ],
+    "warm_up_ms": 5503
+  }
+}

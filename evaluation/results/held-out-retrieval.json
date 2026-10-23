@@ -1,0 +1,1948 @@
+{
+  "config": {
+    "Date (UTC)": "2026-10-23 15:36",
+    "Commit": "9dc7dbb",
+    "Embedding model": "BAAI/bge-small-en-v1.5",
+    "Top k": "5",
+    "CPU": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz (8 logical CPUs)",
+    "RAM": "11.6 GiB visible",
+    "Operating system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "Python": "3.12.14",
+    "Docker": "Docker Desktop 4.86.0 (236216), engine 29.7.2",
+    "Question set": "held-out (10 questions: 8 answerable, 2 should be refused)",
+    "Policies": "8 sample policies from Markdown + upload training-and-development-policy (130 chunks); 8 sample policies from PDF + upload training-and-development-policy (130 chunks)",
+    "Query instruction": "on and off (both reported)",
+    "Threshold": "from the dev set: 0.69 with the instruction, 0.71 without",
+    "LLM": "none (search only)"
+  },
+  "runs": [
+    {
+      "label": "Markdown, instruction on",
+      "source": "md",
+      "instruction": true,
+      "threshold": 0.69,
+      "outcomes": [
+        {
+          "question_id": "h01",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7672449766555484
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.7108633094511456
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6970986488939942
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.6832558105435497
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6825785230053364
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "h02",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.8056648009223041
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6498426198959351
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6387902498245239
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.6376535892486572
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6104592084884644
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "h03",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7261834038168079
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6771619897195131
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6642531356660655
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6478857221739623
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6446252081021554
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "h04",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6560065746307373
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6461050932282144
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6341561675071716
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.6119695901870728
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "9. Disciplinary Action"
+              },
+              "similarity": 0.6081630821130833
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "h05",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "6. Professional Certifications"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.7079813406500816
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.645513696013253
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.613030800873495
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.5992454410948571
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "6. Working Hours and Overtime"
+              },
+              "similarity": 0.5847340968726711
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "h06",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.7982113599244169
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.7320043386217134
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6543600364220158
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6501289799847898
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.6441714571663328
+            }
+          ],
+          "retrieval_ms": 27
+        },
+        {
+          "question_id": "h07",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.747248113155365
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.626879676952405
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.5947053077992625
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.588188648223877
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "Document information"
+              },
+              "similarity": 0.5783686293143862
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "h08",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.8289498788744298
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.7003792106879241
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.6823609253929991
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.656679630279541
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.6418184851516208
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "h09",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.7415685653686523
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.6462582771470262
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.640198311793906
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6333402395248413
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6210959409361
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "h10",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.7166800836706062
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6301999753356036
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6140547028747388
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.5990520001587868
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5886111504667322
+            }
+          ],
+          "retrieval_ms": 18
+        }
+      ]
+    },
+    {
+      "label": "Markdown, instruction off",
+      "source": "md",
+      "instruction": false,
+      "threshold": 0.71,
+      "outcomes": [
+        {
+          "question_id": "h01",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7927121294655582
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.7360103883737107
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.7178304959636643
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.714007769345311
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.688616055928705
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "h02",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.821387908293264
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.683536171913147
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.6762339472770691
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6704772710800171
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.645351231098175
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "h03",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7499536872020514
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6931437985554222
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6853680985727242
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.676714816485074
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6752727016318986
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "h04",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6656572421993481
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6539016984876945
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6368805982541693
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.6225187036372777
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.6214788781715119
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "h05",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "6. Professional Certifications"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.7191267777009752
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6589722037315369
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6257341727176813
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.616155408849991
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.3 Attendance and Punctuality"
+              },
+              "similarity": 0.6024134159088135
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "h06",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.803312361240387
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.7532792981530126
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.6693205833435059
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6658588250959632
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.6646602553534251
+            }
+          ],
+          "retrieval_ms": 30
+        },
+        {
+          "question_id": "h07",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.7798205018043518
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6663121978864481
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.6276922225952148
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.6165839066157408
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6143876910209656
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "h08",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.8458924385373346
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.7122236065731296
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7100245106191077
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.6869733333587646
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.6720684366185417
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "h09",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.759539008140564
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.6732635887547077
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6614688240606306
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6589774489402771
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6421347091037427
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "h10",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.7416049992081537
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6595739532024963
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6589379906654358
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.6441011640965256
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6287037134170532
+            }
+          ],
+          "retrieval_ms": 29
+        }
+      ]
+    },
+    {
+      "label": "PDF, instruction on",
+      "source": "pdf",
+      "instruction": true,
+      "threshold": 0.69,
+      "outcomes": [
+        {
+          "question_id": "h01",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7672449766555484
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.7108633094511456
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6970986488939942
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.6832558105435497
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6825786422146188
+            }
+          ],
+          "retrieval_ms": 18
+        },
+        {
+          "question_id": "h02",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.7996944189071655
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6498426198959351
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6387902498245239
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.6376535892486572
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6104592084884644
+            }
+          ],
+          "retrieval_ms": 20
+        },
+        {
+          "question_id": "h03",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7261834038168079
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6836885998434675
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6642531356660655
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6478857221739623
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6446251484975142
+            }
+          ],
+          "retrieval_ms": 19
+        },
+        {
+          "question_id": "h04",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6560065746307373
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6435719132423401
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6341561675071716
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.6119695901870728
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "9. Disciplinary Action"
+              },
+              "similarity": 0.6081630821130833
+            }
+          ],
+          "retrieval_ms": 27
+        },
+        {
+          "question_id": "h05",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "6. Professional Certifications"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.7079813406500816
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6455136364086154
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.599245381490223
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.598800075268733
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "7. Meal and Transport Allowances for Overtime"
+              },
+              "similarity": 0.5884961976413533
+            }
+          ],
+          "retrieval_ms": 29
+        },
+        {
+          "question_id": "h06",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.7982113599244169
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.7364179711466426
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6543600364220158
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6501289799847898
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "1. Purpose and Scope"
+              },
+              "similarity": 0.6418352318357003
+            }
+          ],
+          "retrieval_ms": 33
+        },
+        {
+          "question_id": "h07",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.747248113155365
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6188760995864868
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.5947053077992625
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.588188648223877
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "8. Claim Submission and Deadlines"
+              },
+              "similarity": 0.5713843703269958
+            }
+          ],
+          "retrieval_ms": 26
+        },
+        {
+          "question_id": "h08",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.8289498788744298
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.7003792106879241
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.6823609253929991
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.656679630279541
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.6418184851516208
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "h09",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.7415686845779419
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.6462582771470262
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.640198311793906
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6333402395248413
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6210959409361
+            }
+          ],
+          "retrieval_ms": 24
+        },
+        {
+          "question_id": "h10",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.7166800836706062
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6290533763734485
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6140547028747388
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.5990520001587868
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.3 Taxi and E-hailing"
+              },
+              "similarity": 0.5886111504667322
+            }
+          ],
+          "retrieval_ms": 23
+        }
+      ]
+    },
+    {
+      "label": "PDF, instruction off",
+      "source": "pdf",
+      "instruction": false,
+      "threshold": 0.71,
+      "outcomes": [
+        {
+          "question_id": "h01",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7927121294655582
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.7360103883737107
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.7178304959636643
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.714007769345311
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6886161155333462
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "h02",
+          "question_type": "table",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.8170827627182007
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6835362315177917
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "9. Sharing What You Learn"
+              },
+              "similarity": 0.6762339472770691
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6704772710800171
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.645351231098175
+            }
+          ],
+          "retrieval_ms": 29
+        },
+        {
+          "question_id": "h03",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "3. Training Days"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7499536872020514
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6983788373018747
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6853680985727242
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6767147568804364
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6752727016318986
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "h04",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.6656572421993481
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6501781552923837
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "4.4 Encashment of Unused Annual Leave"
+              },
+              "similarity": 0.6368805982541693
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.6225187036372777
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.3 Bribery and Facilitation Payments"
+              },
+              "similarity": 0.6214788781715119
+            }
+          ],
+          "retrieval_ms": 29
+        },
+        {
+          "question_id": "h05",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "6. Professional Certifications"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.7191267777009752
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6589721441268921
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "2. Eligibility"
+              },
+              "similarity": 0.6161553492453498
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "3. Normal Working Hours"
+              },
+              "similarity": 0.6130407087182587
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "5.3 Attendance and Punctuality"
+              },
+              "similarity": 0.6024134159088135
+            }
+          ],
+          "retrieval_ms": 21
+        },
+        {
+          "question_id": "h06",
+          "question_type": "two-section",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            },
+            {
+              "document": "training-and-development-policy",
+              "section": "5. External Course Sponsorship"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.8033124208450317
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.7562566995620728
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.2 Giving Gifts and Hospitality"
+              },
+              "similarity": 0.6693205833435059
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "1. Purpose"
+              },
+              "similarity": 0.6658588250959632
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "4.1 Receiving Gifts"
+              },
+              "similarity": 0.6658578515052795
+            }
+          ],
+          "retrieval_ms": 28
+        },
+        {
+          "question_id": "h07",
+          "question_type": "plain",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "7. Training Bond"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.779820442199707
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6576871871948242
+            },
+            {
+              "section": {
+                "document": "medical-claims-policy",
+                "section": "3.3 Non-Panel Clinics and Reimbursement"
+              },
+              "similarity": 0.6276922225952148
+            },
+            {
+              "section": {
+                "document": "travel-policy",
+                "section": "5.2 Remote Site Allowance"
+              },
+              "similarity": 0.6165839066157408
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6143876910209656
+            }
+          ],
+          "retrieval_ms": 23
+        },
+        {
+          "question_id": "h08",
+          "question_type": "look-alike",
+          "expected": [
+            {
+              "document": "training-and-development-policy",
+              "section": "8. Mandatory Safety Training for Site Employees"
+            }
+          ],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.8458924385373346
+            },
+            {
+              "section": {
+                "document": "code-of-conduct",
+                "section": "6. Safety at Project Sites"
+              },
+              "similarity": 0.7122236065731296
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.7100245106191077
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "4. Training Needs Analysis"
+              },
+              "similarity": 0.6869733333587646
+            },
+            {
+              "section": {
+                "document": "work-from-home-policy",
+                "section": "7. Health and Safety at Home"
+              },
+              "similarity": 0.6720684366185417
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "h09",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "7. Training Bond"
+              },
+              "similarity": 0.759539008140564
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "3. Training Days"
+              },
+              "similarity": 0.6732635887547077
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.6614688240606306
+            },
+            {
+              "section": {
+                "document": "overtime-policy",
+                "section": "8. Time Off in Lieu for Executives"
+              },
+              "similarity": 0.6589773893356323
+            },
+            {
+              "section": {
+                "document": "leave-policy",
+                "section": "3. Leave Year and Applications"
+              },
+              "similarity": 0.6421347091037427
+            }
+          ],
+          "retrieval_ms": 22
+        },
+        {
+          "question_id": "h10",
+          "question_type": "missing-detail",
+          "expected": [],
+          "retrieved": [
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "8. Mandatory Safety Training for Site Employees"
+              },
+              "similarity": 0.7416049992081537
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "6. Professional Memberships"
+              },
+              "similarity": 0.6589379906654358
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "5. External Course Sponsorship"
+              },
+              "similarity": 0.6583131551742554
+            },
+            {
+              "section": {
+                "document": "training-and-development-policy",
+                "section": "6. Professional Certifications"
+              },
+              "similarity": 0.6441011640965256
+            },
+            {
+              "section": {
+                "document": "expense-claims-policy",
+                "section": "3.2 Tolls and Parking"
+              },
+              "similarity": 0.6287037134170532
+            }
+          ],
+          "retrieval_ms": 20
+        }
+      ]
+    }
+  ]
+}
