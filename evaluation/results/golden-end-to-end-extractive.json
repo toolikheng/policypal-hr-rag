@@ -1,0 +1,3151 @@
+{
+  "config": {
+    "Date (UTC)": "2026-10-23 15:25",
+    "Commit": "7f3b687",
+    "Embedding model": "BAAI/bge-small-en-v1.5",
+    "Top k": "5",
+    "CPU": "Intel(R) Core(TM) i5-10300H CPU @ 2.50GHz (8 logical CPUs)",
+    "RAM": "11.6 GiB visible",
+    "Operating system": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "Python": "3.12.14",
+    "Docker": "Docker Desktop 4.86.0 (236216), engine 29.7.2",
+    "Question set": "golden (52 questions: 40 answerable, 12 should be refused)",
+    "Policies": "8 sample policies from Markdown (119 chunks)",
+    "Query instruction": "on",
+    "Threshold": "0.69 (from the dev set)",
+    "LLM": "none: extractive mode quotes the policies"
+  },
+  "run": {
+    "provider": "extractive",
+    "model": null,
+    "threshold": 0.69,
+    "outcomes": [
+      {
+        "question_id": "g01",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "leave-policy",
+            "section": "4.1 Annual Leave Entitlement"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Leave Policy — 9. Public Holidays\n> 9.1 The Company observes 11 paid public holidays each year. HR publishes the public holiday calendar for each office and state in December for the following year.\n>\n> 9.2 Site-based employees follow the public holidays of the state where their site is located.\n>\n> 9.3 If a public holiday falls on a rest day, the next working day is a paid holiday.\n>\n> 9.4 Work on a public holiday is paid or compensated under the Overtime Policy (BM-HR-POL-003), section 5.\n\n[2] Leave Policy — 4.3 Carry Forward of Annual Leave\n> Up to five (5) days of unused annual leave may be carried forward into the next leave year. Carried-forward leave must be used by 30 June of that year, and any carried-forward days not used by then are forfeited. Days above the five-day limit are forfeited on 31 December, unless the Head of Department (HOD) has approved a written exception because the employee could not take leave for operational reasons.\n>\n> > **Amendment (version 3.1, 1 January 2025):** The carry-forward limit was increased from three (3) days to five (5) days. The 30 June deadline is unchanged.\n\n[3] Leave Policy — 4.5 Joining or Leaving Part-Way Through the Year\n> Employees who join or leave during the leave year receive annual leave pro-rated by completed months of service in that year. Fractions are rounded to the nearest half day.",
+        "cited": [
+          {
+            "document": "leave-policy",
+            "section": "9. Public Holidays"
+          },
+          {
+            "document": "leave-policy",
+            "section": "4.3 Carry Forward of Annual Leave"
+          },
+          {
+            "document": "leave-policy",
+            "section": "4.5 Joining or Leaving Part-Way Through the Year"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "9. Public Holidays"
+            },
+            "similarity": 0.741815447807312
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.3 Carry Forward of Annual Leave"
+            },
+            "similarity": 0.7130051851272583
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.5 Joining or Leaving Part-Way Through the Year"
+            },
+            "similarity": 0.6919251084327698
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "7. Emergency Leave"
+            },
+            "similarity": 0.6770884587115981
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.1 Annual Leave Entitlement"
+            },
+            "similarity": 0.6760851530927285
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g02",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "leave-policy",
+            "section": "5.1 Sick Leave (Outpatient)"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.4 Medical Certificates"
+            },
+            "similarity": 0.6416889642662439
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "5.1 Sick Leave (Outpatient)"
+            },
+            "similarity": 0.6328426599502563
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.3 Hospital Admission Procedure"
+            },
+            "similarity": 0.6139975650313463
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "5.3 Medical Certificates from Non-Panel Clinics"
+            },
+            "similarity": 0.6097274059219725
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "3. Reviews During Probation"
+            },
+            "similarity": 0.606291138750844
+          }
+        ],
+        "retrieval_ms": 20,
+        "generation_ms": null,
+        "total_ms": 20
+      },
+      {
+        "question_id": "g03",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "leave-policy",
+            "section": "6.2 Paternity Leave"
+          },
+          {
+            "document": "leave-policy",
+            "section": "10. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Leave Policy — 6.2 Paternity Leave\n> Married male employees with at least 12 months of service are entitled to seven (7) consecutive days of paid paternity leave for each birth, up to a maximum of five births during their employment with the Company. The leave must be taken within 30 days of the birth.\n>\n> > **Amendment (version 3.1, 1 January 2025):** Paternity leave was increased from three (3) days to seven (7) days.\n\n[2] Leave Policy — 6.4 Marriage Leave\n> Employees receive three (3) days of paid marriage leave, once during their employment, on producing a copy of the marriage certificate.\n\n[3] Leave Policy — 10. Amendment History\n> | Version | Effective date | Summary of changes |\n> |---|---|---|\n> | 1.0 | 1 March 2019 | First issue. |\n> | 2.0 | 1 January 2022 | Emergency leave introduced (section 7). |\n> | 3.0 | 1 January 2024 | Leave during probation revised (section 4.2); clause 7.4 deleted. |\n> | 3.1 | 1 January 2025 | Carry-forward limit raised from 3 to 5 days; paternity leave raised from 3 to 7 days. |",
+        "cited": [
+          {
+            "document": "leave-policy",
+            "section": "6.2 Paternity Leave"
+          },
+          {
+            "document": "leave-policy",
+            "section": "6.4 Marriage Leave"
+          },
+          {
+            "document": "leave-policy",
+            "section": "10. Amendment History"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.2 Paternity Leave"
+            },
+            "similarity": 0.8498137503751383
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.4 Marriage Leave"
+            },
+            "similarity": 0.7312260109916945
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.7119646496751708
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.1 Maternity Leave"
+            },
+            "similarity": 0.7004917860031178
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.3 Compassionate Leave"
+            },
+            "similarity": 0.6907138640114
+          }
+        ],
+        "retrieval_ms": 23,
+        "generation_ms": null,
+        "total_ms": 23
+      },
+      {
+        "question_id": "g04",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "leave-policy",
+            "section": "6.3 Compassionate Leave"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Leave Policy — 6.3 Compassionate Leave\n> | Death of | Paid compassionate leave |\n> |---|---|\n> | Spouse, child, parent or parent-in-law | 3 days |\n> | Sibling or grandparent | 1 day |\n>\n> Compassionate leave must be taken within 7 days of the death. Employees working in Sabah or Sarawak whose family member died in Peninsular Malaysia, or the other way round, may receive 2 additional days of travelling time with HOD approval.",
+        "cited": [
+          {
+            "document": "leave-policy",
+            "section": "6.3 Compassionate Leave"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.3 Compassionate Leave"
+            },
+            "similarity": 0.8042765376403026
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.4 Marriage Leave"
+            },
+            "similarity": 0.6655215820359253
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.1 Annual Leave Entitlement"
+            },
+            "similarity": 0.6604614268908345
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "8. Unpaid Leave"
+            },
+            "similarity": 0.6523564276270357
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.1 Maternity Leave"
+            },
+            "similarity": 0.649434608288454
+          }
+        ],
+        "retrieval_ms": 18,
+        "generation_ms": null,
+        "total_ms": 18
+      },
+      {
+        "question_id": "g05",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "leave-policy",
+            "section": "5.2 Hospitalisation Leave"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "4.2 Group Hospitalisation and Surgical Insurance"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Leave Policy — 5.2 Hospitalisation Leave\n> An employee who is admitted to hospital, or who is certified by a doctor as needing hospitalisation, receives up to 60 days of paid hospitalisation leave per year. This 60-day limit includes any sick leave taken under section 5.1 in the same year. Hospitalisation leave is not added on top of sick leave.\n>\n> Day surgery, and recovery leave certified by the treating hospital, count as hospitalisation leave.\n\n[2] Medical Claims and Benefits Policy — 4.2 Group Hospitalisation and Surgical Insurance\n> All employees, including those on probation, are covered by the Company's group hospitalisation and surgical insurance from their first day of service.\n>\n> | Grade | Room and board per day | Overall annual limit |\n> |---|---|---|\n> | NE1 to NE4 | RM150 | RM50,000 |\n> | E1 to E3 | RM200 | RM50,000 |\n> | M1 and M2 | RM300 | RM80,000 |\n> | SM | RM400 | RM80,000 |\n>\n> The registered spouse and children of a confirmed employee are covered at the same room-and-board rate as the employee. If the employee chooses a room above their entitlement, they pay the difference.\n\n[3] Medical Claims and Benefits Policy — 4.3 Hospital Admission Procedure\n> 4.3.1 For a planned admission, request a guarantee letter (GL) from the insurer through HR at least three working days before admission.\n>\n> 4.3.2 For an emergency admission, show the insurance card at the hospital and inform HR within 24 hours, or on the next working day.\n>\n> 4.3.3 The employee must also apply for hospitalisation leave under the Leave Policy, section 5.2.",
+        "cited": [
+          {
+            "document": "leave-policy",
+            "section": "5.2 Hospitalisation Leave"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "4.2 Group Hospitalisation and Surgical Insurance"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "4.3 Hospital Admission Procedure"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "5.2 Hospitalisation Leave"
+            },
+            "similarity": 0.7394397258758545
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.2 Group Hospitalisation and Surgical Insurance"
+            },
+            "similarity": 0.7090293765068054
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.3 Hospital Admission Procedure"
+            },
+            "similarity": 0.7031559701972093
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "7. Emergency Leave"
+            },
+            "similarity": 0.6800732207254648
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.1 Maternity Leave"
+            },
+            "similarity": 0.6574118341558091
+          }
+        ],
+        "retrieval_ms": 29,
+        "generation_ms": null,
+        "total_ms": 29
+      },
+      {
+        "question_id": "g06",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "medical-claims-policy",
+            "section": "3.2 Annual Outpatient Limits"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "9. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Medical Claims and Benefits Policy — 3.2 Annual Outpatient Limits\n> | Grade | Annual outpatient limit (employee and family combined) |\n> |---|---|\n> | NE1 to NE4 | RM800 |\n> | E1 to E3 | RM1,200 |\n> | M1 and M2 | RM1,800 |\n> | SM | RM2,500 |\n>\n> The limit applies per calendar year and covers panel clinic visits, approved non-panel claims (section 3.3) and specialist consultations (section 4.1). Unused limits do not carry forward.\n>\n> > **Amendment 2 (version 2.2, 1 July 2025):** The limit for E1 to E3 was increased from RM1,000 to RM1,200. Claims for treatment received before 1 July 2025 use the old limit.",
+        "cited": [
+          {
+            "document": "medical-claims-policy",
+            "section": "3.2 Annual Outpatient Limits"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.2 Annual Outpatient Limits"
+            },
+            "similarity": 0.7960468652220463
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "5.2 Hospitalisation Leave"
+            },
+            "similarity": 0.6856399774551392
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.1 Panel Clinics"
+            },
+            "similarity": 0.6690399646759033
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.2 Group Hospitalisation and Surgical Insurance"
+            },
+            "similarity": 0.6685842275619507
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.3 Non-Panel Clinics and Reimbursement"
+            },
+            "similarity": 0.6617453098297119
+          }
+        ],
+        "retrieval_ms": 20,
+        "generation_ms": null,
+        "total_ms": 20
+      },
+      {
+        "question_id": "g07",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "medical-claims-policy",
+            "section": "3.3 Non-Panel Clinics and Reimbursement"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Medical Claims and Benefits Policy — 3.3 Non-Panel Clinics and Reimbursement\n> 3.3.1 Treatment at a non-panel clinic is reimbursed only if no panel clinic was reasonably available, for example outside clinic hours, while travelling outstation, or in an emergency.\n>\n> 3.3.2 Reimbursement is capped at RM80 per visit and counts toward the annual outpatient limit.\n>\n> 3.3.3 Submit the claim in the eClaim system within 30 days of the visit, with the itemised receipt. Claims without an itemised receipt are rejected.\n\n[2] Medical Claims and Benefits Policy — 3.1 Panel Clinics\n> The Company has panel clinics near every office and major project site. At a panel clinic, the employee shows their staff ID card and pays nothing for the consultation and prescribed medicine, up to the annual outpatient limit in section 3.2. The current panel clinic list is on MyHR under \"Benefits\".\n\n[3] Leave Policy — 5.3 Medical Certificates from Non-Panel Clinics\n> MCs issued by any registered medical practitioner are accepted for sick leave, whether or not the clinic is on the Company's panel. Whether the cost of the visit is reimbursed is a separate question, covered by the Medical Claims Policy (BM-HR-POL-002), section 3.3.",
+        "cited": [
+          {
+            "document": "medical-claims-policy",
+            "section": "3.3 Non-Panel Clinics and Reimbursement"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "3.1 Panel Clinics"
+          },
+          {
+            "document": "leave-policy",
+            "section": "5.3 Medical Certificates from Non-Panel Clinics"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.3 Non-Panel Clinics and Reimbursement"
+            },
+            "similarity": 0.7263938188552856
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.1 Panel Clinics"
+            },
+            "similarity": 0.724737286567688
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "5.3 Medical Certificates from Non-Panel Clinics"
+            },
+            "similarity": 0.6926149909129756
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.1 Specialist Consultation"
+            },
+            "similarity": 0.663225531578064
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.2 Tolls and Parking"
+            },
+            "similarity": 0.6368564367294312
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g08",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "medical-claims-policy",
+            "section": "5. Dental Benefits"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Medical Claims and Benefits Policy — 5. Dental Benefits\n> Confirmed employees may claim up to RM300 per calendar year for dental treatment for themselves only: consultation, scaling and polishing, fillings and extractions. Braces, whitening, veneers and other cosmetic treatment are not covered. Dental claims are separate from the outpatient limit.",
+        "cited": [
+          {
+            "document": "medical-claims-policy",
+            "section": "5. Dental Benefits"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "5. Dental Benefits"
+            },
+            "similarity": 0.7296846235174441
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "9. Amendment History"
+            },
+            "similarity": 0.6769258581675848
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.2 Medical Benefits During Probation"
+            },
+            "similarity": 0.6612716913223267
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.6560063772193983
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "6. Optical Benefits"
+            },
+            "similarity": 0.6411689351595763
+          }
+        ],
+        "retrieval_ms": 18,
+        "generation_ms": null,
+        "total_ms": 18
+      },
+      {
+        "question_id": "g09",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "medical-claims-policy",
+            "section": "4.2 Group Hospitalisation and Surgical Insurance"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Medical Claims and Benefits Policy — 4.2 Group Hospitalisation and Surgical Insurance\n> All employees, including those on probation, are covered by the Company's group hospitalisation and surgical insurance from their first day of service.\n>\n> | Grade | Room and board per day | Overall annual limit |\n> |---|---|---|\n> | NE1 to NE4 | RM150 | RM50,000 |\n> | E1 to E3 | RM200 | RM50,000 |\n> | M1 and M2 | RM300 | RM80,000 |\n> | SM | RM400 | RM80,000 |\n>\n> The registered spouse and children of a confirmed employee are covered at the same room-and-board rate as the employee. If the employee chooses a room above their entitlement, they pay the difference.",
+        "cited": [
+          {
+            "document": "medical-claims-policy",
+            "section": "4.2 Group Hospitalisation and Surgical Insurance"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.2 Group Hospitalisation and Surgical Insurance"
+            },
+            "similarity": 0.7170364856719971
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.6038527960952806
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "1. Purpose and Scope"
+            },
+            "similarity": 0.6007090210914612
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "4.3 Hospital Admission Procedure"
+            },
+            "similarity": 0.5919313917241864
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "4. Accommodation"
+            },
+            "similarity": 0.5901737809181213
+          }
+        ],
+        "retrieval_ms": 18,
+        "generation_ms": null,
+        "total_ms": 18
+      },
+      {
+        "question_id": "g10",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "medical-claims-policy",
+            "section": "7. Exclusions"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "7. Exclusions"
+            },
+            "similarity": 0.6879834718714087
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            },
+            "similarity": 0.6615114413791048
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "5. Dental Benefits"
+            },
+            "similarity": 0.6505287914522675
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "6. Optical Benefits"
+            },
+            "similarity": 0.6472300921863164
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.3 Non-Panel Clinics and Reimbursement"
+            },
+            "similarity": 0.6263007148325028
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": null,
+        "total_ms": 24
+      },
+      {
+        "question_id": "g11",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "overtime-policy",
+            "section": "3. Normal Working Hours"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "5. Overtime Rates"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "5. Overtime Rates"
+            },
+            "similarity": 0.6820609163009587
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "3. Normal Working Hours"
+            },
+            "similarity": 0.6273035255308717
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.2 Internet and Utilities Allowance"
+            },
+            "similarity": 0.59839745769516
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            "similarity": 0.597736108572947
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "9. Public Holidays"
+            },
+            "similarity": 0.5891354924955681
+          }
+        ],
+        "retrieval_ms": 28,
+        "generation_ms": null,
+        "total_ms": 28
+      },
+      {
+        "question_id": "g12",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "overtime-policy",
+            "section": "7. Meal and Transport Allowances for Overtime"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Overtime Policy — 7. Meal and Transport Allowances for Overtime\n> 7.1 The overtime meal allowance is:\n>\n> - RM15 for at least three hours of overtime on a normal working day;\n> - RM20 for at least six hours of work on a rest day or public holiday.\n>\n> Only one overtime meal allowance is paid per day. It is claimed together with the overtime hours in MyHR, not through eClaim.\n>\n> 7.2 If approved overtime ends after 11:00 p.m. and the employee has no transport, the cost of a taxi or e-hailing ride home is reimbursed under the Expense Claims Policy (BM-HR-POL-004), section 3.3.\n>\n> 7.3 The overtime meal allowance is not paid on any day for which the employee receives the outstation meal allowance under the Travel Policy (BM-HR-POL-005).\n\n[2] Expense Claims Policy — 4.2 Working Meals\n> When a team must work through a meal to meet an approved project deadline, the most senior employee present may claim up to RM25 per person. This does not apply to overtime meals, which are paid under the Overtime Policy, section 7.1, or to meals during outstation travel, which are covered by the Travel Policy.\n\n[3] Overtime Policy — 10. Amendment History\n> | Version | Effective date | Summary of changes |\n> |---|---|---|\n> | 1.0 | 1 January 2018 | First issue. |\n> | 1.2 | 1 July 2021 | Site-based working hours updated. |\n> | 2.0 | 1 March 2024 | Overtime meal allowance for a normal working day raised from RM10 to RM15; TOIL validity extended from 30 to 60 days. |",
+        "cited": [
+          {
+            "document": "overtime-policy",
+            "section": "7. Meal and Transport Allowances for Overtime"
+          },
+          {
+            "document": "expense-claims-policy",
+            "section": "4.2 Working Meals"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "10. Amendment History"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            "similarity": 0.8643155774882106
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.2 Working Meals"
+            },
+            "similarity": 0.7782471179962158
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.7553146627357816
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "5. Overtime Rates"
+            },
+            "similarity": 0.7229445576667786
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            },
+            "similarity": 0.7143083044474319
+          }
+        ],
+        "retrieval_ms": 30,
+        "generation_ms": null,
+        "total_ms": 30
+      },
+      {
+        "question_id": "g13",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "overtime-policy",
+            "section": "2. Eligibility"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "8. Time Off in Lieu for Executives"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Overtime Policy — 2. Eligibility\n> 2.1 Employees in Non-Executive grades (NE1 to NE4) are eligible for overtime pay under section 5.\n>\n> 2.2 Employees in Executive grades and above (E1 to SM) are not paid overtime. Executives who work a full rest day or public holiday at a project site with HOD approval may receive time off in lieu under section 8.\n>\n> 2.3 Interns are not permitted to work overtime.",
+        "cited": [
+          {
+            "document": "overtime-policy",
+            "section": "2. Eligibility"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.7557910521404068
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "9. Submitting Overtime Claims"
+            },
+            "similarity": 0.6684228577109792
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.6629518076238908
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            "similarity": 0.6493793756879503
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "5. Overtime Rates"
+            },
+            "similarity": 0.6482462706272325
+          }
+        ],
+        "retrieval_ms": 26,
+        "generation_ms": null,
+        "total_ms": 26
+      },
+      {
+        "question_id": "g14",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "overtime-policy",
+            "section": "8. Time Off in Lieu for Executives"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "10. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Overtime Policy — 8. Time Off in Lieu for Executives\n> 8.1 Executives (E1 and above) who work a full rest day or public holiday at a project site, with prior HOD approval, receive one day of time off in lieu (TOIL). Half a day of TOIL is given for at least four hours of work.\n>\n> 8.2 TOIL must be taken within 60 days of the day worked, or it lapses. TOIL cannot be paid out in cash and cannot be converted into annual leave.\n>\n> 8.3 TOIL is recorded and applied for in MyHR under \"Time Off in Lieu\".",
+        "cited": [
+          {
+            "document": "overtime-policy",
+            "section": "8. Time Off in Lieu for Executives"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.7405360341072083
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.3 Carry Forward of Annual Leave"
+            },
+            "similarity": 0.6725475788116455
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "7. Emergency Leave"
+            },
+            "similarity": 0.6552437153313341
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "3. Leave Year and Applications"
+            },
+            "similarity": 0.6535286124314578
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "8. Unpaid Leave"
+            },
+            "similarity": 0.645505747466938
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": null,
+        "total_ms": 24
+      },
+      {
+        "question_id": "g15",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "overtime-policy",
+            "section": "3. Normal Working Hours"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Overtime Policy — 3. Normal Working Hours\n> | Employee group | Normal working days | Normal working hours |\n> |---|---|---|\n> | Office-based | Monday to Friday | 8:30 a.m. to 5:30 p.m., with a one-hour lunch break |\n> | Site-based | Monday to Saturday | Monday to Friday 8:00 a.m. to 5:00 p.m. (one-hour lunch break); Saturday 8:00 a.m. to 1:00 p.m. |\n>\n> Sunday is the rest day. For sites in states that observe a Friday and Saturday weekend, the rest day is Friday, and the Project Manager publishes the site working days.\n>\n> Work outside normal working hours, on a rest day or on a public holiday counts as overtime only if it was approved under section 4.\n\n[2] Overtime Policy — 5. Overtime Rates\n> 5.1 Overtime is paid at a multiple of the employee's hourly rate:\n>\n> | When the overtime is worked | Rate |\n> |---|---|\n> | Normal working day, after normal working hours | 1.5 × hourly rate |\n> | Rest day | 2.0 × hourly rate |\n> | Public holiday | 3.0 × hourly rate |\n>\n> 5.2 The hourly rate is calculated as: monthly basic salary × 12 ÷ (52 × normal weekly hours). Normal weekly hours are 40 for office-based employees and 45 for site-based employees.\n>\n> 5.3 Example: a site-based NE2 employee with a basic salary of RM2,340 has an hourly rate of RM2,340 × 12 ÷ (52 × 45) = RM12.00. Three hours of overtime on a normal working day are paid at 3 × 1.5 × RM12.00 = RM54.00.\n>\n> 5.4 Fixed allowances are not included when calculating the hourly rate.",
+        "cited": [
+          {
+            "document": "overtime-policy",
+            "section": "3. Normal Working Hours"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "5. Overtime Rates"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "3. Normal Working Hours"
+            },
+            "similarity": 0.7794847155231577
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "5. Overtime Rates"
+            },
+            "similarity": 0.7063573177839937
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6794849420207808
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.6738197401869463
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "3. WFH Arrangements"
+            },
+            "similarity": 0.6651020449278301
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g16",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "expense-claims-policy",
+            "section": "3.1 Mileage for Using Your Own Vehicle"
+          },
+          {
+            "document": "expense-claims-policy",
+            "section": "10. Amendment History"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6810625195503284
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.1 Mileage for Using Your Own Vehicle"
+            },
+            "similarity": 0.6337472259258236
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "8. Amendment History"
+            },
+            "similarity": 0.5610767864539165
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+            },
+            "similarity": 0.548492577761855
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.5424606749462276
+          }
+        ],
+        "retrieval_ms": 23,
+        "generation_ms": null,
+        "total_ms": 23
+      },
+      {
+        "question_id": "g17",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "expense-claims-policy",
+            "section": "4.1 Client Entertainment"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Expense Claims Policy — 4.1 Client Entertainment\n> 4.1.1 Entertainment of clients, consultants and business partners must have a clear business purpose. The claim must list the guests, their organisations and the purpose.\n>\n> 4.1.2 Limits per occasion:\n>\n> | Grade | Limit per occasion |\n> |---|---|\n> | NE1 to NE4 | Prior approval by the HOD required |\n> | E1 to E3 | RM150 |\n> | M1 and M2 | RM300 |\n> | SM | RM600 |\n>\n> 4.1.3 Alcohol is not reimbursable. Entertainment of government officials must also follow the Code of Conduct (BM-HR-POL-006), section 4.2.",
+        "cited": [
+          {
+            "document": "expense-claims-policy",
+            "section": "4.1 Client Entertainment"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.1 Client Entertainment"
+            },
+            "similarity": 0.7056835469196125
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.2 Working Meals"
+            },
+            "similarity": 0.6161688566207886
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "4. Accommodation"
+            },
+            "similarity": 0.599109411239624
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.2 Giving Gifts and Hospitality"
+            },
+            "similarity": 0.5950341820716858
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "1. Purpose and Scope"
+            },
+            "similarity": 0.5913383364677429
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g18",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "expense-claims-policy",
+            "section": "5. Mobile Phone and Internet"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "5.2 Internet and Utilities Allowance"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Expense Claims Policy — 5. Mobile Phone and Internet\n> 5.1 Employees whose roles require them to be reachable outside office hours receive a monthly reimbursement of their personal mobile phone bill:\n>\n> | Grade or role | Monthly limit |\n> |---|---|\n> | E1 to E3 in site or field roles | RM80 |\n> | M1 and M2 | RM150 |\n> | SM | RM250 |\n>\n> 5.2 Home internet bills are not claimed under this policy. Employees on an approved work-from-home arrangement receive a fixed allowance under the Work From Home Policy (BM-HR-POL-008), section 5.2.\n\n[2] Work From Home Policy — 5.2 Internet and Utilities Allowance\n> Employees with an approved regular WFH arrangement receive a fixed allowance of RM50 per month, paid with their salary, toward home internet and electricity costs. No separate claims for internet or utility bills may be made. The allowance is not paid for ad hoc WFH under section 2.4.\n>\n> > **Amendment (version 1.1, 1 October 2024):** The allowance was increased from RM30 to RM50 per month.",
+        "cited": [
+          {
+            "document": "expense-claims-policy",
+            "section": "5. Mobile Phone and Internet"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "5.2 Internet and Utilities Allowance"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.7410300086700958
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.2 Internet and Utilities Allowance"
+            },
+            "similarity": 0.691625035807491
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6361777240912226
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "7. Items That Cannot Be Claimed"
+            },
+            "similarity": 0.6334777752214014
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "2. General Principles"
+            },
+            "similarity": 0.6262236087055717
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g19",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "expense-claims-policy",
+            "section": "9. Approval Limits"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Expense Claims Policy — 9. Approval Limits\n> | Claim amount | Approved by |\n> |---|---|\n> | Up to RM500 | Immediate superior |\n> | RM500.01 to RM2,000 | Head of Department |\n> | Above RM2,000 | Finance Director |\n>\n> Claims made by an HOD are approved by the HOD's own superior. No one may approve their own claim.\n\n[2] Expense Claims Policy — 2. General Principles\n> 2.1 Expenses must be necessary for Company business, reasonable in amount, and supported by original receipts.\n>\n> 2.2 All claims are submitted through the eClaim system and approved according to section 9.\n>\n> 2.3 A receipt is required for every item above RM20. Items of RM20 or less without a receipt may be claimed with a written explanation, up to RM100 per month.\n>\n> 2.4 Employees must not split one expense into several claims to stay below an approval limit.\n\n[3] Expense Claims Policy — 3.1 Mileage for Using Your Own Vehicle\n> 3.1.1 Employees who use their own vehicle for Company business are paid mileage:\n>\n> | Vehicle | First 500 km in a calendar month | Above 500 km in the same month |\n> |---|---|---|\n> | Car | RM0.70 per km | RM0.55 per km |\n> | Motorcycle | RM0.35 per km | RM0.35 per km |\n>\n> 3.1.2 Travel between home and the employee's usual workplace is not business travel and cannot be claimed. Where an employee goes directly from home to another work location, only the distance in excess of the normal home-to-workplace trip may be claimed.\n>\n> 3.1.3 Mileage claims must state the date, the start and end points, the purpose and the distance. Distances are checked against an online map.\n>\n> > **Amendment (version 4.0, 1 January 2025):** The car rate for the first 500 km was increased from RM0.60 to RM0.70 per km. The rate above 500 km is unchanged.",
+        "cited": [
+          {
+            "document": "expense-claims-policy",
+            "section": "9. Approval Limits"
+          },
+          {
+            "document": "expense-claims-policy",
+            "section": "2. General Principles"
+          },
+          {
+            "document": "expense-claims-policy",
+            "section": "3.1 Mileage for Using Your Own Vehicle"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "9. Approval Limits"
+            },
+            "similarity": 0.7503029108047485
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "2. General Principles"
+            },
+            "similarity": 0.7340478897094727
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.1 Mileage for Using Your Own Vehicle"
+            },
+            "similarity": 0.6904465925161182
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6901109629935612
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.6805738210678101
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 20
+      },
+      {
+        "question_id": "g20",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "expense-claims-policy",
+            "section": "7. Items That Cannot Be Claimed"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Expense Claims Policy — 3.2 Tolls and Parking\n> Tolls and parking for business trips are reimbursed at cost. Attach the receipt, or the toll card statement showing the transaction. Parking at the employee's own usual workplace is not reimbursed.",
+        "cited": [
+          {
+            "document": "expense-claims-policy",
+            "section": "3.2 Tolls and Parking"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.2 Tolls and Parking"
+            },
+            "similarity": 0.7099943968652013
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            },
+            "similarity": 0.6514705613693765
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "7. Items That Cannot Be Claimed"
+            },
+            "similarity": 0.6486943976258353
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.1 Mileage for Using Your Own Vehicle"
+            },
+            "similarity": 0.6321582825042423
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.1 Client Entertainment"
+            },
+            "similarity": 0.6285643390248938
+          }
+        ],
+        "retrieval_ms": 23,
+        "generation_ms": null,
+        "total_ms": 23
+      },
+      {
+        "question_id": "g21",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "travel-policy",
+            "section": "4. Accommodation"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Travel Policy — 4. Accommodation\n> 4.1 Hotel room limits per night, including service charge and tax:\n>\n> | Grade | Kuala Lumpur, Penang and Johor Bahru | Other towns in Peninsular Malaysia | Sabah and Sarawak |\n> |---|---|---|---|\n> | NE1 to NE4 | RM180 | RM150 | RM200 |\n> | E1 to E3 | RM250 | RM200 | RM280 |\n> | M1 and M2 | RM350 | RM280 | RM380 |\n> | SM | Reasonable actual cost | Reasonable actual cost | Reasonable actual cost |\n>\n> 4.2 If no hotel within the limit is available, for example during a major event, the HOD may approve up to 20% above the limit. The reason must be stated in the claim.\n>\n> 4.3 Employees who stay with friends or relatives instead of at a hotel receive a lodging allowance of RM60 per night. No receipt is needed.\n>\n> 4.4 Employees on the same assignment should share transport where practical. Room sharing is not required.\n>\n> 4.5 For stays of more than 14 nights at one location, HR may arrange a serviced apartment instead of a hotel room.",
+        "cited": [
+          {
+            "document": "travel-policy",
+            "section": "4. Accommodation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "4. Accommodation"
+            },
+            "similarity": 0.7071942861560425
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "8. Amendment History"
+            },
+            "similarity": 0.6269844992766094
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.2 Remote Site Allowance"
+            },
+            "similarity": 0.5684743441969938
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "3.2 Annual Outpatient Limits"
+            },
+            "similarity": 0.5572314194164968
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "2. Travel Approval"
+            },
+            "similarity": 0.5534694460946662
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g22",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "travel-policy",
+            "section": "4. Accommodation"
+          },
+          {
+            "document": "travel-policy",
+            "section": "8. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Travel Policy — 5.1 Outstation Meal Allowance\n> 5.1.1 A daily meal allowance is paid for each day of outstation travel, instead of claiming individual meal receipts:\n>\n> | Grade | Full day | Half day |\n> |---|---|---|\n> | NE1 to NE4 | RM50 | RM25 |\n> | E1 to E3 | RM70 | RM35 |\n> | M1 and M2 | RM90 | RM45 |\n> | SM | RM110 | RM55 |\n>\n> 5.1.2 The half-day rate applies on the day of departure if the employee leaves after 1:00 p.m., and on the day of return if the employee arrives back before 1:00 p.m.\n>\n> 5.1.3 Where meals are provided free, for example by a client or at a conference, the allowance is reduced by one third for each main meal provided.\n\n[2] Travel Policy — 6.1 Overseas Daily Allowance\n> 6.1.1 Instead of the outstation meal allowance, overseas travellers receive a daily allowance in US dollars to cover meals, local transport and incidental expenses:\n>\n> | Destination | Daily allowance |\n> |---|---|\n> | ASEAN countries | USD60 |\n> | Other countries in Asia | USD80 |\n> | Europe, North America, Australia and New Zealand | USD110 |\n> | All other destinations | USD80 |\n>\n> 6.1.2 The allowance is converted to Ringgit at the exchange rate on the date of departure.\n\n[3] Travel Policy — 4. Accommodation\n> 4.1 Hotel room limits per night, including service charge and tax:\n>\n> | Grade | Kuala Lumpur, Penang and Johor Bahru | Other towns in Peninsular Malaysia | Sabah and Sarawak |\n> |---|---|---|---|\n> | NE1 to NE4 | RM180 | RM150 | RM200 |\n> | E1 to E3 | RM250 | RM200 | RM280 |\n> | M1 and M2 | RM350 | RM280 | RM380 |\n> | SM | Reasonable actual cost | Reasonable actual cost | Reasonable actual cost |\n>\n> 4.2 If no hotel within the limit is available, for example during a major event, the HOD may approve up to 20% above the limit. The reason must be stated in the claim.\n>\n> 4.3 Employees who stay with friends or relatives instead of at a hotel receive a lodging allowance of RM60 per night. No receipt is needed.\n>\n> 4.4 Employees on the same assignment should share transport where practical. Room sharing is not required.\n>\n> 4.5 For stays of more than 14 nights at one location, HR may arrange a serviced apartment instead of a hotel room.",
+        "cited": [
+          {
+            "document": "travel-policy",
+            "section": "5.1 Outstation Meal Allowance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "6.1 Overseas Daily Allowance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "4. Accommodation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            },
+            "similarity": 0.7255907491201622
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.1 Overseas Daily Allowance"
+            },
+            "similarity": 0.6967995762825012
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "4. Accommodation"
+            },
+            "similarity": 0.6954030990600586
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.2 Remote Site Allowance"
+            },
+            "similarity": 0.6831224153564933
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "8. Amendment History"
+            },
+            "similarity": 0.654228925704956
+          }
+        ],
+        "retrieval_ms": 21,
+        "generation_ms": null,
+        "total_ms": 21
+      },
+      {
+        "question_id": "g23",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "travel-policy",
+            "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Expense Claims Policy — 3.1 Mileage for Using Your Own Vehicle\n> 3.1.1 Employees who use their own vehicle for Company business are paid mileage:\n>\n> | Vehicle | First 500 km in a calendar month | Above 500 km in the same month |\n> |---|---|---|\n> | Car | RM0.70 per km | RM0.55 per km |\n> | Motorcycle | RM0.35 per km | RM0.35 per km |\n>\n> 3.1.2 Travel between home and the employee's usual workplace is not business travel and cannot be claimed. Where an employee goes directly from home to another work location, only the distance in excess of the normal home-to-workplace trip may be claimed.\n>\n> 3.1.3 Mileage claims must state the date, the start and end points, the purpose and the distance. Distances are checked against an online map.\n>\n> > **Amendment (version 4.0, 1 January 2025):** The car rate for the first 500 km was increased from RM0.60 to RM0.70 per km. The rate above 500 km is unchanged.\n\n[2] Travel Policy — 3.2 Using Your Own Vehicle for Outstation Travel\n> 3.2.1 Employees may drive their own vehicle to outstation destinations within Peninsular Malaysia with HOD approval. Mileage is paid at the rates in the Expense Claims Policy, section 3.1, together with tolls.\n>\n> 3.2.2 For a one-way distance of more than 350 km, the total mileage claim for the trip is capped at the cost of a return economy flight on the same route, unless the HOD approves driving for a work reason, for example to carry site equipment.",
+        "cited": [
+          {
+            "document": "expense-claims-policy",
+            "section": "3.1 Mileage for Using Your Own Vehicle"
+          },
+          {
+            "document": "travel-policy",
+            "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.1 Mileage for Using Your Own Vehicle"
+            },
+            "similarity": 0.7824817092749414
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+            },
+            "similarity": 0.727056817587805
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.2 Remote Site Allowance"
+            },
+            "similarity": 0.6522128400548887
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6436218023300216
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            },
+            "similarity": 0.6270963771881843
+          }
+        ],
+        "retrieval_ms": 26,
+        "generation_ms": null,
+        "total_ms": 26
+      },
+      {
+        "question_id": "g24",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "travel-policy",
+            "section": "6.1 Overseas Daily Allowance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "6.2 Travel Insurance"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Travel Policy — 6.2 Travel Insurance\n> All overseas business travel is covered by the Company's group travel insurance. HR must be told the travel dates at least three working days before departure so that cover can be confirmed.\n\n[2] Travel Policy — 6.1 Overseas Daily Allowance\n> 6.1.1 Instead of the outstation meal allowance, overseas travellers receive a daily allowance in US dollars to cover meals, local transport and incidental expenses:\n>\n> | Destination | Daily allowance |\n> |---|---|\n> | ASEAN countries | USD60 |\n> | Other countries in Asia | USD80 |\n> | Europe, North America, Australia and New Zealand | USD110 |\n> | All other destinations | USD80 |\n>\n> 6.1.2 The allowance is converted to Ringgit at the exchange rate on the date of departure.\n\n[3] Travel Policy — 5.1 Outstation Meal Allowance\n> 5.1.1 A daily meal allowance is paid for each day of outstation travel, instead of claiming individual meal receipts:\n>\n> | Grade | Full day | Half day |\n> |---|---|---|\n> | NE1 to NE4 | RM50 | RM25 |\n> | E1 to E3 | RM70 | RM35 |\n> | M1 and M2 | RM90 | RM45 |\n> | SM | RM110 | RM55 |\n>\n> 5.1.2 The half-day rate applies on the day of departure if the employee leaves after 1:00 p.m., and on the day of return if the employee arrives back before 1:00 p.m.\n>\n> 5.1.3 Where meals are provided free, for example by a client or at a conference, the allowance is reduced by one third for each main meal provided.",
+        "cited": [
+          {
+            "document": "travel-policy",
+            "section": "6.2 Travel Insurance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "6.1 Overseas Daily Allowance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "5.1 Outstation Meal Allowance"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.2 Travel Insurance"
+            },
+            "similarity": 0.7441648840904236
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.1 Overseas Daily Allowance"
+            },
+            "similarity": 0.7377306222915649
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.1 Outstation Meal Allowance"
+            },
+            "similarity": 0.7233388855063264
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "1. Purpose and Scope"
+            },
+            "similarity": 0.6945803165435791
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "1. Purpose and Scope"
+            },
+            "similarity": 0.6873008012771606
+          }
+        ],
+        "retrieval_ms": 25,
+        "generation_ms": null,
+        "total_ms": 25
+      },
+      {
+        "question_id": "g25",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "travel-policy",
+            "section": "6.3 Cash Advance"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Travel Policy — 6.3 Cash Advance\n> 6.3.1 Employees may apply for a cash advance of up to 70% of the estimated trip cost at least seven days before departure.\n>\n> 6.3.2 The advance must be settled with a travel claim within 14 days of return. Advances not settled after 30 days are deducted from salary.\n\n[2] Travel Policy — 6.2 Travel Insurance\n> All overseas business travel is covered by the Company's group travel insurance. HR must be told the travel dates at least three working days before departure so that cover can be confirmed.\n\n[3] Travel Policy — 2. Travel Approval\n> 2.1 All outstation and overseas travel needs an approved Travel Request in MyHR before anything is booked.\n>\n> 2.2 Outstation travel is approved by the Head of Department (HOD). Overseas travel is approved by the HOD and by the Director of the division.\n>\n> 2.3 Overseas Travel Requests must be submitted at least 14 days before departure, except for urgent client or project matters approved by the Director.\n>\n> 2.4 Flights and hotels are booked through the Company's appointed travel agent where possible. Employees who book for themselves must choose the lowest reasonable fare.",
+        "cited": [
+          {
+            "document": "travel-policy",
+            "section": "6.3 Cash Advance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "6.2 Travel Insurance"
+          },
+          {
+            "document": "travel-policy",
+            "section": "2. Travel Approval"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.3 Cash Advance"
+            },
+            "similarity": 0.731101350122611
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.2 Travel Insurance"
+            },
+            "similarity": 0.711875753886954
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "2. Travel Approval"
+            },
+            "similarity": 0.7054673608858979
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.4 Passports and Visas"
+            },
+            "similarity": 0.6506620257698293
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "6.1 Overseas Daily Allowance"
+            },
+            "similarity": 0.6505748837843618
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g26",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "code-of-conduct",
+            "section": "10. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Code of Conduct — 10. Amendment History\n> | Version | Effective date | Summary of changes |\n> |---|---|---|\n> | 1.0 | 1 May 2018 | First issue. |\n> | 2.0 | 1 January 2022 | Whistleblowing channel and stop-work authority added. |\n> | 2.1 | 1 September 2024 | Gift limit reduced from RM200 to RM100; facilitation payments clause added (section 4.3). |\n\n[2] Code of Conduct — 4.3 Bribery and Facilitation Payments\n> The Company has zero tolerance for bribery. Employees must not offer, give, request or accept any payment or advantage to improperly influence a decision. Facilitation payments (\"duit kopi\") to speed up permits, inspections or approvals are prohibited, even if small or customary.",
+        "cited": [
+          {
+            "document": "code-of-conduct",
+            "section": "10. Amendment History"
+          },
+          {
+            "document": "code-of-conduct",
+            "section": "4.3 Bribery and Facilitation Payments"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.7403747594133177
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.3 Bribery and Facilitation Payments"
+            },
+            "similarity": 0.7147998979806973
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "1. Purpose and Application"
+            },
+            "similarity": 0.6055056326978645
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "9. Disciplinary Action"
+            },
+            "similarity": 0.5931063183419325
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "Document information"
+            },
+            "similarity": 0.5855276831670007
+          }
+        ],
+        "retrieval_ms": 21,
+        "generation_ms": null,
+        "total_ms": 21
+      },
+      {
+        "question_id": "g27",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "code-of-conduct",
+            "section": "4.2 Giving Gifts and Hospitality"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Code of Conduct — 4.2 Giving Gifts and Hospitality\n> 4.2.1 Gifts and hospitality offered to clients or business partners must be modest, infrequent and recorded. Anything above RM300 per person needs prior approval from the Compliance Unit.\n>\n> 4.2.2 Any gift or hospitality for a government official, or for a person working for a government-linked client, needs prior approval from the Compliance Unit, whatever its value.\n>\n> 4.2.3 No gift or hospitality may be offered to anyone involved in a live tender evaluation.\n\n[2] Code of Conduct — 4.1 Receiving Gifts\n> 4.1.1 Employees may accept small gifts worth up to RM100, such as festive food hampers or branded souvenirs, provided the giver is not in a tender or negotiation with the Company at the time.\n>\n> 4.1.2 Gifts worth more than RM100 must be declared to the Compliance Unit within three working days and either returned or surrendered to the Company.\n>\n> 4.1.3 Cash, cash vouchers, gift cards and loans must never be accepted, whatever the amount.\n>\n> > **Amendment (version 2.1, 1 September 2024):** The gift limit was reduced from RM200 to RM100.",
+        "cited": [
+          {
+            "document": "code-of-conduct",
+            "section": "4.2 Giving Gifts and Hospitality"
+          },
+          {
+            "document": "code-of-conduct",
+            "section": "4.1 Receiving Gifts"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.2 Giving Gifts and Hospitality"
+            },
+            "similarity": 0.7026903629302979
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.1 Receiving Gifts"
+            },
+            "similarity": 0.6950338250358362
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.3 Bribery and Facilitation Payments"
+            },
+            "similarity": 0.5788789391517639
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            },
+            "similarity": 0.5754237174987793
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.2 Internet and Utilities Allowance"
+            },
+            "similarity": 0.5576095581054688
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g28",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "code-of-conduct",
+            "section": "5.2 Anti-Harassment"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "5.2 Anti-Harassment"
+            },
+            "similarity": 0.6080426392542554
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "5.2 Anti-Harassment"
+            },
+            "similarity": 0.5813900135290606
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.1 Client Entertainment"
+            },
+            "similarity": 0.5291947687632121
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "8. Whistleblowing"
+            },
+            "similarity": 0.5217476461234515
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "Document information"
+            },
+            "similarity": 0.5205770706442511
+          }
+        ],
+        "retrieval_ms": 23,
+        "generation_ms": null,
+        "total_ms": 23
+      },
+      {
+        "question_id": "g29",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "code-of-conduct",
+            "section": "7.2 Social Media"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "7.2 Social Media"
+            },
+            "similarity": 0.5870799072337216
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.2 Remote Site Allowance"
+            },
+            "similarity": 0.5175666192094541
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "7.3 Confidential Information"
+            },
+            "similarity": 0.5156610896789388
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "6. Safety at Project Sites"
+            },
+            "similarity": 0.5156490188063361
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "2. Travel Approval"
+            },
+            "similarity": 0.4989936054352766
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g30",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "code-of-conduct",
+            "section": "5.3 Attendance and Punctuality"
+          },
+          {
+            "document": "code-of-conduct",
+            "section": "9. Disciplinary Action"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "5.3 Attendance and Punctuality"
+            },
+            "similarity": 0.6341314315795898
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "9. Disciplinary Action"
+            },
+            "similarity": 0.5831962476255756
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "7. Claims After Travel"
+            },
+            "similarity": 0.5522394180297852
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "8. Claim Submission and Deadlines"
+            },
+            "similarity": 0.552210807800293
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            "similarity": 0.5479451956814333
+          }
+        ],
+        "retrieval_ms": 26,
+        "generation_ms": null,
+        "total_ms": 26
+      },
+      {
+        "question_id": "g31",
+        "question_type": "table",
+        "expected": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "7.2 Notice After Confirmation"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Probation and Confirmation Policy — 7.2 Notice After Confirmation\n> After confirmation, the notice period is:\n>\n> | Grade | Notice after confirmation |\n> |---|---|\n> | NE1 to NE4 | 1 month |\n> | E1 to E3 | 2 months |\n> | M1, M2 and SM | 3 months |\n>\n> These notice periods apply unless the employee's letter of appointment states a different period.\n\n[2] Probation and Confirmation Policy — 9. Amendment History\n> | Version | Effective date | Summary of changes |\n> |---|---|---|\n> | 1.0 | 1 March 2019 | First issue. |\n> | 1.2 | 1 January 2023 | Mid-probation review made mandatory. |\n> | 1.3 | 1 February 2025 | Notice during probation for E1 to SM changed from 2 weeks to 1 month. |\n\n[3] Probation and Confirmation Policy — 5. Confirmation\n> 5.1 HR issues a confirmation letter within 14 days after a successful final review. Confirmation takes effect from the day after the probation period ends.\n>\n> 5.2 An employee whose probation period has ended, and who has not received either a confirmation letter or an extension letter, should contact HR.\n>\n> 5.3 On confirmation, the employee becomes eligible for the benefits in section 6 that are limited to confirmed employees.",
+        "cited": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "7.2 Notice After Confirmation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "9. Amendment History"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "5. Confirmation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.2 Notice After Confirmation"
+            },
+            "similarity": 0.7860611463675847
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "9. Amendment History"
+            },
+            "similarity": 0.7165830473204846
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "5. Confirmation"
+            },
+            "similarity": 0.7144008619307495
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            "similarity": 0.7049060571417672
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "3. Reviews During Probation"
+            },
+            "similarity": 0.6630467182910362
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": null,
+        "total_ms": 24
+      },
+      {
+        "question_id": "g32",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "7.1 Notice During Probation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "9. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Probation and Confirmation Policy — 7.1 Notice During Probation\n> Either the employee or the Company may end employment during probation by giving written notice:\n>\n> | Grade | Notice during probation |\n> |---|---|\n> | NE1 to NE4 | 2 weeks |\n> | E1 to SM | 1 month |\n>\n> > **Amendment (version 1.3, 1 February 2025):** The notice period during probation for E1 to SM was changed from 2 weeks to 1 month.\n\n[2] Leave Policy — 4.2 Leave During Probation\n> 4.2.1 Employees on probation earn annual leave at the rate of one-twelfth of their yearly entitlement for each completed month of service.\n>\n> 4.2.2 Probationers may take the leave they have earned so far, subject to approval. Taking leave before it has been earned is not allowed during probation.\n>\n> 4.2.3 Earned but untaken leave carries over into the confirmed period. It is not lost on confirmation.\n\n[3] Probation and Confirmation Policy — 8. Ending Employment During Probation\n> 8.1 The Company may end the employment of a probationer whose performance or conduct remains unsatisfactory after the reviews in section 3, or after an extension under section 4.\n>\n> 8.2 The decision must be supported by the documented reviews and approved by the HOD and the Head of Human Resources. The employee receives the reasons in writing.\n>\n> 8.3 Serious misconduct during probation is handled under the Code of Conduct, section 9, and may lead to dismissal without the review process.",
+        "cited": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "7.1 Notice During Probation"
+          },
+          {
+            "document": "leave-policy",
+            "section": "4.2 Leave During Probation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "8. Ending Employment During Probation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            "similarity": 0.7640807313822883
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.2 Leave During Probation"
+            },
+            "similarity": 0.7171562314033508
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "8. Ending Employment During Probation"
+            },
+            "similarity": 0.6922315359115601
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "9. Disciplinary Action"
+            },
+            "similarity": 0.6768953396740365
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.1 Leave During Probation"
+            },
+            "similarity": 0.6708858609199524
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": null,
+        "total_ms": 24
+      },
+      {
+        "question_id": "g33",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "4. Extension of Probation"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Probation and Confirmation Policy — 4. Extension of Probation\n> 4.1 Probation may be extended once, by up to three months, if the employee's performance or conduct has not yet met the required standard.\n>\n> 4.2 The employee must be told about the extension in writing before the original probation period ends, with the reasons and the improvement expected.\n>\n> 4.3 Probation cannot be extended a second time. At the end of an extension, the employee is either confirmed or their employment is ended under section 8.\n\n[2] Probation and Confirmation Policy — 3. Reviews During Probation\n> 3.1 The immediate superior holds a mid-probation review halfway through the probation period, using the Probation Review Form in MyHR, and agrees improvement actions where needed.\n>\n> 3.2 A final review is held at least two weeks before the probation period ends. The superior recommends one of: confirmation, extension of probation, or termination.\n>\n> 3.3 Reviews assess the quality and quantity of work, attendance and punctuality, safety behaviour (for site-based employees), teamwork, and conduct in line with the Code of Conduct.\n\n[3] Probation and Confirmation Policy — 8. Ending Employment During Probation\n> 8.1 The Company may end the employment of a probationer whose performance or conduct remains unsatisfactory after the reviews in section 3, or after an extension under section 4.\n>\n> 8.2 The decision must be supported by the documented reviews and approved by the HOD and the Head of Human Resources. The employee receives the reasons in writing.\n>\n> 8.3 Serious misconduct during probation is handled under the Code of Conduct, section 9, and may lead to dismissal without the review process.",
+        "cited": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "4. Extension of Probation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "3. Reviews During Probation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "8. Ending Employment During Probation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "4. Extension of Probation"
+            },
+            "similarity": 0.8509206860708797
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "3. Reviews During Probation"
+            },
+            "similarity": 0.7155349424162554
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "8. Ending Employment During Probation"
+            },
+            "similarity": 0.7059595584869385
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            "similarity": 0.6835468192640807
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "5. Confirmation"
+            },
+            "similarity": 0.6825633645057678
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g34",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "6.2 Medical Benefits During Probation"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "5. Dental Benefits"
+          },
+          {
+            "document": "medical-claims-policy",
+            "section": "6. Optical Benefits"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Probation and Confirmation Policy — 6.2 Medical Benefits During Probation\n> Probationers are covered for outpatient treatment at panel clinics for themselves only, and by the group hospitalisation insurance from their first day. Cover for family members, and dental and optical benefits, start on confirmation. See the Medical Claims and Benefits Policy (BM-HR-POL-002), sections 2 and 4.2.\n\n[2] Probation and Confirmation Policy — 6.1 Leave During Probation\n> Probationers earn annual leave month by month and may take leave they have already earned, as set out in the Leave Policy (BM-HR-POL-001), section 4.2. Sick leave and hospitalisation leave are available in full from the first day.",
+        "cited": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "6.2 Medical Benefits During Probation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "6.1 Leave During Probation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.2 Medical Benefits During Probation"
+            },
+            "similarity": 0.7623756669535849
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.1 Leave During Probation"
+            },
+            "similarity": 0.7212844061085949
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "9. Amendment History"
+            },
+            "similarity": 0.6854758058346595
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.3 Overtime, Claims and Work From Home"
+            },
+            "similarity": 0.6822665712515626
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "6. Optical Benefits"
+            },
+            "similarity": 0.6725360144610391
+          }
+        ],
+        "retrieval_ms": 18,
+        "generation_ms": null,
+        "total_ms": 18
+      },
+      {
+        "question_id": "g35",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "4. Extension of Probation"
+          },
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "8. Ending Employment During Probation"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Probation and Confirmation Policy — 4. Extension of Probation\n> 4.1 Probation may be extended once, by up to three months, if the employee's performance or conduct has not yet met the required standard.\n>\n> 4.2 The employee must be told about the extension in writing before the original probation period ends, with the reasons and the improvement expected.\n>\n> 4.3 Probation cannot be extended a second time. At the end of an extension, the employee is either confirmed or their employment is ended under section 8.",
+        "cited": [
+          {
+            "document": "probation-and-confirmation-policy",
+            "section": "4. Extension of Probation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "4. Extension of Probation"
+            },
+            "similarity": 0.7566552903261621
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "8. Ending Employment During Probation"
+            },
+            "similarity": 0.6795185804367065
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "3. Reviews During Probation"
+            },
+            "similarity": 0.651013931571608
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.1 Notice During Probation"
+            },
+            "similarity": 0.6369432643719641
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "5. Confirmation"
+            },
+            "similarity": 0.6357060670852661
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g36",
+        "question_type": "amendment",
+        "expected": [
+          {
+            "document": "work-from-home-policy",
+            "section": "5.2 Internet and Utilities Allowance"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "10. Amendment History"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Work From Home Policy — 5.2 Internet and Utilities Allowance\n> Employees with an approved regular WFH arrangement receive a fixed allowance of RM50 per month, paid with their salary, toward home internet and electricity costs. No separate claims for internet or utility bills may be made. The allowance is not paid for ad hoc WFH under section 2.4.\n>\n> > **Amendment (version 1.1, 1 October 2024):** The allowance was increased from RM30 to RM50 per month.\n\n[2] Expense Claims Policy — 5. Mobile Phone and Internet\n> 5.1 Employees whose roles require them to be reachable outside office hours receive a monthly reimbursement of their personal mobile phone bill:\n>\n> | Grade or role | Monthly limit |\n> |---|---|\n> | E1 to E3 in site or field roles | RM80 |\n> | M1 and M2 | RM150 |\n> | SM | RM250 |\n>\n> 5.2 Home internet bills are not claimed under this policy. Employees on an approved work-from-home arrangement receive a fixed allowance under the Work From Home Policy (BM-HR-POL-008), section 5.2.\n\n[3] Work From Home Policy — 3. WFH Arrangements\n> 3.1 An employee with an approved arrangement may work from home up to two days per week. The WFH days are agreed with the HOD in advance and do not change from week to week without approval.\n>\n> 3.2 A whole team may not work from home on the same day, so that every department has staff in the office on every working day.\n>\n> 3.3 While working from home, employees must be reachable by phone and the Company's messaging tools during core hours of 10:00 a.m. to 4:00 p.m. They must attend in-person meetings in the office when asked with at least one working day's notice.",
+        "cited": [
+          {
+            "document": "work-from-home-policy",
+            "section": "5.2 Internet and Utilities Allowance"
+          },
+          {
+            "document": "expense-claims-policy",
+            "section": "5. Mobile Phone and Internet"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "3. WFH Arrangements"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.2 Internet and Utilities Allowance"
+            },
+            "similarity": 0.8150424957275391
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.7127676010131836
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "3. WFH Arrangements"
+            },
+            "similarity": 0.692407924389368
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6894104665869208
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.1 Mileage for Using Your Own Vehicle"
+            },
+            "similarity": 0.6850191134191665
+          }
+        ],
+        "retrieval_ms": 17,
+        "generation_ms": null,
+        "total_ms": 17
+      },
+      {
+        "question_id": "g37",
+        "question_type": "look-alike",
+        "expected": [
+          {
+            "document": "work-from-home-policy",
+            "section": "2. Eligibility"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Work From Home Policy — 2. Eligibility\n> 2.1 The following employees may apply for a regular WFH arrangement:\n>\n> (a) confirmed office-based employees in grades E1 to SM; and\n>\n> (b) confirmed office-based employees in NE grades whose work can be done remotely, with HOD approval.\n>\n> 2.2 Site-based employees are not eligible for regular WFH, because their work must be done at the project site.\n>\n> 2.3 Employees on probation are not eligible, so that they can learn the role in person.\n>\n> 2.4 Ad hoc WFH for a single day, for example while waiting for a home repair, may be approved by the immediate superior for any office-based employee, up to two days per month. Ad hoc WFH does not need an arrangement under section 4.\n\n[2] Work From Home Policy — 1. Purpose\n> This policy sets out when employees of Binaan Maju Sdn Bhd (\"the Company\") may work from home (WFH), how arrangements are approved, and the rules that apply while working from home.\n\n[3] Work From Home Policy — 3. WFH Arrangements\n> 3.1 An employee with an approved arrangement may work from home up to two days per week. The WFH days are agreed with the HOD in advance and do not change from week to week without approval.\n>\n> 3.2 A whole team may not work from home on the same day, so that every department has staff in the office on every working day.\n>\n> 3.3 While working from home, employees must be reachable by phone and the Company's messaging tools during core hours of 10:00 a.m. to 4:00 p.m. They must attend in-person meetings in the office when asked with at least one working day's notice.",
+        "cited": [
+          {
+            "document": "work-from-home-policy",
+            "section": "2. Eligibility"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "1. Purpose"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "3. WFH Arrangements"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.7302245658502254
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.7087442874908447
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "3. WFH Arrangements"
+            },
+            "similarity": 0.6988881409830976
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "6. Working Hours and Overtime"
+            },
+            "similarity": 0.6812097620242988
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.1 Company Equipment"
+            },
+            "similarity": 0.6787269902988095
+          }
+        ],
+        "retrieval_ms": 17,
+        "generation_ms": null,
+        "total_ms": 17
+      },
+      {
+        "question_id": "g38",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "work-from-home-policy",
+            "section": "8. Information Security"
+          }
+        ],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "8. Information Security"
+            },
+            "similarity": 0.6225526518390375
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.1 Company Equipment"
+            },
+            "similarity": 0.6008329808463782
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.5895867523427832
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "6. Working Hours and Overtime"
+            },
+            "similarity": 0.5827982252002315
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.2 Internet and Utilities Allowance"
+            },
+            "similarity": 0.5782799297058564
+          }
+        ],
+        "retrieval_ms": 25,
+        "generation_ms": null,
+        "total_ms": 25
+      },
+      {
+        "question_id": "g39",
+        "question_type": "plain",
+        "expected": [
+          {
+            "document": "work-from-home-policy",
+            "section": "5.1 Company Equipment"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Work From Home Policy — 5.1 Company Equipment\n> The Company provides a laptop and, on request, a headset. Office furniture, monitors and printers for home use are not provided. Company equipment must be returned when the employee leaves the Company.",
+        "cited": [
+          {
+            "document": "work-from-home-policy",
+            "section": "5.1 Company Equipment"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.1 Company Equipment"
+            },
+            "similarity": 0.7119104437881456
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "8. Information Security"
+            },
+            "similarity": 0.6242120265960693
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "7.1 IT Equipment and Email"
+            },
+            "similarity": 0.5823698813429442
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "Document information"
+            },
+            "similarity": 0.5798337632368139
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.5760340690612793
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g40",
+        "question_type": "two-section",
+        "expected": [
+          {
+            "document": "work-from-home-policy",
+            "section": "6. Working Hours and Overtime"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "4. Pre-Approval of Overtime"
+          }
+        ],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Overtime Policy — 4. Pre-Approval of Overtime\n> 4.1 Overtime must be approved in advance by the Head of Department (HOD), or at project sites by the Project Manager, through the overtime request in MyHR.\n>\n> 4.2 In an emergency, such as a site safety incident, an equipment breakdown or a concrete pour that cannot be stopped, overtime may be approved verbally. It must then be recorded in MyHR within two working days.\n>\n> 4.3 Overtime that was not approved under 4.1 or 4.2 is not paid.\n\n[2] Work From Home Policy — 6. Working Hours and Overtime\n> 6.1 Normal working hours and attendance rules apply while working from home. Employees log in on the MyHR app at the start and end of each WFH day.\n>\n> 6.2 NE employees working from home may only work overtime with prior approval under the Overtime Policy (BM-HR-POL-003), section 4.\n\n[3] Overtime Policy — 2. Eligibility\n> 2.1 Employees in Non-Executive grades (NE1 to NE4) are eligible for overtime pay under section 5.\n>\n> 2.2 Employees in Executive grades and above (E1 to SM) are not paid overtime. Executives who work a full rest day or public holiday at a project site with HOD approval may receive time off in lieu under section 8.\n>\n> 2.3 Interns are not permitted to work overtime.",
+        "cited": [
+          {
+            "document": "overtime-policy",
+            "section": "4. Pre-Approval of Overtime"
+          },
+          {
+            "document": "work-from-home-policy",
+            "section": "6. Working Hours and Overtime"
+          },
+          {
+            "document": "overtime-policy",
+            "section": "2. Eligibility"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "4. Pre-Approval of Overtime"
+            },
+            "similarity": 0.7440981421412158
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "6. Working Hours and Overtime"
+            },
+            "similarity": 0.7183602024102103
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.7103159600307978
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "9. Submitting Overtime Claims"
+            },
+            "similarity": 0.6753203868865967
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "4. Applying for WFH"
+            },
+            "similarity": 0.671769917011261
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": null,
+        "total_ms": 24
+      },
+      {
+        "question_id": "g41",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.1 Annual Leave Entitlement"
+            },
+            "similarity": 0.66518888888492
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.5 Joining or Leaving Part-Way Through the Year"
+            },
+            "similarity": 0.6450051665306091
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.3 Carry Forward of Annual Leave"
+            },
+            "similarity": 0.6239922642707825
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.1 Maternity Leave"
+            },
+            "similarity": 0.6178755391910362
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "9. Public Holidays"
+            },
+            "similarity": 0.6140884160995483
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g42",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "3. Leave Year and Applications"
+            },
+            "similarity": 0.619897649300383
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.5 Joining or Leaving Part-Way Through the Year"
+            },
+            "similarity": 0.6130289435386658
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.1 Annual Leave Entitlement"
+            },
+            "similarity": 0.6118931040891328
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.609811461556642
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "10. Amendment History"
+            },
+            "similarity": 0.6054897543496051
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g43",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.1 Mileage for Using Your Own Vehicle"
+            },
+            "similarity": 0.6457201875948582
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.6254152282824987
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.2 Internet and Utilities Allowance"
+            },
+            "similarity": 0.6215549336937121
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            "similarity": 0.60455899184239
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            },
+            "similarity": 0.6005257606192981
+          }
+        ],
+        "retrieval_ms": 19,
+        "generation_ms": null,
+        "total_ms": 19
+      },
+      {
+        "question_id": "g44",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "6. Professional Memberships"
+            },
+            "similarity": 0.6250396966934204
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.2 Tolls and Parking"
+            },
+            "similarity": 0.5847051739692688
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.1 Company Equipment"
+            },
+            "similarity": 0.5729095594340835
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.3 Bribery and Facilitation Payments"
+            },
+            "similarity": 0.5618563294410706
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.5617333650588989
+          }
+        ],
+        "retrieval_ms": 17,
+        "generation_ms": null,
+        "total_ms": 17
+      },
+      {
+        "question_id": "g45",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "3. Conflicts of Interest"
+            },
+            "similarity": 0.5844249028653064
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "5.1 Company Equipment"
+            },
+            "similarity": 0.5806721006622145
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "7.3 Confidential Information"
+            },
+            "similarity": 0.576133957370052
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.5756807833098473
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "7.2 Social Media"
+            },
+            "similarity": 0.5744079858770428
+          }
+        ],
+        "retrieval_ms": 21,
+        "generation_ms": null,
+        "total_ms": 21
+      },
+      {
+        "question_id": "g46",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.1 Maternity Leave"
+            },
+            "similarity": 0.5834306130748632
+          },
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.5718757424502721
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "1. Purpose"
+            },
+            "similarity": 0.5665445327758789
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "5. Mobile Phone and Internet"
+            },
+            "similarity": 0.5622361898422241
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "6.3 Compassionate Leave"
+            },
+            "similarity": 0.5616767406463623
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g47",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.1 Annual Leave Entitlement"
+            },
+            "similarity": 0.54500611811767
+          },
+          {
+            "section": {
+              "document": "code-of-conduct",
+              "section": "4.2 Giving Gifts and Hospitality"
+            },
+            "similarity": 0.5392803824376842
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.5 Joining or Leaving Part-Way Through the Year"
+            },
+            "similarity": 0.5359980740548338
+          },
+          {
+            "section": {
+              "document": "work-from-home-policy",
+              "section": "2. Eligibility"
+            },
+            "similarity": 0.5294188822008512
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "Document information"
+            },
+            "similarity": 0.5193806267523018
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g48",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "2. Scope"
+            },
+            "similarity": 0.6501537159131088
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.2 Tolls and Parking"
+            },
+            "similarity": 0.6283108183238157
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "3.2 Using Your Own Vehicle for Outstation Travel"
+            },
+            "similarity": 0.6202042287648987
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "3.1 Air Travel"
+            },
+            "similarity": 0.6178855484093891
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "1. Purpose and Scope"
+            },
+            "similarity": 0.6159292643049142
+          }
+        ],
+        "retrieval_ms": 26,
+        "generation_ms": null,
+        "total_ms": 26
+      },
+      {
+        "question_id": "g49",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.4 Encashment of Unused Annual Leave"
+            },
+            "similarity": 0.6271973848342896
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "8. Unpaid Leave"
+            },
+            "similarity": 0.6130964390578019
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "3.3 Taxi and E-hailing"
+            },
+            "similarity": 0.6124081611633301
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.6088554859161377
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "7.3 Payment Instead of Notice"
+            },
+            "similarity": 0.6049893733865407
+          }
+        ],
+        "retrieval_ms": 24,
+        "generation_ms": null,
+        "total_ms": 24
+      },
+      {
+        "question_id": "g50",
+        "question_type": "uncovered-topic",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "medical-claims-policy",
+              "section": "2. Eligibility and Covered Family Members"
+            },
+            "similarity": 0.6092117661707551
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.2 Working Meals"
+            },
+            "similarity": 0.6007803320419601
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "4.3 Carry Forward of Annual Leave"
+            },
+            "similarity": 0.5953701379674602
+          },
+          {
+            "section": {
+              "document": "leave-policy",
+              "section": "3. Leave Year and Applications"
+            },
+            "similarity": 0.5869374417774493
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "Document information"
+            },
+            "similarity": 0.5855083363642292
+          }
+        ],
+        "retrieval_ms": 22,
+        "generation_ms": null,
+        "total_ms": 22
+      },
+      {
+        "question_id": "g51",
+        "question_type": "missing-detail",
+        "expected": [],
+        "mode": "extractive",
+        "answer": "No AI summary available — the most relevant policy passages are below.\n\n[1] Travel Policy — 4. Accommodation\n> 4.1 Hotel room limits per night, including service charge and tax:\n>\n> | Grade | Kuala Lumpur, Penang and Johor Bahru | Other towns in Peninsular Malaysia | Sabah and Sarawak |\n> |---|---|---|---|\n> | NE1 to NE4 | RM180 | RM150 | RM200 |\n> | E1 to E3 | RM250 | RM200 | RM280 |\n> | M1 and M2 | RM350 | RM280 | RM380 |\n> | SM | Reasonable actual cost | Reasonable actual cost | Reasonable actual cost |\n>\n> 4.2 If no hotel within the limit is available, for example during a major event, the HOD may approve up to 20% above the limit. The reason must be stated in the claim.\n>\n> 4.3 Employees who stay with friends or relatives instead of at a hotel receive a lodging allowance of RM60 per night. No receipt is needed.\n>\n> 4.4 Employees on the same assignment should share transport where practical. Room sharing is not required.\n>\n> 4.5 For stays of more than 14 nights at one location, HR may arrange a serviced apartment instead of a hotel room.",
+        "cited": [
+          {
+            "document": "travel-policy",
+            "section": "4. Accommodation"
+          }
+        ],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "4. Accommodation"
+            },
+            "similarity": 0.7608928084373474
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "8. Amendment History"
+            },
+            "similarity": 0.6607198715209961
+          },
+          {
+            "section": {
+              "document": "expense-claims-policy",
+              "section": "4.1 Client Entertainment"
+            },
+            "similarity": 0.628321431379234
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "3.1 Air Travel"
+            },
+            "similarity": 0.6237642765045166
+          },
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "1. Purpose and Scope"
+            },
+            "similarity": 0.600231945514679
+          }
+        ],
+        "retrieval_ms": 23,
+        "generation_ms": null,
+        "total_ms": 23
+      },
+      {
+        "question_id": "g52",
+        "question_type": "missing-detail",
+        "expected": [],
+        "mode": "refused",
+        "answer": "I couldn't find this in the policies.",
+        "cited": [],
+        "fallback_reason": null,
+        "retrieved": [
+          {
+            "section": {
+              "document": "travel-policy",
+              "section": "5.2 Remote Site Allowance"
+            },
+            "similarity": 0.6721317963521614
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "7. Meal and Transport Allowances for Overtime"
+            },
+            "similarity": 0.64797743272916
+          },
+          {
+            "section": {
+              "document": "probation-and-confirmation-policy",
+              "section": "6.3 Overtime, Claims and Work From Home"
+            },
+            "similarity": 0.6370914198701739
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "8. Time Off in Lieu for Executives"
+            },
+            "similarity": 0.6294846534729004
+          },
+          {
+            "section": {
+              "document": "overtime-policy",
+              "section": "3. Normal Working Hours"
+            },
+            "similarity": 0.626771591498162
+          }
+        ],
+        "retrieval_ms": 21,
+        "generation_ms": null,
+        "total_ms": 21
+      }
+    ],
+    "warm_up_ms": null
+  }
+}
