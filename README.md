@@ -296,7 +296,7 @@ make eval             # golden set: search (Markdown and PDF, instruction on and
 make eval-llm         # golden set: answers from the local LLM (Ollama must be healthy; slow on a CPU)
 ```
 
-Reports are written to `evaluation/results/` as Markdown and JSON. Each one starts with
+Reports are written to `evaluation/results/<version>/` as Markdown and JSON. Each one starts with
 the settings and machine it ran on, and the golden reports explain every mistake.
 There is also `make eval-held-out`, the "unseen document" test described below.
 
@@ -305,7 +305,7 @@ There is also `make eval-held-out`, the "unseen document" test described below.
 Run on an Intel Core i5-10300H laptop (4 cores / 8 threads, CPU only), Docker Desktop
 4.86.0 on WSL2 with 11.6 GiB visible to Docker, commit `7f3b687` (golden) and `9dc7dbb`
 (held-out). Embedding model `BAAI/bge-small-en-v1.5`, top k = 5, LLM `llama3.2:3b`
-through Ollama 0.35.1. The full reports, with every question, are in `evaluation/results/`.
+through Ollama 0.35.1. The full reports, with every question, are in `evaluation/results/v1/`.
 
 **1. Threshold calibration (dev set, 20 questions).** Every threshold from 0.50 to 0.85
 was tried; the one with the best balanced accuracy (the average of "answerable questions

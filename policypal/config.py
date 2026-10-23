@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     retrieval_top_k: int = Field(default=5, ge=1, le=20)
     # Refuse when the best chunk's cosine similarity is below this. It is a score, not a
     # probability. 0.69 was chosen on the evaluation's dev set (20 questions, query
-    # instruction on) by the best balanced accuracy: evaluation/results/dev-calibration.md.
+    # instruction on) by the best balanced accuracy: evaluation/results/v1/dev-calibration.md.
     # With the instruction off, the dev set's threshold is 0.71.
     min_similarity: float = Field(default=0.69, ge=0, le=1)
 
