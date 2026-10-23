@@ -1,7 +1,7 @@
 """PolicyPal chat page: ask HR policy questions; answers cite the policy and section.
 
 Streamlit runs this script again from the top on every click, so everything that must
-last (the conversation, votes, open sections) lives in st.session_state.
+last (the conversation, votes, fetched sections) lives in st.session_state.
 Text is shown as Markdown through safe_markdown() (no images load by themselves); HTML is
 never allowed.
 """
@@ -23,7 +23,8 @@ state = st.session_state
 state.setdefault("conversation_id", None)
 state.setdefault("turns", [])  # [{"question": str, "answer": Answer}]
 state.setdefault("votes", {})  # message_id -> "up" / "down"
-state.setdefault("open_sections", set())  # (turn index, citation number)
+# (turn index, citation number) -> the full section's text, fetched once when opened.
+state.setdefault("sections", {})
 
 
 def show_health(client: PolicyPalClient) -> None:
@@ -54,17 +55,18 @@ def show_source(client: PolicyPalClient, index: int, citation: dict) -> None:
     key = (index, citation["number"])
     with st.expander(source_label(citation)):
         st.markdown(safe_markdown(citation["text"]))
-        if key in state.open_sections:
+        if key not in state.sections and st.button(
+            "View full section", key=f"section-{index}-{citation['number']}"
+        ):
             try:
                 document = client.get_document(citation["document_id"])
             except ApiError as exc:
                 st.error(str(exc))
             else:
-                st.markdown("**Full section**")
-                st.markdown(safe_markdown(section_text(document, citation["section"])))
-        elif st.button("View full section", key=f"section-{index}-{citation['number']}"):
-            state.open_sections.add(key)
-            st.rerun()
+                state.sections[key] = section_text(document, citation["section"])
+        if key in state.sections:
+            st.markdown("**Full section**")
+            st.markdown(safe_markdown(state.sections[key]))
 
 
 def show_feedback(client: PolicyPalClient, index: int, message_id: str) -> None:

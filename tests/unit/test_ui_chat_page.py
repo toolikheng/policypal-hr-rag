@@ -209,3 +209,30 @@ def test_images_in_answers_and_sources_are_never_loaded(monkeypatch: pytest.Monk
     shown = [text for text in texts(page.markdown) if "attacker.example" in text]
     assert len(shown) == 3  # the answer, the source and the full section
     assert all("![" not in text.replace("\\![", "") for text in shown)
+
+
+def test_a_full_section_is_fetched_once_not_on_every_click(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = FakeApiClient(answers=[ANSWER, REFUSAL, REFUSAL], documents={3: LEAVE_DOCUMENT})
+    page = ask(run_page(monkeypatch, client), "Leave?")
+    page = page.button(key="section-0-1").click().run()
+
+    page = ask(ask(page, "Bonus?"), "Car?")
+
+    assert [call for call in client.calls if call[0] == "get_document"] == [("get_document", 3)]
+    assert "Annual leave depends on grade.\n\n" + LEAVE_TEXT in texts(page.markdown)
+
+
+def test_a_failed_section_fetch_shows_the_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = FakeApiClient(answers=[ANSWER], documents={})  # document 3 is missing
+
+    def missing(document_id: int) -> dict:
+        raise ApiError("Document not found.", 404)
+
+    client.get_document = missing  # type: ignore[method-assign]
+    page = ask(run_page(monkeypatch, client), "Leave?")
+
+    page = page.button(key="section-0-1").click().run()
+
+    assert "Document not found." in texts(page.error)
