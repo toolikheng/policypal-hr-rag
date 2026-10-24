@@ -383,8 +383,9 @@ class IngestResultResponse(BaseModel):
 
     slug: str
     status: IngestStatus = Field(
-        description="created, updated, unchanged, removed (file gone), or skipped "
-        "(an uploaded file whose slug belongs to a sample policy)."
+        description="created, updated, unchanged, removed (file gone), skipped "
+        "(an uploaded file whose slug belongs to a sample policy), or failed (the file "
+        "couldn't be loaded; its last good version, if any, stays searchable)."
     )
     chunks: int
 

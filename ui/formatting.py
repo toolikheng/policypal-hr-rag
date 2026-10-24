@@ -1,7 +1,7 @@
 """Small pure helpers that turn API replies into text for the pages (tested without Streamlit)."""
 
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
 # Why the API quoted the policies instead of giving an AI answer, in plain words.
 _FALLBACK_REASONS = {
@@ -67,14 +67,31 @@ def upload_summary(result: dict[str, Any]) -> str:
     return f"{document['title']}: {result['status']} ({document['chunks']} chunks)."
 
 
-def reingest_summary(results: list[dict[str, Any]]) -> str:
-    """'Re-ingested 9 policies: 8 unchanged, 1 removed.' (statuses in order of first appearance)"""
+# How a page shows the result of an action: st.success, st.warning or st.error.
+NoticeLevel = Literal["success", "warning", "error"]
+
+# Re-ingest statuses for a file whose current content isn't searchable afterwards.
+_NOT_LOADED = ("failed", "skipped")
+
+
+def reingest_notice(results: list[dict[str, Any]]) -> tuple[NoticeLevel, str]:
+    """The level and message for a re-ingest, decided from the per-file statuses.
+
+    'Re-ingested 9 policies: 8 unchanged, 1 removed.' (statuses in order of first
+    appearance) is a success. If any file failed or was skipped, it is a warning that
+    names them: '... Not loaded: broken-policy (failed).'
+    """
     counts: dict[str, int] = {}
     for result in results:
         counts[result["status"]] = counts.get(result["status"], 0) + 1
     noun = "policy" if len(results) == 1 else "policies"
     parts = ", ".join(f"{count} {status}" for status, count in counts.items())
-    return f"Re-ingested {len(results)} {noun}: {parts}."
+    message = f"Re-ingested {len(results)} {noun}: {parts}."
+    not_loaded = [r for r in results if r["status"] in _NOT_LOADED]
+    if not not_loaded:
+        return "success", message
+    names = ", ".join(f"{r['slug']} ({r['status']})" for r in not_loaded)
+    return "warning", f"{message} Not loaded: {names}."
 
 
 def fallback_label(reason: str) -> str:

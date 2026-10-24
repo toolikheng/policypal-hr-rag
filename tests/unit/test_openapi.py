@@ -1,9 +1,10 @@
 """Swagger (/docs) must show a request and response example for every endpoint."""
 
-from typing import Any
+from typing import Any, get_args
 
 import pytest
 
+from policypal.ingest.pipeline import IngestStatus
 from tests.helpers import build_test_app
 
 SCHEMA = build_test_app("postgresql+psycopg://user:pw@localhost:1/db").openapi()
@@ -62,3 +63,9 @@ def test_admin_token_is_documented_as_an_api_key() -> None:
     }
     for path in ("/documents", "/documents/reingest"):
         assert SCHEMA["paths"][path]["post"]["security"] == [{"APIKeyHeader": []}]
+
+
+def test_the_reingest_status_description_names_every_status() -> None:
+    status = SCHEMA["components"]["schemas"]["IngestResultResponse"]["properties"]["status"]
+    for value in get_args(IngestStatus):
+        assert value in status["description"], value

@@ -113,3 +113,31 @@ def test_reingest_shows_a_summary(monkeypatch: pytest.MonkeyPatch) -> None:
 
     assert ("reingest", "t0k") in client.calls
     assert texts(page.success) == ["Re-ingested 1 policy: 1 unchanged."]
+
+
+def test_a_reingest_with_files_not_loaded_is_a_warning_not_a_success(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    results = [
+        {"slug": "leave-policy", "status": "unchanged", "chunks": 20},
+        {"slug": "broken-policy", "status": "failed", "chunks": 0},
+    ]
+    page = run_page(monkeypatch, FakeApiClient(reingests=[results]))
+    page.text_input(key="admin_token").input("t0k").run()
+
+    page = page.button(key="reingest").click().run()
+
+    assert texts(page.warning) == [
+        "Re-ingested 2 policies: 1 unchanged, 1 failed. Not loaded: broken-policy (failed)."
+    ]
+    assert not page.success
+
+
+def test_reingest_errors_are_shown(monkeypatch: pytest.MonkeyPatch) -> None:
+    error = ApiError("Admin token is not valid.", 403)
+    page = run_page(monkeypatch, FakeApiClient(reingests=[error]))
+    page.text_input(key="admin_token").input("t0k").run()
+
+    page = page.button(key="reingest").click().run()
+
+    assert texts(page.error) == ["Admin token is not valid."]

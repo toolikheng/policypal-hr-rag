@@ -2,7 +2,7 @@ from ui.formatting import (
     badge,
     fallback_label,
     percent,
-    reingest_summary,
+    reingest_notice,
     safe_markdown,
     seconds,
     section_text,
@@ -87,14 +87,37 @@ def test_upload_summary() -> None:
     assert upload_summary(result) == "Training Policy: created (11 chunks)."
 
 
-def test_reingest_summary_counts_each_status() -> None:
+def test_reingest_notice_is_a_success_when_every_file_loaded() -> None:
     results = [
         {"slug": "a", "status": "unchanged", "chunks": 3},
         {"slug": "b", "status": "unchanged", "chunks": 4},
         {"slug": "c", "status": "removed", "chunks": 0},
     ]
 
-    assert reingest_summary(results) == "Re-ingested 3 policies: 2 unchanged, 1 removed."
+    assert reingest_notice(results) == (
+        "success",
+        "Re-ingested 3 policies: 2 unchanged, 1 removed.",
+    )
+
+
+def test_reingest_notice_warns_and_names_the_files_that_were_not_loaded() -> None:
+    results = [
+        {"slug": "leave-policy", "status": "unchanged", "chunks": 20},
+        {"slug": "broken-policy", "status": "failed", "chunks": 0},
+        {"slug": "overtime-policy", "status": "skipped", "chunks": 0},
+    ]
+
+    assert reingest_notice(results) == (
+        "warning",
+        "Re-ingested 3 policies: 1 unchanged, 1 failed, 1 skipped. "
+        "Not loaded: broken-policy (failed), overtime-policy (skipped).",
+    )
+
+
+def test_reingest_notice_of_one_policy_uses_the_singular() -> None:
+    results = [{"slug": "a", "status": "created", "chunks": 3}]
+
+    assert reingest_notice(results) == ("success", "Re-ingested 1 policy: 1 created.")
 
 
 def test_safe_markdown_stops_images_loading_by_themselves() -> None:
