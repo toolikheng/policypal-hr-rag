@@ -15,12 +15,23 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import OperationalError
 
+from policypal.config import Settings
 from policypal.db import make_engine
 from tests.helpers import alembic_config, build_test_app
 
 DEFAULT_TEST_DATABASE_URL = (
     "postgresql+psycopg://policypal:policypal-local-dev@localhost:5433/policypal_test"
 )
+
+
+@pytest.fixture(autouse=True)
+def no_settings_from_the_shell(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Remove every PolicyPal setting from the environment, so a variable exported in the
+    developer's shell (ADMIN_TOKEN, LLM_PROVIDER, ...) can't change a test's result. The
+    names come from Settings itself, so a new setting is covered without a list to update.
+    Tests that need a variable set it with monkeypatch.setenv."""
+    for name in Settings.model_fields:
+        monkeypatch.delenv(name.upper(), raising=False)
 
 
 @pytest.fixture(scope="session")

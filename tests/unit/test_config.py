@@ -6,26 +6,7 @@ from pydantic import ValidationError
 from evaluation.run_eval import RESULTS_DIR, load_thresholds
 from policypal.config import Settings
 
-SETTING_ENV_VARS = [
-    "DATABASE_URL",
-    "LLM_PROVIDER",
-    "LOG_LEVEL",
-    "EMBEDDING_QUERY_INSTRUCTION",
-    "RETRIEVAL_TOP_K",
-    "OLLAMA_BASE_URL",
-    "OLLAMA_MODEL",
-    "OLLAMA_TIMEOUT_SECONDS",
-    "MIN_SIMILARITY",
-    "ADMIN_TOKEN",
-    "MAX_UPLOAD_MB",
-    "UPLOAD_DIR",
-]
-
-
-@pytest.fixture(autouse=True)
-def clean_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in SETTING_ENV_VARS:
-        monkeypatch.delenv(name, raising=False)
+# tests/conftest.py removes every setting from the environment before each test.
 
 
 def test_database_url_is_required() -> None:
@@ -40,6 +21,7 @@ def test_other_settings_have_safe_defaults(monkeypatch: pytest.MonkeyPatch) -> N
 
     assert settings.llm_provider == "ollama"
     assert settings.log_level == "INFO"
+    assert settings.embedding_model == "BAAI/bge-small-en-v1.5"
 
 
 def test_questions_use_the_bge_query_instruction_by_default(
