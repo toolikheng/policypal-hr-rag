@@ -14,7 +14,8 @@ permissions:
   contents: read
   packages: write
 
-# One publish at a time, so "latest" always ends up on the newest tested commit.
+# One publish at a time: a new run waits for the running one (replacing any older waiting
+# run), so "latest" ends on the commit whose CI finished last, normally the newest push.
 concurrency:
   group: cd-main
   cancel-in-progress: false
