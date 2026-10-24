@@ -11,6 +11,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
 
@@ -71,6 +72,16 @@ def create_app(
         lifespan=lifespan,
     )
     app.middleware("http")(request_context)
+    if settings.cors_origins:
+        # Added after request_context, so it is the outer middleware: its headers are also
+        # added to request_context's 500 reply, which the browser would otherwise hide.
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.cors_origins,
+            allow_methods=["GET", "POST"],
+            allow_headers=["Content-Type", "X-Request-ID"],  # never X-Admin-Token
+            expose_headers=["X-Request-ID"],
+        )
     app.exception_handler(OperationalError)(database_unavailable)
     app.exception_handler(UploadRejected)(upload_rejected)
     app.include_router(health.router)

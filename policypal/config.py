@@ -4,11 +4,14 @@ Every setting is documented in .env.example. Invalid or missing values stop the 
 startup with a clear validation error instead of failing later.
 """
 
+import re
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, SecretStr, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+_ORIGIN = re.compile(r"^https?://[^/\s]+$")
 
 
 class Settings(BaseSettings):
@@ -46,6 +49,28 @@ class Settings(BaseSettings):
     max_upload_mb: int = Field(default=5, ge=1, le=50)
     # Uploaded policies are saved here (a Docker volume in Compose) and re-ingested on start.
     upload_dir: Path = Path("uploads")
+
+    # Other websites whose pages may call the API from the browser (an embedded widget), as
+    # a comma-separated list such as "http://localhost:8080,https://intranet.example.com".
+    # Empty (the default): only pages served by the API itself, such as /widget/demo.html.
+    # NoDecode: read the plain text here instead of expecting a JSON list.
+    cors_origins: Annotated[list[str], NoDecode] = []
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _comma_separated(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
+
+    @field_validator("cors_origins")
+    @classmethod
+    def _scheme_and_host_only(cls, origins: list[str]) -> list[str]:
+        # A browser sends its origin as scheme://host[:port], with no path or slash.
+        for origin in origins:
+            if not _ORIGIN.match(origin):
+                raise ValueError(f"{origin!r} is not an origin like http://localhost:8080")
+        return origins
 
     @field_validator("admin_token", mode="before")
     @classmethod

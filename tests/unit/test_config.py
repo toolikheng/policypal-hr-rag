@@ -161,3 +161,57 @@ def test_invalid_max_upload_size_is_rejected(monkeypatch: pytest.MonkeyPatch, si
 
     with pytest.raises(ValidationError, match="max_upload_mb"):
         Settings(_env_file=None)
+
+
+def test_no_cross_origin_browser_access_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+
+    assert Settings(_env_file=None).cors_origins == []
+
+
+@pytest.mark.parametrize(
+    ("value", "origins"),
+    [
+        ("", []),
+        ("http://localhost:8080", ["http://localhost:8080"]),
+        (
+            " http://localhost:8080 , https://intranet.example.com ,",
+            ["http://localhost:8080", "https://intranet.example.com"],
+        ),
+    ],
+)
+def test_cors_origins_are_a_comma_separated_list(
+    monkeypatch: pytest.MonkeyPatch, value: str, origins: list[str]
+) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("CORS_ORIGINS", value)
+
+    assert Settings(_env_file=None).cors_origins == origins
+
+
+@pytest.mark.parametrize(
+    "value", ["*", "localhost:8080", "http://localhost:8080/", "http://x.example/widget"]
+)
+def test_a_cors_origin_must_be_a_scheme_and_host_only(
+    monkeypatch: pytest.MonkeyPatch, value: str
+) -> None:
+    monkeypatch.setenv("DATABASE_URL", "postgresql+psycopg://u:p@db:5432/x")
+    monkeypatch.setenv("CORS_ORIGINS", value)
+
+    with pytest.raises(ValidationError, match="cors_origins"):
+        Settings(_env_file=None)
+
+
+ENV_EXAMPLE = Path(__file__).parents[2] / ".env.example"
+
+
+def test_env_example_documents_every_setting() -> None:
+    text = ENV_EXAMPLE.read_text(encoding="utf-8")
+
+    for name in Settings.model_fields:
+        assert f"\n{name.upper()}=" in text or f"\n# {name.upper()}=" in text, name
+
+
+def test_the_settings_in_env_example_are_valid() -> None:
+    # `cp .env.example .env` must give a configuration the app accepts as it is.
+    Settings(_env_file=ENV_EXAMPLE)
