@@ -92,6 +92,15 @@ PyTorch, and the embedding model. On the laptop used for development this took a
 | PostgreSQL (from your machine) | `localhost:5433` |
 | Ollama (from your machine only) | `127.0.0.1:11434` |
 
+All of these listen on `127.0.0.1` only, so other devices on your network can't reach
+them. To open the API and the UI to your network on purpose (for example to try the
+widget from a phone), first set your own `ADMIN_TOKEN`, then set `BIND_ADDRESS=0.0.0.0`
+(or one of your machine's LAN addresses) in `.env` and run `docker compose up -d`.
+`docker compose ps` shows the result. The database and Ollama stay on `127.0.0.1`
+whatever `BIND_ADDRESS` says: the database password in `.env.example` is public and
+Ollama has no authentication. On Windows, the firewall may still block access from other
+devices.
+
 `curl localhost:8000/health` returns:
 
 ```json
