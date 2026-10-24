@@ -18,7 +18,7 @@ from sqlalchemy.exc import OperationalError
 from policypal import __version__
 from policypal.api.errors import database_unavailable, upload_rejected
 from policypal.api.routes import analytics, ask, documents, feedback, health
-from policypal.config import Settings
+from policypal.config import PLACEHOLDER_ADMIN_TOKEN, Settings
 from policypal.db import make_engine
 from policypal.embeddings import Embedder, build_embedder, check_dimension
 from policypal.ingest.uploads import UploadRejected
@@ -60,6 +60,7 @@ def create_app(
         app.state.settings = settings
         app.state.embedder = embedder if embedder is not None else build_embedder(settings)
         check_dimension(app.state.embedder)  # refuse to start rather than fail on every question
+        warn_if_placeholder_admin_token(settings)
         app.state.llm = llm if llm is not None else build_llm(settings)
         app.state.engine = make_engine(settings.database_url)
         yield
@@ -90,6 +91,20 @@ def create_app(
     app.include_router(feedback.router)
     app.include_router(analytics.router)
     return app
+
+
+def warn_if_placeholder_admin_token(settings: Settings) -> None:
+    """The placeholder token is published in .env.example, so anyone who can reach the API
+    could use it to upload policies. Start anyway (the quick start must work), but say so."""
+    token = settings.admin_token
+    if token is not None and token.get_secret_value() == PLACEHOLDER_ADMIN_TOKEN:
+        logger.warning(
+            "admin.placeholder_token",
+            extra={
+                "hint": "ADMIN_TOKEN is still the example value from .env.example. Set your "
+                "own in .env (e.g. the output of `openssl rand -hex 16`) and restart."
+            },
+        )
 
 
 async def request_context(

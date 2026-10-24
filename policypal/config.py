@@ -13,6 +13,10 @@ from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 _ORIGIN = re.compile(r"^https?://[^/\s]+$")
 
+# The ADMIN_TOKEN in .env.example. It is public, so the API warns at start-up while it is
+# still in use.
+PLACEHOLDER_ADMIN_TOKEN = "change-me"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

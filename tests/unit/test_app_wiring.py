@@ -1,10 +1,12 @@
 """How the app is put together: startup checks, the LLM choice and unexpected errors."""
 
 import json
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
+from policypal.config import PLACEHOLDER_ADMIN_TOKEN
 from policypal.llm import LLMInfo, build_llm, describe_llm
 from policypal.llm.ollama import OllamaProvider
 from policypal.logging_setup import JsonFormatter
@@ -77,3 +79,34 @@ def test_unexpected_error_is_a_500_with_the_request_id(caplog: pytest.LogCapture
     assert failure["request_id"] == "trace-500"
     assert failure["level"] == "ERROR"
     assert "secret internal detail" in failure["exception"]
+
+
+def startup_warnings(caplog: pytest.LogCaptureFixture, **settings: object) -> list[dict]:
+    caplog.handler.setFormatter(JsonFormatter())
+    with TestClient(build_test_app(NO_DATABASE, **settings)):
+        pass
+    lines = [json.loads(line) for line in caplog.text.splitlines()]
+    return [line for line in lines if line["message"] == "admin.placeholder_token"]
+
+
+def test_the_placeholder_admin_token_is_warned_about_at_startup(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    [warning] = startup_warnings(caplog, admin_token=PLACEHOLDER_ADMIN_TOKEN)
+
+    assert warning["level"] == "WARNING"
+    assert "ADMIN_TOKEN" in warning["hint"]
+    assert PLACEHOLDER_ADMIN_TOKEN not in json.dumps(warning)  # never log a token
+
+
+@pytest.mark.parametrize("token", ["my-own-long-random-token", None])
+def test_no_warning_for_an_own_token_or_admin_switched_off(
+    caplog: pytest.LogCaptureFixture, token: str | None
+) -> None:
+    assert startup_warnings(caplog, admin_token=token) == []
+
+
+def test_the_placeholder_is_the_token_in_env_example() -> None:
+    env_example = (Path(__file__).parents[2] / ".env.example").read_text(encoding="utf-8")
+
+    assert f"\nADMIN_TOKEN={PLACEHOLDER_ADMIN_TOKEN}\n" in env_example
