@@ -137,7 +137,11 @@ class CitationResponse(BaseModel):
     document_id: int
     document_title: str
     section: str
-    text: str = Field(description="The policy text the answer is based on.")
+    text: str = Field(
+        description="The policy text the answer is based on, as Markdown (block quotes, "
+        "tables). Policies can be uploaded, so treat it as untrusted: show it as text or "
+        "escaped Markdown, never as HTML."
+    )
     similarity: float = Field(description="Cosine similarity to the question (not a probability).")
 
 
@@ -148,9 +152,17 @@ class LatencyResponse(BaseModel):
 
 
 class AskResponse(BaseModel):
+    """Every field is always present; one that doesn't apply is null. (Swagger's examples
+    leave the null fields out.)"""
+
     message_id: UUID
     conversation_id: UUID
-    answer: str
+    answer: str = Field(
+        description="Markdown. An LLM answer cites its sources as [n]. An extractive answer "
+        "already quotes each passage under its [n] title, so a client that also lists "
+        "`citations` shows the passages twice. A refusal is \"I couldn't find this in the "
+        'policies."'
+    )
     mode: Mode = Field(description="llm, extractive (quoted policy text) or refused.")
     citations: list[CitationResponse]
     model: str | None = Field(description="The LLM that wrote or refused the answer, if any.")

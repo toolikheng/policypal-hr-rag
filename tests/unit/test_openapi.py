@@ -136,3 +136,15 @@ def test_the_checked_routes_are_every_operation() -> None:
     routes = {(method, route.path) for route in ROUTES for method in route.methods}
 
     assert routes == {(method, path) for method, path, _ in OPERATIONS}
+
+
+def test_the_ask_reply_says_how_to_show_it() -> None:
+    """A second client (the widget) is written from these docs, not from the UI's code."""
+    ask_reply = SCHEMA["components"]["schemas"]["AskResponse"]
+    citation = SCHEMA["components"]["schemas"]["CitationResponse"]
+
+    assert "always present" in ask_reply["description"]
+    assert "Markdown" in ask_reply["properties"]["answer"]["description"]
+    assert "already quotes" in ask_reply["properties"]["answer"]["description"]
+    assert "Markdown" in citation["properties"]["text"]["description"]
+    assert "untrusted" in citation["properties"]["text"]["description"]
