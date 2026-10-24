@@ -9,23 +9,78 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
 > made-up company, **Binaan Maju Sdn Bhd**. They are not real company policies
 > and are not legal advice.
 
-**Status:** work in progress. What works today:
-- **Scaffold:** Docker Compose services for the database, API, UI and a local LLM, a
-  `/health` endpoint, database migrations, tests, linting and CI.
-- **Sample data and ingestion:** eight fictional policies are parsed, split into
-  chunks, embedded with a local model, and stored in PostgreSQL + pgvector
-  automatically when the API starts.
-- **Question answering API:** `POST /ask` answers from the policies with citations
-  (document and section), refuses when the policies don't cover a question, and quotes
-  the policy text when no LLM is available. Admins can upload new policies.
-- **Streamlit UI:** a chat page with sources and 👍/👎 feedback, and an admin page for
-  uploads and re-ingesting.
-- **Question history and analytics:** every question, answer, source and vote is stored
-  in PostgreSQL (users are anonymous: a conversation is only a random ID). `GET /analytics`
-  and an analytics page show top and unanswered questions, feedback, answer times and
-  LLM fallbacks.
-- **Evaluation:** fixed question sets, a repeatable evaluation command and measured
-  results for search, refusals, answers and speed (see [Evaluation](#evaluation)).
+![The chat page: an AI answer from the Overtime Policy, with its cited section open](docs/screenshots/chat-answer.png)
+
+**What it does:**
+- **Answers with citations:** every answer names the policy document and section it
+  used, in the Streamlit chat, in an embeddable chat widget, and through `POST /ask`.
+- **Refuses instead of guessing:** when no policy text is similar enough, the reply is
+  `I couldn't find this in the policies.`
+- **Works without an LLM:** if the local model is missing, slow or switched off, it
+  quotes the most relevant policy text instead, and says why.
+- **Admin tools:** upload `.md` or `.pdf` policies (never silently replacing one) and
+  re-ingest the folders.
+- **History and analytics:** every question, answer, source, answer time and vote is
+  stored in PostgreSQL; an analytics page shows top and unanswered questions, feedback
+  and fallbacks.
+- **Measured:** fixed question sets and a repeatable evaluation for search, refusals,
+  answers and speed (see [Evaluation](#evaluation)).
+- **Runs on a laptop:** Docker Compose, no paid API keys, no GPU. CI tests every push; CD
+  publishes a ready-made Docker image.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph clients [Clients]
+        UI["Streamlit UI<br/>chat · admin · analytics"]
+        W["Chat widget<br/>plain JavaScript"]
+        C["curl / Swagger"]
+    end
+    subgraph api [FastAPI api container]
+        ASK["POST /ask"]
+        RET["Retrieval<br/>bge-small-en-v1.5"]
+        ANS["Answering<br/>threshold · citations · fallback"]
+        ING["Ingestion<br/>parse · chunk · embed"]
+    end
+    DB[("PostgreSQL + pgvector<br/>chunks · history · feedback")]
+    OL["Ollama<br/>llama3.2:3b on the CPU"]
+    FILES["Policy files<br/>.md and .pdf"]
+    UI --> ASK
+    W --> ASK
+    C --> ASK
+    ASK --> RET
+    RET -->|"5 most similar chunks"| DB
+    RET --> ANS
+    ANS -->|"excerpts above the threshold"| OL
+    ANS -->|"question, answer, sources, times"| DB
+    FILES --> ING --> DB
+```
+
+A question goes through these steps:
+1. The question is turned into a vector by a local embedding model, and pgvector finds
+   the 5 most similar policy chunks.
+2. If even the best one is below the similarity threshold (0.69), the API refuses
+   without calling the LLM.
+3. Otherwise the excerpts, numbered `[1]`…`[n]`, go to the local LLM with instructions
+   to use only them and cite them.
+4. The server checks the citations against the excerpts it sent. If the LLM is
+   unavailable or cites nothing valid, the excerpts are quoted instead.
+5. The question, answer, sources and times are saved for analytics.
+
+Everything runs in four containers: `db`, `api`, `ui` and `ollama`. The UI and the widget
+only talk to the API over HTTP.
+
+## Screenshots
+
+From the real app running locally (fictional sample data).
+
+| | |
+|---|---|
+| ![A question the policies don't cover, refused](docs/screenshots/chat-refusal.png) | ![The chat widget on a demo intranet page](docs/screenshots/widget.png) |
+| A question the policies don't cover is refused | The chat widget on a demo intranet page |
+| ![The admin page after a re-ingest](docs/screenshots/admin.png) | ![The analytics page](docs/screenshots/analytics.png) |
+| Admin: uploads, re-ingest and the document list | Analytics: questions, refusals, feedback and fallbacks |
 
 ## Using the UI
 
@@ -46,11 +101,35 @@ Open <http://localhost:8501>.
 
   If an uploaded policy with the same name already exists, the page shows the API's
   message and a **Replace existing policy** button. Built-in sample policies can't be
-  replaced, so they get no button.
+  replaced, so they get no button. If a re-ingest leaves a file not loaded (it failed,
+  or an upload used a sample policy's name), the summary is a warning that names it.
 - **Analytics** (sidebar): enter the admin token and choose a period (7 to 365 days) to
   see the number of questions and refusals, the feedback and helpful rates, the average
   answer time per mode, the top and unanswered questions, and how often answers fell back
   to quoted policy text, with the reason.
+
+## Chat widget
+
+`widget/policypal-widget.js` is a small chat box that any web page can add with one
+script tag. Try it on a fictional intranet page at
+<http://localhost:8000/widget/demo.html>.
+
+```html
+<script src="http://localhost:8000/widget/policypal-widget.js" defer></script>
+```
+
+- It asks the API that served the script (or the one in `data-api-url="..."` on the tag)
+  and shows how the answer was produced, the answer and the cited sections. Votes are
+  only in the Streamlit UI. Questions are stored with the channel `widget`.
+- Answers and policy text are untrusted (policies can be uploaded), so the widget only
+  ever sets text with `textContent`, never as HTML. It lives in a shadow root, so the
+  page's styles and the widget's don't mix.
+- On a page from **another site**, the browser blocks the call unless that site is
+  allowed: add its origin to `CORS_ORIGINS` in `.env` (comma-separated, e.g.
+  `http://localhost:8080`) and run `docker compose up -d`. Only `GET` and `POST` with
+  `Content-Type` are allowed; the admin token header never is.
+- It is checked by hand in a browser. The tests check that the files are served, the
+  CORS rules, and that the script never turns text into HTML.
 
 ## Prerequisites
 
@@ -66,10 +145,16 @@ No paid API keys and no GPU are needed.
 ## Quick start
 
 ```bash
-git clone <this-repo-url> policypal && cd policypal
+git clone https://github.com/toolikheng/policypal-hr-rag.git policypal && cd policypal
 cp .env.example .env
 docker compose up --build
 ```
+
+Before the last command, open `.env` and set `ADMIN_TOKEN` to your own value, for
+example the output of `openssl rand -hex 16`. The example value `change-me` is public,
+so anyone who can reach the API could use it; the API logs a warning
+(`admin.placeholder_token`) at start-up while it is still in use. The other defaults
+work as they are.
 
 The first build downloads the Python dependencies, including a CPU-only build of
 PyTorch, and the embedding model. On the laptop used for development this took about
@@ -118,6 +203,29 @@ devices.
 Stop everything with `docker compose down`. Data is kept in volumes: `pgdata` (the
 database), `uploads` (uploaded policies) and `ollama` (the model).
 `docker compose down -v` deletes them.
+
+## Run the published image (no build)
+
+Each push to `main` that passes CI publishes the Docker image to GitHub Container
+Registry as `ghcr.io/toolikheng/policypal`, tagged with the full commit SHA and `latest`
+(`.github/workflows/cd.yml`). To run it without building anything:
+
+```bash
+git clone https://github.com/toolikheng/policypal-hr-rag.git policypal && cd policypal
+cp .env.example .env    # then set your own ADMIN_TOKEN, as above
+POLICYPAL_IMAGE=ghcr.io/toolikheng/policypal:latest docker compose pull api ui
+POLICYPAL_IMAGE=ghcr.io/toolikheng/policypal:latest docker compose up --no-build -d --wait
+```
+
+- The clone is still needed for `docker-compose.yml`, `.env.example` and the start-up
+  scripts that Compose mounts. You can also set `POLICYPAL_IMAGE` in `.env` instead.
+- `latest` moves with every push. For a run you can repeat exactly, use a commit:
+  `ghcr.io/toolikheng/policypal:<full commit SHA>`.
+- The image holds the API, the UI, CPU-only PyTorch, the embedding model and the sample
+  policies, never `.env`. The database and Ollama images still come from Docker Hub, and
+  the LLM is downloaded on the first start as usual.
+- Only the default embedding model is inside the image; to change `EMBEDDING_MODEL`,
+  build the image yourself.
 
 ## Asking questions
 
@@ -206,9 +314,9 @@ is a shared demo token, not real user authentication. In Swagger, use **Authoriz
 ```bash
 curl -s localhost:8000/documents                       # list the policies
 curl -s localhost:8000/documents/3                     # one policy, section by section
-curl -s -X POST localhost:8000/documents -H "X-Admin-Token: change-me" \
+curl -s -X POST localhost:8000/documents -H "X-Admin-Token: <your ADMIN_TOKEN>" \
   -F "file=@data/upload-demo/training-and-development-policy.md"   # upload (.md or .pdf)
-curl -s -X POST localhost:8000/documents/reingest -H "X-Admin-Token: change-me"
+curl -s -X POST localhost:8000/documents/reingest -H "X-Admin-Token: <your ADMIN_TOKEN>"
 ```
 
 A policy is identified by its file name (its *slug*, e.g. `leave-policy`). Uploads
@@ -460,16 +568,58 @@ Then the golden set was run again (commit `85f97f7`; reports in `evaluation/resu
 - Each version is a single run. Temperature 0 makes the LLM mostly repeatable, but not
   fully: 5 of 33 answers changed between v1 and v2.
 
-### Future work (evaluation)
+## Limitations
 
+- **A citation shows where an answer came from, not that it is true.** The LLM can add
+  details its excerpt doesn't contain and still cite it (the redundancy example above).
+  Nothing checks each sentence against its source yet.
+- **The threshold is a trade-off.** Conversational questions are sometimes refused (8 of
+  40 answerable golden questions), and questions about a missing detail of a covered
+  topic can get through and be answered anyway.
+- **Speed on a CPU:** about 5–15 s per AI answer once the model is loaded, and up to
+  about a minute for the first answer after it is loaded. Answers aren't streamed, so the
+  user waits for the whole answer.
+- **One question at a time:** each question is answered on its own. The conversation ID
+  groups questions for the history, but earlier questions aren't used, so a follow-up
+  like "and for managers?" isn't understood.
+- **English only:** the embedding model, the prompt and the policies are English;
+  questions in Malay aren't supported or tested.
+- **Demo-level security:** one shared admin token (the Admin and Analytics pages each ask
+  for it), no user accounts and no SSO. The ports are published on `127.0.0.1` only by
+  default. Questions and comments are stored as typed, so a user could store personal
+  details (there is no redaction).
+- **Documents:** Markdown and PDFs with a text layer only; scanned PDFs are rejected (no
+  OCR). PDF headings are found from font sizes and were tested on PDFs rendered from the
+  same Markdown.
+- **Embedding the widget in SharePoint Online** would need an SPFx web part, because
+  modern SharePoint pages don't run script tags added to the page.
+- **Swagger's examples hide null fields** (FastAPI removes them from the OpenAPI
+  document). Every field of a reply is always present; the field descriptions say so.
+- **One machine:** one API process, not load-tested.
+
+## Future work
+
+- **A hosted LLM provider** (AWS Bedrock or Google Gemini) behind the existing provider
+  interface (`policypal/llm/base.py`), for faster answers without a local model.
+- **A GPU through Ollama**, which uses an NVIDIA GPU when Compose gives the container one.
+  Not tried here: the project is CPU-only by design.
+- **A re-ranker or hybrid search** (keyword and vector), to rank look-alike sections
+  better and refuse fewer conversational questions without letting near-topic ones
+  through. Any change like this needs a fresh evaluation.
 - **LLM-as-judge / faithfulness check:** check that every sentence of an answer is
   supported by the excerpt it cites (with a second model or an entailment model), to
   catch invented details like the redundancy example above.
-- A bigger set of questions written by people who didn't build the system, and repeated
-  LLM runs to measure how much the answers vary.
-- Ways to refuse fewer conversational questions without letting near-topic ones through,
-  for example re-ranking the search results, or a threshold rule that counts a false
-  refusal and a false answer differently. Any of these needs a fresh evaluation.
+- **Streaming answers**, so the first words appear while the model is still writing.
+- **Multi-turn conversations:** use earlier questions to understand a follow-up.
+- **Malay support:** a multilingual embedding model, plus Malay policies and test
+  questions.
+- **PII redaction** before questions and comments are stored.
+- **SSO** with roles, instead of the shared admin token.
+- **One admin token shared across the Admin and Analytics pages**, instead of each page
+  asking for it.
+- **Evaluation:** a bigger set of questions written by people who didn't build the
+  system, repeated LLM runs to measure how much answers vary, and a threshold rule that
+  counts a false refusal and a false answer differently.
 
 ## Sample data
 
@@ -535,6 +685,10 @@ make help      # list all commands
 - **CI:** GitHub Actions (`.github/workflows/ci.yml`) runs lint and tests on every
   push and pull request. The tests use a PostgreSQL + pgvector service container.
   `make lint-workflows` checks the workflow files locally with actionlint.
+- **CD:** `.github/workflows/cd.yml` runs when CI finishes on `main`. Only for a passing
+  push run, and only while the repository is public, it builds the exact commit CI
+  tested and publishes it to GHCR (see
+  [Run the published image](#run-the-published-image-no-build)).
 - **Configuration:** every setting is an environment variable, documented in
   `.env.example`. Never commit `.env`.
 - **Tests and the models:** the tests use a fake embedder and a fake LLM that live
@@ -555,6 +709,8 @@ policypal/llm/      prompt, provider interface and the Ollama client
 policypal/ingest/   parsing, chunking, the ingestion pipeline and uploads
 ui/                 Streamlit UI (Chat.py, pages/1_Admin.py, pages/2_Analytics.py). It
                     talks to the API over HTTP only, through ui/api_client.py
+widget/             embeddable chat widget (plain JavaScript) and its demo page, served
+                    by the API at /widget/
 migrations/         Alembic database migrations
 evaluation/         question sets, metrics, the evaluation runner and its results
 data/               fictional sample policies (Markdown + PDF)
@@ -563,6 +719,8 @@ tests/              unit tests (no database) and integration tests (PostgreSQL)
 docker/             container start-up scripts and database init SQL
 Dockerfile          one Python image, used by both the api and ui services
 docker-compose.yml  db (PostgreSQL + pgvector), api, ui, ollama
+.github/workflows/  CI (lint and tests) and CD (publish the image to GHCR)
+docs/screenshots/   screenshots used in this README
 ```
 
 ## Running on Windows (WSL2)
