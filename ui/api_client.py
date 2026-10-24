@@ -85,7 +85,7 @@ class UploadResult(TypedDict):
 
 class IngestResult(TypedDict):
     slug: str
-    status: str
+    status: Literal["created", "updated", "unchanged", "removed", "skipped", "failed"]
     chunks: int
 
 

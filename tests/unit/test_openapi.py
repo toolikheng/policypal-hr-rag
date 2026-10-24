@@ -1,13 +1,18 @@
 """Swagger (/docs) must show a request and response example for every endpoint."""
 
-from typing import Any, get_args
+from typing import Any, get_args, get_origin
 
 import pytest
+from fastapi.routing import APIRoute
+from pydantic import BaseModel
 
+from policypal.api import schemas
+from policypal.api.routes import analytics, ask, documents, feedback, health
 from policypal.ingest.pipeline import IngestStatus
 from tests.helpers import build_test_app
 
-SCHEMA = build_test_app("postgresql+psycopg://user:pw@localhost:1/db").openapi()
+APP = build_test_app("postgresql+psycopg://user:pw@localhost:1/db")
+SCHEMA = APP.openapi()
 OPERATIONS = [
     (method.upper(), path, operation)
     for path, methods in SCHEMA["paths"].items()
@@ -69,3 +74,65 @@ def test_the_reingest_status_description_names_every_status() -> None:
     status = SCHEMA["components"]["schemas"]["IngestResultResponse"]["properties"]["status"]
     for value in get_args(IngestStatus):
         assert value in status["description"], value
+
+
+# Examples are checked where they are written, in Python. Swagger's copy can't be used:
+# FastAPI builds /openapi.json with exclude_none=True, which drops every null value from
+# the examples (e.g. "model": null in a refusal).
+def model_examples(model: type[BaseModel]) -> list[Any]:
+    extra = model.model_config.get("json_schema_extra")
+    return list(extra.get("examples", [])) if isinstance(extra, dict) else []
+
+
+def route_examples(route: APIRoute) -> list[tuple[str, type[BaseModel], Any]]:
+    """The examples a route declares for its successful replies, with the model to check."""
+    found = []
+    for status, response in route.responses.items():
+        model = response.get("model") or (route.response_model if int(status) < 300 else None)
+        media = response.get("content", {}).get("application/json", {})
+        if "example" in media:
+            examples = [media["example"]]
+        else:
+            examples = [example["value"] for example in media.get("examples", {}).values()]
+        if get_origin(model) is list:  # e.g. list[DocumentSummary]: check each item
+            [model] = get_args(model)
+            examples = [item for example in examples for item in example]
+        if model is not None and issubclass(model, BaseModel):
+            found += [(f"{route.path} {status}", model, example) for example in examples]
+    return found
+
+
+# FastAPI keeps included routers nested (privately), so the routes come from each router.
+ROUTERS = [analytics.router, ask.router, documents.router, feedback.router, health.router]
+ROUTES = [route for router in ROUTERS for route in router.routes if isinstance(route, APIRoute)]
+MODELS = [
+    model
+    for model in vars(schemas).values()
+    if isinstance(model, type)
+    and issubclass(model, BaseModel)
+    and model.__module__ == schemas.__name__
+]
+EXAMPLES = [
+    (model.__name__, model, example) for model in MODELS for example in model_examples(model)
+] + [found for route in ROUTES for found in route_examples(route)]
+
+
+@pytest.mark.parametrize(("where", "model", "example"), EXAMPLES, ids=lambda v: str(v)[:40])
+def test_every_example_is_a_valid_body(where: str, model: type[BaseModel], example: Any) -> None:
+    # Round trip: every field is allowed and present, and computed fields (status, refused)
+    # agree with the rest of the example.
+    assert model.model_validate(example).model_dump(mode="json") == example, where
+
+
+@pytest.mark.parametrize("route", ROUTES, ids=lambda route: route.path)
+def test_every_successful_reply_has_a_checked_example(route: APIRoute) -> None:
+    model = route.response_model
+    model = get_args(model)[0] if get_origin(model) is list else model
+
+    assert route_examples(route) or model_examples(model), route.path
+
+
+def test_the_checked_routes_are_every_operation() -> None:
+    routes = {(method, route.path) for route in ROUTES for method in route.methods}
+
+    assert routes == {(method, path) for method, path, _ in OPERATIONS}
