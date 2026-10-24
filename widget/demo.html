@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Binaan Maju intranet (fictional demo)</title>
+  <style>
+    body { margin: 0; font-family: Georgia, serif; background: #f8fafc; color: #1f2937; }
+    .bar { background: #0f766e; color: #fff; padding: 14px 24px; font-family: system-ui, sans-serif; }
+    main { max-width: 720px; margin: 32px auto; padding: 0 16px; line-height: 1.6; }
+    code { background: #e5e7eb; padding: 1px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="bar"><strong>Binaan Maju Sdn Bhd</strong> · Staff intranet (fictional demo page)</div>
+  <main>
+    <h1>Welcome to the HR corner</h1>
+    <p>
+      This page stands in for a company intranet. The <strong>Ask HR policies</strong>
+      button in the bottom-right corner is the PolicyPal widget: one script tag added to
+      this page.
+    </p>
+    <p>
+      Binaan Maju Sdn Bhd and all its policies are <strong>fictional sample data</strong>,
+      not real company policies and not legal advice.
+    </p>
+    <p>
+      To add the widget to a page on another site, include
+      <code>&lt;script src="http://localhost:8000/widget/policypal-widget.js" defer&gt;&lt;/script&gt;</code>
+      and add that site's origin to <code>CORS_ORIGINS</code> in <code>.env</code>.
+    </p>
+  </main>
+  <script src="policypal-widget.js" defer></script>
+</body>
+</html>

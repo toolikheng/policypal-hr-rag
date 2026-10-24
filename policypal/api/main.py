@@ -9,10 +9,12 @@ import time
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import OperationalError
 
 from policypal import __version__
@@ -27,6 +29,8 @@ from policypal.llm.base import LLMProvider
 from policypal.logging_setup import configure_logging, request_id_var
 
 logger = logging.getLogger("policypal.api")
+
+WIDGET_DIR = Path(__file__).resolve().parents[2] / "widget"
 
 # Accept a caller's request ID only if it is short and safe to echo back and log.
 _VALID_REQUEST_ID = re.compile(r"^[A-Za-z0-9-]{1,64}$")
@@ -90,6 +94,8 @@ def create_app(
     app.include_router(documents.router)
     app.include_router(feedback.router)
     app.include_router(analytics.router)
+    # The embeddable chat widget and its demo page (plain files, no build step).
+    app.mount("/widget", StaticFiles(directory=WIDGET_DIR), name="widget")
     return app
 
 

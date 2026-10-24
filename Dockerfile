@@ -33,6 +33,7 @@ COPY migrations/ migrations/
 COPY policypal/ policypal/
 COPY evaluation/ evaluation/
 COPY ui/ ui/
+COPY widget/ widget/
 COPY data/policies/ data/policies/
 COPY docker/api-entrypoint.sh docker/api-entrypoint.sh
 
