@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from policypal.api import schemas
 from policypal.ingest.pipeline import IngestStatus
-from policypal.vocabulary import FallbackReason, LLMErrorReason
+from policypal.vocabulary import FallbackReason, LLMErrorReason, Mode
 from ui import api_client
 from ui.formatting import fallback_label
 
@@ -79,9 +79,23 @@ def test_each_ui_reply_type_has_the_api_response_fields(
             assert values(annotation) == values(api_fields[name]), name
 
 
-def test_the_ui_knows_every_reingest_status() -> None:
-    # The admin page warns about "failed" and "skipped", so it must know the exact values.
-    status = get_type_hints(api_client.IngestResult)["status"]
+# Fields the UI branches on (the answer badge, the re-ingest warning). The table above
+# compares values only where the UI lists them, so these must also be Literals.
+BRANCHED_ON = [
+    (api_client.Answer, "mode", Mode),
+    (api_client.IngestResult, "status", IngestStatus),
+]
 
-    assert get_origin(status) is Literal
-    assert values(status) == values(IngestStatus)
+
+@pytest.mark.parametrize(
+    ("ui_type", "field", "api_values"),
+    BRANCHED_ON,
+    ids=[f"{ui_type.__name__}.{field}" for ui_type, field, _ in BRANCHED_ON],
+)
+def test_the_ui_lists_every_value_of_the_fields_it_branches_on(
+    ui_type: type, field: str, api_values: object
+) -> None:
+    annotation = get_type_hints(ui_type)[field]
+
+    assert get_origin(annotation) is Literal, field
+    assert values(annotation) == values(api_values), field
