@@ -4,11 +4,11 @@ actionlint (make lint-workflows) checks the syntax; these tests pin the rules. W
 publish really works can only be seen on GitHub after a push to main.
 """
 
-from pathlib import Path
-
 import yaml
 
-WORKFLOWS = Path(__file__).resolve().parents[2] / ".github" / "workflows"
+from tests.helpers import REPO_ROOT
+
+WORKFLOWS = REPO_ROOT / ".github" / "workflows"
 CD = yaml.safe_load((WORKFLOWS / "cd.yml").read_text(encoding="utf-8"))
 CI = yaml.safe_load((WORKFLOWS / "ci.yml").read_text(encoding="utf-8"))
 # PyYAML reads the key `on` as the boolean True.

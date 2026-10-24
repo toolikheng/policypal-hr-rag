@@ -5,6 +5,7 @@ from pydantic import ValidationError
 
 from evaluation.run_eval import RESULTS_DIR, load_thresholds
 from policypal.config import Settings
+from tests.helpers import ENV_EXAMPLE
 
 # tests/conftest.py removes every setting from the environment before each test.
 
@@ -113,8 +114,7 @@ def test_min_similarity_default_is_the_dev_set_calibration(monkeypatch: pytest.M
     calibrated = load_thresholds(RESULTS_DIR / "dev-calibration.json")["on"]
 
     assert Settings(_env_file=None).min_similarity == calibrated
-    env_example = (Path(__file__).parents[2] / ".env.example").read_text(encoding="utf-8")
-    assert f"\nMIN_SIMILARITY={calibrated:g}\n" in env_example
+    assert f"\nMIN_SIMILARITY={calibrated:g}\n" in ENV_EXAMPLE.read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize("value", ["-0.1", "1.5", "high"])
@@ -200,9 +200,6 @@ def test_a_cors_origin_must_be_a_scheme_and_host_only(
 
     with pytest.raises(ValidationError, match="cors_origins"):
         Settings(_env_file=None)
-
-
-ENV_EXAMPLE = Path(__file__).parents[2] / ".env.example"
 
 
 def test_env_example_documents_every_setting() -> None:

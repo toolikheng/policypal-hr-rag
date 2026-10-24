@@ -1,7 +1,6 @@
 """How the app is put together: startup checks, the LLM choice and unexpected errors."""
 
 import json
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -11,10 +10,7 @@ from policypal.llm import LLMInfo, build_llm, describe_llm
 from policypal.llm.ollama import OllamaProvider
 from policypal.logging_setup import JsonFormatter
 from tests.fakes import FakeEmbedder, FakeLLM
-from tests.helpers import build_test_app, make_settings
-
-# Nothing listens on port 1; these tests never touch the database.
-NO_DATABASE = "postgresql+psycopg://user:pw@localhost:1/db"
+from tests.helpers import ENV_EXAMPLE, NO_DATABASE, build_test_app, make_settings
 
 
 def test_ollama_provider_is_built_from_settings() -> None:
@@ -107,6 +103,6 @@ def test_no_warning_for_an_own_token_or_admin_switched_off(
 
 
 def test_the_placeholder_is_the_token_in_env_example() -> None:
-    env_example = (Path(__file__).parents[2] / ".env.example").read_text(encoding="utf-8")
+    env_example = ENV_EXAMPLE.read_text(encoding="utf-8")
 
     assert f"\nADMIN_TOKEN={PLACEHOLDER_ADMIN_TOKEN}\n" in env_example

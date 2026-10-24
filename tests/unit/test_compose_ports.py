@@ -5,15 +5,12 @@ open the API and the UI to the network on purpose; the database and Ollama stay 
 whatever it says (Ollama has no authentication; the database has a demo password).
 """
 
-from pathlib import Path
-
 import pytest
 import yaml
 
-COMPOSE = yaml.safe_load(
-    (Path(__file__).resolve().parents[2] / "docker-compose.yml").read_text(encoding="utf-8")
-)
-ENV_EXAMPLE = (Path(__file__).resolve().parents[2] / ".env.example").read_text(encoding="utf-8")
+from tests.helpers import ENV_EXAMPLE, REPO_ROOT
+
+COMPOSE = yaml.safe_load((REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8"))
 
 
 def published(service: str) -> list[str]:
@@ -42,4 +39,4 @@ def test_every_published_port_names_an_interface() -> None:
 
 
 def test_env_example_keeps_api_and_ui_local() -> None:
-    assert "\nBIND_ADDRESS=127.0.0.1\n" in ENV_EXAMPLE
+    assert "\nBIND_ADDRESS=127.0.0.1\n" in ENV_EXAMPLE.read_text(encoding="utf-8")

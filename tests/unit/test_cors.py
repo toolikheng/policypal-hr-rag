@@ -6,10 +6,8 @@ embedding the widget in a page on another site.
 
 from fastapi.testclient import TestClient
 
-from tests.helpers import build_test_app
+from tests.helpers import NO_DATABASE, build_test_app
 
-# Nothing listens on port 1; these tests never touch the database.
-NO_DATABASE = "postgresql+psycopg://user:pw@localhost:1/db"
 ALLOWED = "http://localhost:8080"
 OTHER = "https://elsewhere.example"
 

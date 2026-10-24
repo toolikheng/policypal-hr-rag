@@ -5,16 +5,13 @@ and guard the rules that keep it safe and countable.
 """
 
 import re
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.helpers import build_test_app
+from policypal.api.main import WIDGET_DIR
+from tests.helpers import NO_DATABASE, build_test_app
 
-# Nothing listens on port 1; these tests never touch the database.
-NO_DATABASE = "postgresql+psycopg://user:pw@localhost:1/db"
-WIDGET_DIR = Path(__file__).resolve().parents[2] / "widget"
 SCRIPT = (WIDGET_DIR / "policypal-widget.js").read_text(encoding="utf-8")
 
 

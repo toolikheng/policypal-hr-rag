@@ -1,6 +1,7 @@
 """Small helpers shared by tests (fixtures live in conftest.py)."""
 
 from collections.abc import Collection, Sequence
+from pathlib import Path
 from typing import Any
 
 from alembic.config import Config
@@ -14,6 +15,11 @@ from policypal.llm.base import REFUSAL_SENTENCE, LLMProvider
 from policypal.retrieval import RetrievedChunk
 from policypal.vocabulary import FallbackReason, Mode
 from tests.fakes import FakeEmbedder, FakeLLM
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+ENV_EXAMPLE = REPO_ROOT / ".env.example"
+# A database URL nothing listens on (port 1), for tests that never touch the database.
+NO_DATABASE = "postgresql+psycopg://user:pw@localhost:1/db"
 
 
 def alembic_config(database_url: str) -> Config:

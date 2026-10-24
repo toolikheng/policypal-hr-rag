@@ -1,15 +1,14 @@
 """The Streamlit admin page, run headless with AppTest and a fake API client."""
 
-from pathlib import Path
-
 import pytest
 from streamlit.testing.v1 import AppTest
 
 from tests.fakes import FakeApiClient
+from tests.helpers import REPO_ROOT
 from ui import api_client
 from ui.api_client import ApiError
 
-ADMIN_PAGE = Path(__file__).resolve().parents[2] / "ui" / "pages" / "1_Admin.py"
+ADMIN_PAGE = REPO_ROOT / "ui" / "pages" / "1_Admin.py"
 
 DOCUMENTS = {
     3: {"id": 3, "slug": "leave-policy", "title": "Leave Policy", "file_type": "md",

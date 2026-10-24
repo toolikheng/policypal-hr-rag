@@ -9,9 +9,9 @@ from pydantic import BaseModel
 from policypal.api import schemas
 from policypal.api.routes import analytics, ask, documents, feedback, health
 from policypal.ingest.pipeline import IngestStatus
-from tests.helpers import build_test_app
+from tests.helpers import NO_DATABASE, build_test_app
 
-APP = build_test_app("postgresql+psycopg://user:pw@localhost:1/db")
+APP = build_test_app(NO_DATABASE)
 SCHEMA = APP.openapi()
 OPERATIONS = [
     (method.upper(), path, operation)

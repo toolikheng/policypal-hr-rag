@@ -8,7 +8,9 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parents[2] / "docker" / "ollama-entrypoint.sh"
+from tests.helpers import REPO_ROOT
+
+SCRIPT = REPO_ROOT / "docker" / "ollama-entrypoint.sh"
 
 # Records each call. `serve` fails or runs until stopped; `show` succeeds only if the
 # model is "downloaded".

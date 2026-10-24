@@ -1,15 +1,14 @@
 """The Streamlit chat page, run headless with AppTest and a fake API client."""
 
-from pathlib import Path
-
 import pytest
 from streamlit.testing.v1 import AppTest
 
 from tests.fakes import FakeApiClient
+from tests.helpers import REPO_ROOT
 from ui import api_client
 from ui.api_client import ApiError
 
-CHAT_PAGE = Path(__file__).resolve().parents[2] / "ui" / "Chat.py"
+CHAT_PAGE = REPO_ROOT / "ui" / "Chat.py"
 
 LEAVE_TEXT = "| Years | E grades |\n|---|---|\n| 2 to 5 | 16 days |"
 ANSWER = {
