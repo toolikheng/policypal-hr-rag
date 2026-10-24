@@ -1,0 +1,65 @@
+# Continuous delivery: after CI passes on a push to main, build the Docker image and
+# publish it to GitHub Container Registry (ghcr.io), tagged with the commit SHA and
+# "latest". Nothing is deployed anywhere; the image is only published.
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+# GITHUB_TOKEN may read the code and publish packages, nothing else. No other secrets.
+permissions:
+  contents: read
+  packages: write
+
+# One publish at a time, so "latest" always ends up on the newest tested commit.
+concurrency:
+  group: cd-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Only for a CI run that passed on a push (never a pull request), and only while the
+    # repository is public (GHCR storage is free for public packages).
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      !github.event.repository.private
+    runs-on: ubuntu-24.04
+    steps:
+      # The exact commit CI tested, not whatever main points to now.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Image name (GHCR needs lower case)
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/policypal" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v4.4.1
+
+      - uses: docker/login-action@v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The same Dockerfile as a local build: CPU-only torch, the embedding model and the
+      # sample policies baked in; never .env (the Dockerfile copies explicit paths).
+      - uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}
+            ${{ steps.image.outputs.name }}:latest
+          labels: |
+            org.opencontainers.image.title=PolicyPal
+            org.opencontainers.image.description=HR policy assistant (RAG) on fictional sample policies
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
+          # Reuse unchanged layers (dependencies, the model) between runs: free Actions cache.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
