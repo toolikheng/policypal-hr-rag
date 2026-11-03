@@ -28,6 +28,27 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
 - **Runs on a laptop:** Docker Compose, no paid API keys, no GPU. CI tests every push; CD
   publishes a ready-made Docker image.
 
+## Contents
+
+- [Architecture](#architecture)
+- [Screenshots](#screenshots)
+- [Using the UI](#using-the-ui)
+- [Chat widget](#chat-widget)
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Run the published image (no build)](#run-the-published-image-no-build)
+- [Asking questions](#asking-questions)
+- [Managing policies (admin)](#managing-policies-admin)
+- [Question history and analytics](#question-history-and-analytics)
+- [Evaluation](#evaluation)
+- [Limitations](#limitations)
+- [Future work](#future-work)
+- [Sample data](#sample-data)
+- [How ingestion works](#how-ingestion-works)
+- [Development](#development)
+- [Project layout](#project-layout)
+- [Running on Windows (WSL2)](#running-on-windows-wsl2)
+
 ## Architecture
 
 ```mermaid
