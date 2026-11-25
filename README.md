@@ -25,8 +25,8 @@ embedding model, PostgreSQL + pgvector, and a local LLM through Ollama.
   and fallbacks.
 - **Measured:** fixed question sets and a repeatable evaluation for search, refusals,
   answers and speed (see [Evaluation](#evaluation)).
-- **Runs on a laptop:** Docker Compose, no paid API keys, no GPU. CI tests every push; CD
-  publishes a ready-made Docker image.
+- **Runs on a laptop:** Docker Compose, no paid API keys, no GPU. CI tests and scans every
+  push; CD publishes a ready-made Docker image, only if its vulnerability scan passes.
 
 ## Contents
 
@@ -695,6 +695,7 @@ make lint      # Ruff (lint) + Black (format check)
 make format    # auto-fix lint issues and reformat
 make ingest    # load the sample policies again (inside the running api container)
 make pdfs      # re-render the sample policy PDFs from their Markdown
+make image-scan  # build the image and scan it for vulnerabilities (as CI does)
 make help      # list all commands
 ```
 
@@ -703,13 +704,23 @@ make help      # list all commands
   running, the database tests are skipped with a clear message (`pytest -ra` shows why).
   In CI they fail instead.
 - **Code style:** the pre-commit hook runs Ruff and Black on every commit.
-- **CI:** GitHub Actions (`.github/workflows/ci.yml`) runs lint and tests on every
-  push and pull request. The tests use a PostgreSQL + pgvector service container.
+- **CI:** GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests and an image scan
+  on every push and pull request. The tests use a PostgreSQL + pgvector service container.
   `make lint-workflows` checks the workflow files locally with actionlint.
+- **Image scan:** `scripts/scan-image.sh` runs [Trivy](https://trivy.dev) 0.75.0 (pinned
+  by digest) on the built image and fails on any HIGH or CRITICAL vulnerability that has
+  a fix (`--ignore-unfixed`), in Debian packages or Python packages. CI, CD and
+  `make image-scan` all use this script.
+- **Fresh OS fixes:** the Dockerfile has three stages. `deps` (Python packages and the
+  embedding model) comes from the build cache; `runtime` runs `apt-get upgrade` and is
+  always built without the cache (`--no-cache-filter runtime`), so each build gets the
+  Debian security fixes released since the base image.
 - **CD:** `.github/workflows/cd.yml` runs when CI finishes on `main`. Only for a passing
   push run, and only while the repository is public, it builds the exact commit CI
-  tested and publishes it to GHCR (see
+  tested once, scans it, and pushes that same image to GHCR (see
   [Run the published image](#run-the-published-image-no-build)).
+  `scripts/push-image.sh` refuses a tag that isn't the scanned image and checks that the
+  registry serves the digest that was pushed.
 - **Configuration:** every setting is an environment variable, documented in
   `.env.example`. Never commit `.env`.
 - **Tests and the models:** the tests use a fake embedder and a fake LLM that live
@@ -735,12 +746,12 @@ widget/             embeddable chat widget (plain JavaScript) and its demo page,
 migrations/         Alembic database migrations
 evaluation/         question sets, metrics, the evaluation runner and its results
 data/               fictional sample policies (Markdown + PDF)
-scripts/            developer scripts (PDF rendering)
+scripts/            developer scripts (PDF rendering, image scan, push of the scanned image)
 tests/              unit tests (no database) and integration tests (PostgreSQL)
 docker/             container start-up scripts and database init SQL
-Dockerfile          one Python image, used by both the api and ui services
+Dockerfile          one Python image (deps + runtime stages), used by both api and ui
 docker-compose.yml  db (PostgreSQL + pgvector), api, ui, ollama
-.github/workflows/  CI (lint and tests) and CD (publish the image to GHCR)
+.github/workflows/  CI (lint, tests, image scan) and CD (scan, then publish to GHCR)
 docs/screenshots/   screenshots used in this README
 ```
 

@@ -55,3 +55,22 @@ jobs:
           cache-dependency-path: requirements*.txt
       - run: pip install -r requirements-dev.txt
       - run: pytest
+
+  # Build the Docker image the way CD does and fail on HIGH/CRITICAL vulnerabilities
+  # that have a fix, so they are caught on a branch, before they reach main.
+  image-scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4.4.1
+      - uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          load: true
+          tags: policypal:ci
+          # Dependencies and the model come from the cache; the runtime stage (with its
+          # apt-get upgrade) is always rebuilt, as in CD.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          no-cache-filters: runtime
+      - run: sh scripts/scan-image.sh policypal:ci
