@@ -18,7 +18,7 @@ httpx==0.28.1
 # FastAPI needs it to read file uploads (multipart form data).
 python-multipart==0.0.32
 streamlit==1.66.1
-pypdf==6.19.0
+pypdf==6.21.4
 sentence-transformers==6.1.0
 # Pinned explicitly because sentence-transformers relies heavily on it.
 transformers==5.18.0
