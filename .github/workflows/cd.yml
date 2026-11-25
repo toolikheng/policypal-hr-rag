@@ -49,10 +49,11 @@ jobs:
 
       # The same Dockerfile as a local build: CPU-only torch, the embedding model and the
       # sample policies baked in; never .env (the Dockerfile copies explicit paths).
+      # Built once and loaded into Docker, not pushed: only the scanned image is pushed.
       - uses: docker/build-push-action@v7.4.0
         with:
           context: .
-          push: true
+          load: true
           tags: |
             ${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}
             ${{ steps.image.outputs.name }}:latest
@@ -66,3 +67,19 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           no-cache-filters: runtime
+
+      # Docker's own ID for the image just loaded. The scan and the push both use it.
+      - name: Image ID
+        id: local-image
+        run: echo "id=$(docker image inspect --format '{{.Id}}' "${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}")" >> "$GITHUB_OUTPUT"
+
+      # Same gate as CI: fail on HIGH/CRITICAL vulnerabilities that have a fix.
+      - name: Scan the image (Trivy)
+        run: sh scripts/scan-image.sh ${{ steps.local-image.outputs.id }}
+
+      # Push the scanned image itself (no second build) and check the registry has it.
+      - name: Push the scanned image
+        run: >-
+          sh scripts/push-image.sh ${{ steps.local-image.outputs.id }}
+          ${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}
+          ${{ steps.image.outputs.name }}:latest

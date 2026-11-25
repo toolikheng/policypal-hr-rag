@@ -41,7 +41,8 @@ def test_the_image_is_tagged_with_the_commit_sha_and_latest() -> None:
     build = STEPS["docker/build-push-action"]["with"]
     tags = build["tags"].splitlines()
 
-    assert build["push"] is True
+    # Not pushed by the build: scripts/push-image.sh pushes the scanned image (test_image_scan).
+    assert build.get("push", False) is False
     assert tags == [
         "${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}",
         "${{ steps.image.outputs.name }}:latest",

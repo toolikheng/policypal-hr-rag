@@ -2,7 +2,7 @@
 VENV := .venv
 BIN := $(VENV)/bin
 
-.PHONY: help setup up down logs db-up test lint format lint-workflows migrate ingest pdfs \
+.PHONY: help setup up down logs db-up test lint format lint-workflows image-scan migrate ingest pdfs \
 	eval-calibrate eval eval-llm eval-held-out
 
 # The evaluation runs in a one-off container from the api image (it has the embedding
@@ -52,6 +52,10 @@ format: ## Fix lint issues Ruff can fix and reformat code with Black
 
 lint-workflows: ## Check GitHub Actions workflow files with actionlint (runs in Docker)
 	docker run --rm -v "$(CURDIR)":/repo -w /repo rhysd/actionlint:1.7.12 -color
+
+image-scan: ## Build the image (runtime stage uncached, as in CI) and fail on fixable HIGH/CRITICAL vulnerabilities
+	docker build --no-cache-filter runtime -t policypal:scan .
+	sh scripts/scan-image.sh policypal:scan
 
 migrate: ## Apply database migrations inside the running api container
 	docker compose exec api alembic upgrade head
