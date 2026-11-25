@@ -62,5 +62,7 @@ jobs:
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
           # Reuse unchanged layers (dependencies, the model) between runs: free Actions cache.
+          # The runtime stage is always rebuilt, so its apt-get upgrade gets today's fixes.
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          no-cache-filters: runtime
